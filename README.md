@@ -263,17 +263,24 @@ Once your project is created:
 - **[Registry Directory](https://registry.directory/)** - Central hub for discovering shadcn components and libraries
 
 **Premium Component Libraries:**
+- **[Intent UI](https://intentui.com/)** - Professional component library with comprehensive design system
+  - [Design System](https://design.intentui.com/) - Intent UI's design guidelines and patterns
+- **[RE UI](https://reui.io/)** - Refined components and patterns for modern applications
+- **[Tailark](https://tailark.com/)** - Marketing-focused blocks (hero, pricing, testimonials, CTAs) with 100+ variants
+- **[shadcnblocks](https://www.shadcnblocks.com/)** - 959+ premium blocks with Tailwind 4 support
+- **[Coss UI](https://coss.com/ui/)** - Modern UI library based on Cal.com's design, built on Base UI
 - **[Origin UI](https://originui.com/)** - Beautiful, production-ready components
 - **[Tweak CN](https://tweakcn.com/)** - Enhanced shadcn components with extra features
 - **[Kibo UI](https://kibo-ui.com/)** - Modern component collection
-- **[RE UI](https://reui.io/)** - Refined components and patterns
 - **[Animate UI](https://animate-ui.com/)** - Animation-focused components built on shadcn
-- **[Intent UI](https://intentui.com/)** - Professional component library
-  - [Design System](https://design.intentui.com/) - Intent UI's design guidelines
 
 **When to use:**
-- Start with base shadcn/ui
-- Explore these libraries for specialized components or enhanced variants
+- Start with base shadcn/ui for core components
+- Use Intent UI or RE UI for polished, production-ready component variants
+- Use Tailark or shadcnblocks for marketing pages and landing pages
+- Use Coss UI for calendar/scheduling-heavy applications or Cal.com-inspired designs
+- Use Origin UI, Tweak CN, Kibo UI for general component enhancements
+- Use Animate UI for animation-rich interfaces
 - Mix and match components as needed
 
 ---
@@ -449,12 +456,15 @@ Hono
 - [shadcn/ui](https://ui.shadcn.com)
 - [Tailwind CSS](https://tailwindcss.com)
 - [Registry Directory](https://registry.directory/) - Discover shadcn components
+- [Intent UI](https://intentui.com/) & [Design System](https://design.intentui.com/)
+- [RE UI](https://reui.io/)
+- [Tailark](https://tailark.com/) - Marketing blocks
+- [shadcnblocks](https://www.shadcnblocks.com/) - Premium blocks collection
+- [Coss UI](https://coss.com/ui/) - Cal.com-inspired components
 - [Origin UI](https://originui.com/)
 - [Tweak CN](https://tweakcn.com/)
 - [Kibo UI](https://kibo-ui.com/)
-- [RE UI](https://reui.io/)
 - [Animate UI](https://animate-ui.com/)
-- [Intent UI](https://intentui.com/) & [Design System](https://design.intentui.com/)
 - [AI SDK Elements](https://ai-sdk.dev/elements/overview)
 
 ---
