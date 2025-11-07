@@ -19,6 +19,44 @@ This stack prioritizes:
 
 ---
 
+## 📑 Table of Contents
+
+- [Getting Started](#-getting-started)
+- [Infrastructure & Deployment](#-infrastructure--deployment)
+- [Application Framework](#-application-framework)
+- [API Development](#-api-development)
+- [Authentication & Authorization](#-authentication--authorization)
+- [File Management](#-file-management)
+- [Styling & UI](#-styling--ui)
+- [TanStack Ecosystem](#-tanstack-ecosystem)
+- [Monorepo & Build Tools](#-monorepo--build-tools)
+- [Payments & Subscriptions](#-payments--subscriptions)
+- [Documentation](#-documentation)
+- [AI Integration](#-ai-integration)
+- [Decision Tree](#-decision-tree)
+- [Quick Start Templates](#-quick-start-templates)
+- [Resources](#-resources)
+
+---
+
+## 🎯 Getting Started
+
+**New to the Fenod Stack?** Start here:
+
+📖 **[Development Strategy Guide](docs/development-strategy.md)** - Learn our UI-first workflow with complete code examples. This guide walks you through building applications from initial UI mockups to production deployment, with practical examples for every phase.
+
+**Key topics covered:**
+- UI-first development workflow (validate ideas with dummy data first)
+- shadcn/ui component setup and usage
+- TanStack Start routing and data loading
+- Database schema design from UI requirements
+- Type-safe API implementation with Hono + ORPC
+- Authentication with Better Auth
+- MCP/AI SDK integration patterns
+- Production deployment checklist
+
+---
+
 ## 🏗️ Infrastructure & Deployment
 
 ### Cloudflare ☁️
@@ -322,4 +360,4 @@ Hono
 
 ---
 
-**Last Updated:** October 2025
+**Last Updated:** November 2025
