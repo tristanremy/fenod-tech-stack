@@ -19,6 +19,131 @@ This stack prioritizes:
 
 ---
 
+## 📑 Table of Contents
+
+- [Getting Started](#-getting-started)
+- [Quick Start](#-quick-start)
+- [Infrastructure & Deployment](#-infrastructure--deployment)
+- [Application Framework](#-application-framework)
+- [API Development](#-api-development)
+- [Authentication & Authorization](#-authentication--authorization)
+- [File Management](#-file-management)
+- [Styling & UI](#-styling--ui)
+- [TanStack Ecosystem](#-tanstack-ecosystem)
+- [Monorepo & Build Tools](#-monorepo--build-tools)
+- [Payments & Subscriptions](#-payments--subscriptions)
+- [Documentation](#-documentation)
+- [AI Integration](#-ai-integration)
+- [Decision Tree](#-decision-tree)
+- [Quick Start Templates](#-quick-start-templates)
+- [Resources](#-resources)
+
+---
+
+## 🎯 Getting Started
+
+**New to the Fenod Stack?** Start here:
+
+📖 **[Development Strategy Guide](docs/development-strategy.md)** - Learn our UI-first workflow with complete code examples. This guide walks you through building applications from initial UI mockups to production deployment, with practical examples for every phase.
+
+**Key topics covered:**
+- UI-first development workflow (validate ideas with dummy data first)
+- shadcn/ui component setup and usage
+- TanStack Start routing and data loading
+- Database schema design from UI requirements
+- Type-safe API implementation with Hono + ORPC
+- Authentication with Better Auth
+- MCP/AI SDK integration patterns
+- Production deployment checklist
+
+---
+
+## 🚀 Quick Start
+
+### Bootstrap a New Project
+
+The fastest way to start a Fenod Stack project is with **[create-better-t-stack](https://github.com/AmanVarshney01/create-better-t-stack)** - an interactive CLI that scaffolds projects with the exact technologies you need.
+
+```bash
+# Using bun (recommended)
+bun create better-t-stack@latest
+
+# Or npm
+npx create-better-t-stack@latest
+
+# Or pnpm
+pnpm create better-t-stack@latest
+```
+
+**Visual Builder**: Visit [better-t-stack.dev/new](https://better-t-stack.dev/new) to visually configure your stack and generate the command.
+
+### Recommended Configurations
+
+Choose based on your project type:
+
+#### 1. **Full-Stack Application** (SaaS, Dashboard, Web App)
+```bash
+# Interactive selections:
+Frontend: React + TanStack Start
+Backend: Hono
+API: ORPC
+Database: SQLite (Cloudflare D1) or PostgreSQL
+ORM: Drizzle
+Auth: Better Auth
+Styling: Tailwind CSS + shadcn/ui
+Add-ons: Turborepo (if multi-package)
+```
+
+**What you get**: Type-safe full-stack app ready for Cloudflare Workers deployment
+
+#### 2. **Content Site with Interactivity** (Marketing, Blog, Docs)
+```bash
+# Interactive selections:
+Frontend: React + TanStack Start
+Backend: Hono (optional, for dynamic features)
+Styling: Tailwind CSS + shadcn/ui
+Add-ons: Starlight (if building documentation)
+```
+
+**What you get**: Fast static site with interactive components, ready for Cloudflare Pages
+
+#### 3. **API Service** (Microservice, Backend Only)
+```bash
+# Interactive selections:
+Frontend: None
+Backend: Hono
+API: ORPC
+Database: SQLite (D1) or PostgreSQL
+ORM: Drizzle
+Auth: Better Auth (if needed)
+```
+
+**What you get**: Standalone API service ready for Cloudflare Workers
+
+#### 4. **Monorepo with Multiple Apps**
+```bash
+# Interactive selections:
+Frontend: React + TanStack Start
+Backend: Hono
+API: ORPC
+Database: SQLite or PostgreSQL
+ORM: Drizzle
+Auth: Better Auth
+Add-ons: Turborepo ✓
+```
+
+**What you get**: Monorepo structure with shared packages (UI components, utilities, types)
+
+### After Bootstrapping
+
+Once your project is created:
+
+1. **Follow the UI-first workflow**: See [Development Strategy Guide](docs/development-strategy.md)
+2. **Configure Cloudflare**: Set up D1, R2, and other services as needed
+3. **Setup deployment**: Use [Alchemy](https://alchemy.run) for streamlined Cloudflare deployments
+
+---
+
 ## 🏗️ Infrastructure & Deployment
 
 ### Cloudflare ☁️
@@ -138,17 +263,24 @@ This stack prioritizes:
 - **[Registry Directory](https://registry.directory/)** - Central hub for discovering shadcn components and libraries
 
 **Premium Component Libraries:**
+- **[Intent UI](https://intentui.com/)** - Professional component library with comprehensive design system
+  - [Design System](https://design.intentui.com/) - Intent UI's design guidelines and patterns
+- **[RE UI](https://reui.io/)** - Refined components and patterns for modern applications
+- **[Tailark](https://tailark.com/)** - Marketing-focused blocks (hero, pricing, testimonials, CTAs) with 100+ variants
+- **[shadcnblocks](https://www.shadcnblocks.com/)** - 959+ premium blocks with Tailwind 4 support
+- **[Coss UI](https://coss.com/ui/)** - Modern UI library based on Cal.com's design, built on Base UI
 - **[Origin UI](https://originui.com/)** - Beautiful, production-ready components
 - **[Tweak CN](https://tweakcn.com/)** - Enhanced shadcn components with extra features
 - **[Kibo UI](https://kibo-ui.com/)** - Modern component collection
-- **[RE UI](https://reui.io/)** - Refined components and patterns
 - **[Animate UI](https://animate-ui.com/)** - Animation-focused components built on shadcn
-- **[Intent UI](https://intentui.com/)** - Professional component library
-  - [Design System](https://design.intentui.com/) - Intent UI's design guidelines
 
 **When to use:**
-- Start with base shadcn/ui
-- Explore these libraries for specialized components or enhanced variants
+- Start with base shadcn/ui for core components
+- Use Intent UI or RE UI for polished, production-ready component variants
+- Use Tailark or shadcnblocks for marketing pages and landing pages
+- Use Coss UI for calendar/scheduling-heavy applications or Cal.com-inspired designs
+- Use Origin UI, Tweak CN, Kibo UI for general component enhancements
+- Use Animate UI for animation-rich interfaces
 - Mix and match components as needed
 
 ---
@@ -189,12 +321,19 @@ Leverage the full TanStack suite:
 - Fast, incremental builds
 - Remote caching
 - Perfect for multi-package projects
+- Pipeline orchestration
 
 **When to use:** Projects with multiple apps/packages
 
 ### Ultracite
-**Additional tooling**
-- [Context: Include specific use cases if known]
+**Zero-configuration linter & formatter**
+- Built on Biome (Rust-based, extremely fast)
+- Replaces ESLint + Prettier + Husky
+- AI-ready (works with Claude Code, Cursor, Copilot)
+- Unified configuration across monorepo packages
+- Subsecond code analysis
+
+**When to use:** Any project, especially monorepos. Simplifies code quality tooling to a single dependency.
 
 ---
 
@@ -305,21 +444,29 @@ Hono
 - [Better Upload](https://better-upload.dev)
 - [Cloudflare Developers](https://developers.cloudflare.com)
 - [Turborepo](https://turbo.build)
+- [Ultracite](https://github.com/haydenbleasel/ultracite)
 - [Polar.sh](https://polar.sh)
 - [AI SDK](https://sdk.vercel.ai)
+
+### Tools & CLI
+- [create-better-t-stack](https://github.com/AmanVarshney01/create-better-t-stack) - Project bootstrapping CLI
+- [better-t-stack.dev/new](https://better-t-stack.dev/new) - Visual stack builder
 
 ### UI & Components
 - [shadcn/ui](https://ui.shadcn.com)
 - [Tailwind CSS](https://tailwindcss.com)
 - [Registry Directory](https://registry.directory/) - Discover shadcn components
+- [Intent UI](https://intentui.com/) & [Design System](https://design.intentui.com/)
+- [RE UI](https://reui.io/)
+- [Tailark](https://tailark.com/) - Marketing blocks
+- [shadcnblocks](https://www.shadcnblocks.com/) - Premium blocks collection
+- [Coss UI](https://coss.com/ui/) - Cal.com-inspired components
 - [Origin UI](https://originui.com/)
 - [Tweak CN](https://tweakcn.com/)
 - [Kibo UI](https://kibo-ui.com/)
-- [RE UI](https://reui.io/)
 - [Animate UI](https://animate-ui.com/)
-- [Intent UI](https://intentui.com/) & [Design System](https://design.intentui.com/)
 - [AI SDK Elements](https://ai-sdk.dev/elements/overview)
 
 ---
 
-**Last Updated:** October 2025
+**Last Updated:** November 2025
