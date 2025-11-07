@@ -44,23 +44,45 @@ Phase 9: Polish & Optimization (ongoing)
 
 ### 1.1 Initialize Project
 
-```bash
-# Create TanStack Start project
-npm create @tanstack/start@latest my-app
-cd my-app
-npm install
+Use **[create-better-t-stack](https://github.com/AmanVarshney01/create-better-t-stack)** to bootstrap your project with all the right dependencies:
 
-# Add dependencies
-npm install @tanstack/react-router
-npm install -D tailwindcss@next @tailwindcss/vite@next
-npm install class-variance-authority clsx tailwind-merge
+```bash
+# Using bun (recommended for speed)
+bun create better-t-stack@latest my-app
+
+# Or npm
+npx create-better-t-stack@latest my-app
+
+# Or pnpm
+pnpm create better-t-stack@latest my-app
+```
+
+**Interactive selections:**
+- Frontend: `React + TanStack Start`
+- Backend: `Hono`
+- API: `ORPC`
+- Database: `SQLite` (for D1) or `PostgreSQL`
+- ORM: `Drizzle`
+- Auth: `Better Auth` (select Yes)
+- Styling: `Tailwind CSS` (+ shadcn/ui will be added in Phase 2)
+- Add-ons: `Ultracite` (for linting/formatting)
+
+**Alternative - Visual Builder**: Visit [better-t-stack.dev/new](https://better-t-stack.dev/new) to configure visually.
+
+```bash
+# Navigate to project
+cd my-app
+
+# Install additional dependencies for icons
 npm install lucide-react
 ```
 
-### 1.2 Setup Tailwind CSS v4
+### 1.2 Verify Tailwind CSS v4 Setup
+
+> **Note**: If you selected Tailwind CSS during `create-better-t-stack` setup, this should already be configured. Verify and customize as needed.
 
 ```js
-// vite.config.ts
+// vite.config.ts (should already exist)
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -787,9 +809,12 @@ export function ErrorMessage({ title, message }: { title?: string; message: stri
 
 **Goal**: Design database schema based on UI requirements discovered in Phase 3-4.
 
-### 5.1 Install Drizzle
+### 5.1 Verify Drizzle Installation
+
+> **Note**: If you selected Drizzle during `create-better-t-stack` setup, these dependencies should already be installed. Verify your `package.json`.
 
 ```bash
+# Only run if Drizzle is not already installed
 npm install drizzle-orm
 npm install -D drizzle-kit
 npm install @cloudflare/workers-types
@@ -884,9 +909,12 @@ npx wrangler d1 execute fenod-db --remote --file=./db/migrations/0000_initial.sq
 
 **Goal**: Build type-safe APIs with Hono + ORPC + Drizzle.
 
-### 6.1 Setup API Structure
+### 6.1 Verify API Dependencies
+
+> **Note**: If you selected Hono and ORPC during `create-better-t-stack` setup, these should already be installed and have basic structure scaffolded.
 
 ```bash
+# Only run if not already installed
 npm install hono @orpc/server @orpc/client
 ```
 
@@ -1213,9 +1241,12 @@ function NewCustomer() {
 
 **Goal**: Add Better Auth for user management.
 
-### 8.1 Setup Better Auth
+### 8.1 Verify Better Auth Installation
+
+> **Note**: If you selected Better Auth during `create-better-t-stack` setup, it should already be installed with basic configuration. Review and customize as needed.
 
 ```bash
+# Only run if Better Auth is not already installed
 npm install better-auth
 ```
 
