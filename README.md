@@ -48,6 +48,12 @@ This stack prioritizes:
 - [Quick Start Templates](#-quick-start-templates)
 - [Resources](#-resources)
 
+### Governance
+- [Contributing & Governance](#-contributing--governance)
+- [Version Matrix](docs/versions.md)
+- [Stack Changelog](STACK_CHANGELOG.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
+
 ---
 
 ## 🎯 Getting Started
@@ -499,6 +505,51 @@ Hono
 - [Kibo UI](https://kibo-ui.com/)
 - [Animate UI](https://animate-ui.com/)
 - [AI SDK Elements](https://ai-sdk.dev/elements/overview)
+
+---
+
+## 🤝 Contributing & Governance
+
+### How to Contribute
+
+We welcome contributions to improve the Fenod Stack!
+
+- **Documentation Improvements**: Submit a PR for typos, clarifications, or examples
+- **Technology Proposals**: Follow our [RFC process](CONTRIBUTING.md#proposing-new-technologies)
+- **Bug Reports**: Open an issue with details
+- **Questions**: Start a GitHub Discussion
+
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for detailed guidelines.
+
+### Stack Governance
+
+- **[Version Matrix](docs/versions.md)** - Recommended versions and compatibility
+- **[Stack Changelog](STACK_CHANGELOG.md)** - Track all major decisions and changes
+- **[Architecture Decisions](docs/decisions/)** - Understand why we chose each technology
+
+### Proposing Changes
+
+Want to add or change a technology?
+
+1. **Read** [Contributing Guidelines](CONTRIBUTING.md)
+2. **Create** a proposal in GitHub Discussions
+3. **Wait** for community and technical review
+4. **Implement** if approved (create ADR, update docs)
+
+**Evaluation Criteria:**
+- Alignment with stack principles (40%)
+- Maturity & stability (25%)
+- Practical benefits (20%)
+- Integration complexity (15%)
+
+**Minimum score: 70%** to be considered
+
+### Stay Updated
+
+- **Review Schedule**: Quarterly (Jan, Apr, Jul, Oct)
+- **Next Review**: February 2026
+- **Security Updates**: Applied immediately
+- **Breaking Changes**: Coordinated with migration guides
 
 ---
 
