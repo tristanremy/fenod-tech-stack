@@ -21,8 +21,16 @@ This stack prioritizes:
 
 ## 📑 Table of Contents
 
+### Core Documentation
 - [Getting Started](#-getting-started)
 - [Quick Start](#-quick-start)
+- [Architecture](docs/architecture.md) - System design, diagrams, and data flow
+- [Development Strategy](docs/development-strategy.md) - UI-first workflow guide
+- [Local Development](docs/local-development.md) - Docker setup and dev environment
+- [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
+- [Architecture Decisions](docs/decisions/) - Why we chose each technology
+
+### Stack Components
 - [Infrastructure & Deployment](#-infrastructure--deployment)
 - [Application Framework](#-application-framework)
 - [API Development](#-api-development)
@@ -34,6 +42,8 @@ This stack prioritizes:
 - [Payments & Subscriptions](#-payments--subscriptions)
 - [Documentation](#-documentation)
 - [AI Integration](#-ai-integration)
+
+### Quick Reference
 - [Decision Tree](#-decision-tree)
 - [Quick Start Templates](#-quick-start-templates)
 - [Resources](#-resources)
@@ -42,19 +52,42 @@ This stack prioritizes:
 
 ## 🎯 Getting Started
 
-**New to the Fenod Stack?** Start here:
+**New to the Fenod Stack?** Start with these guides:
 
-📖 **[Development Strategy Guide](docs/development-strategy.md)** - Learn our UI-first workflow with complete code examples. This guide walks you through building applications from initial UI mockups to production deployment, with practical examples for every phase.
+### 📚 Essential Documentation
 
-**Key topics covered:**
-- UI-first development workflow (validate ideas with dummy data first)
-- shadcn/ui component setup and usage
-- TanStack Start routing and data loading
-- Database schema design from UI requirements
-- Type-safe API implementation with Hono + ORPC
-- Authentication with Better Auth
-- MCP/AI SDK integration patterns
-- Production deployment checklist
+1. **[Architecture Guide](docs/architecture.md)** - Understand how all pieces fit together
+   - Full-stack data flow diagrams
+   - Cloudflare edge deployment architecture
+   - Authentication flow
+   - Request lifecycle
+   - Performance characteristics
+
+2. **[Development Strategy](docs/development-strategy.md)** - UI-first workflow with code examples
+   - 9-phase development process
+   - Complete code examples for each phase
+   - shadcn/ui setup and usage
+   - Database schema design from UI requirements
+   - Type-safe API implementation
+   - Production deployment checklist
+
+3. **[Local Development Setup](docs/local-development.md)** - Get your environment running
+   - Docker Compose configuration
+   - Database options (PostgreSQL, D1, SQLite)
+   - Environment variables setup
+   - Testing locally
+   - VS Code configuration
+
+4. **[Troubleshooting Guide](docs/troubleshooting.md)** - Solve common issues fast
+   - TanStack Start, ORPC, Drizzle issues
+   - Cloudflare D1, Better Auth problems
+   - Build, deployment, and performance fixes
+
+5. **[Architecture Decisions](docs/decisions/)** - Understand our technology choices
+   - Why TanStack Start over Next.js
+   - Why ORPC over tRPC
+   - Why Drizzle over Prisma
+   - Why Cloudflare over Vercel/AWS
 
 ---
 
