@@ -30,6 +30,11 @@ This stack prioritizes:
 - [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
 - [Architecture Decisions](docs/decisions/) - Why we chose each technology
 
+### Advanced Guides
+- [Cost Calculator](docs/cost-calculator.md) - Estimate infrastructure costs
+- [Infrastructure as Code](docs/infrastructure-as-code.md) - Terraform, Wrangler, CI/CD
+- [Observability](docs/observability.md) - Logging, monitoring, tracing, alerts
+
 ### Stack Components
 - [Infrastructure & Deployment](#-infrastructure--deployment)
 - [Application Framework](#-application-framework)
@@ -94,6 +99,29 @@ This stack prioritizes:
    - Why ORPC over tRPC
    - Why Drizzle over Prisma
    - Why Cloudflare over Vercel/AWS
+
+### 🚀 Advanced Guides
+
+6. **[Cost Calculator](docs/cost-calculator.md)** - Estimate your monthly infrastructure costs
+   - Cloudflare pricing breakdown (Workers, D1, R2, KV, Pages)
+   - Interactive JavaScript cost calculator
+   - Cost comparison: Cloudflare vs Vercel vs AWS
+   - Optimization tips to reduce costs by 60-90%
+
+7. **[Infrastructure as Code](docs/infrastructure-as-code.md)** - Automate infrastructure provisioning
+   - Wrangler configuration templates (multi-environment)
+   - Terraform examples for Cloudflare resources
+   - GitHub Actions CI/CD workflows
+   - Deployment strategies (blue-green, canary, rolling)
+   - Secrets management
+
+8. **[Observability Guide](docs/observability.md)** - Monitor your applications in production
+   - Logging strategies and structured logging
+   - Metrics and monitoring with Cloudflare Analytics
+   - Error tracking with Sentry
+   - Performance monitoring and Web Vitals
+   - Distributed tracing with OpenTelemetry
+   - Alerting and dashboard setup
 
 ---
 
