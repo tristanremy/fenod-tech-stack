@@ -34,6 +34,7 @@ This stack prioritizes:
 - [Payments & Subscriptions](#-payments--subscriptions)
 - [Documentation](#-documentation)
 - [AI Integration](#-ai-integration)
+- [SEO](#-seo)
 - [Decision Tree](#-decision-tree)
 - [Quick Start Templates](#-quick-start-templates)
 - [Resources](#-resources)
@@ -55,6 +56,8 @@ This stack prioritizes:
 - Authentication with Better Auth
 - MCP/AI SDK integration patterns
 - Production deployment checklist
+
+🔍 **[SEO for Astro Guide](docs/astro-seo-guide.md)** - Comprehensive guide for implementing SEO in Astro applications. Learn how to turn Astro's performance advantages into actual organic visibility with proper metadata, structured data, and optimization techniques.
 
 ---
 
@@ -376,6 +379,33 @@ Leverage the full TanStack suite:
 - Chat interfaces, streaming displays, message components
 
 **When to use:** Features requiring LLM integration, chat interfaces, AI-powered tools
+
+---
+
+## 🔍 SEO
+
+### Astro SEO Guide
+**Comprehensive SEO implementation for Astro**
+- 📖 **[SEO for Astro Guide](docs/astro-seo-guide.md)** - Complete guide for implementing SEO in Astro applications
+
+**Key topics covered:**
+- Meta tags and metadata implementation
+- Sitemap generation with @astrojs/sitemap
+- Robots.txt configuration
+- Structured data (JSON-LD) schemas
+- Cache headers and performance optimization
+- Core Web Vitals optimization
+- Image optimization best practices
+- Content strategy and semantic HTML
+- Monitoring with Google Search Console
+
+**When to use:** Any Astro project, especially content-heavy sites, blogs, marketing sites, and e-commerce platforms
+
+**Core Principles:**
+- Astro's zero-JavaScript default gives massive SEO advantages
+- Performance alone isn't enough - proper metadata and structure matter
+- Search engines reward clean HTML, accurate metadata, and structured data
+- In 2025, structured content benefits both search engines and LLMs
 
 ---
 
