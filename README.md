@@ -1,502 +1,247 @@
-# The Fenod Stack
+# Fenod Stack
 
-> Modern TypeScript web stack - The official tech stack from [Fenod](https://www.fenod.fr)
+> [Development Strategy](docs/development-strategy.md) | [Debugging](docs/debugging.md) | [MCP Guide](docs/mcp-guide.md) | [Astro SEO](docs/astro-seo-guide.md)
 
-## What is the Fenod Stack?
+## Decision Matrix
 
-The Fenod Stack is the curated collection of modern web technologies used by Fenod, a digital agency specializing in fast, type-safe, and scalable applications. This stack leverages Cloudflare's edge infrastructure, TanStack's powerful tooling, and the best libraries from the React ecosystem.
+| Need | Stack | Deploy |
+|------|-------|--------|
+| Full-stack app | TanStack Start + Hono + ORPC + Drizzle + D1 + Better Auth | CF Workers |
+| Content + SEO | Astro + TanStack Start | CF Pages |
+| SPA (no SEO) | TanStack Start | CF Workers |
+| API only | Hono + ORPC + Drizzle | CF Workers |
+| Docs site | Starlight | CF Pages |
+| Monorepo | Add Turborepo to any above | - |
 
-**Created and maintained by:** [Fenod Digital Agency](https://www.fenod.fr)
-
-## 💡 Philosophy
-
-This stack prioritizes:
-- **Cloudflare-first infrastructure** ☁️ - Leverage CF tools whenever possible
-- **Type safety** 🔒 - End-to-end TypeScript with strong typing
-- **Modern DX** ✨ - Best-in-class developer experience
-- **Performance** ⚡ - Edge-first architecture
-- **Simplicity** 🎯 - Minimal configuration, maximum productivity
-
----
-
-## 📑 Table of Contents
-
-- [Getting Started](#-getting-started)
-- [Quick Start](#-quick-start)
-- [Infrastructure & Deployment](#-infrastructure--deployment)
-- [Application Framework](#-application-framework)
-- [API Development](#-api-development)
-- [Authentication & Authorization](#-authentication--authorization)
-- [File Management](#-file-management)
-- [Styling & UI](#-styling--ui)
-- [TanStack Ecosystem](#-tanstack-ecosystem)
-- [Monorepo & Build Tools](#-monorepo--build-tools)
-- [Payments & Subscriptions](#-payments--subscriptions)
-- [Documentation](#-documentation)
-- [AI Integration](#-ai-integration)
-- [SEO](#-seo)
-- [Decision Tree](#-decision-tree)
-- [Quick Start Templates](#-quick-start-templates)
-- [Resources](#-resources)
-
----
-
-## 🎯 Getting Started
-
-**New to the Fenod Stack?** Start here:
-
-📖 **[Development Strategy Guide](docs/development-strategy.md)** - Learn our UI-first workflow with complete code examples. This guide walks you through building applications from initial UI mockups to production deployment, with practical examples for every phase.
-
-**Key topics covered:**
-- UI-first development workflow (validate ideas with dummy data first)
-- shadcn/ui component setup and usage
-- TanStack Start routing and data loading
-- Database schema design from UI requirements
-- Type-safe API implementation with Hono + ORPC
-- Authentication with Better Auth
-- MCP/AI SDK integration patterns
-- Production deployment checklist
-
-🔍 **[SEO for Astro Guide](docs/astro-seo-guide.md)** - Comprehensive guide for implementing SEO in Astro applications. Learn how to turn Astro's performance advantages into actual organic visibility with proper metadata, structured data, and optimization techniques.
-
----
-
-## 🚀 Quick Start
-
-### Bootstrap a New Project
-
-The fastest way to start a Fenod Stack project is with **[create-better-t-stack](https://github.com/AmanVarshney01/create-better-t-stack)** - an interactive CLI that scaffolds projects with the exact technologies you need.
+## Bootstrap
 
 ```bash
-# Using bun (recommended)
-bun create better-t-stack@latest
-
-# Or npm
-npx create-better-t-stack@latest
-
-# Or pnpm
 pnpm create better-t-stack@latest
 ```
 
-**Visual Builder**: Visit [better-t-stack.dev/new](https://better-t-stack.dev/new) to visually configure your stack and generate the command.
+Visual builder: [better-t-stack.dev/new](https://better-t-stack.dev/new)
 
-### Recommended Configurations
+## Cloudflare Services
 
-Choose based on your project type:
+| Service | Use |
+|---------|-----|
+| Workers | Serverless compute |
+| Pages | Static sites |
+| D1 | SQLite database |
+| R2 | Object storage |
+| KV | Key-value store |
+| Images | Image optimization |
 
-#### 1. **Full-Stack Application** (SaaS, Dashboard, Web App)
+Deploy with [Alchemy](https://alchemy.run)
+
+## API Pattern (Hono + ORPC + Drizzle)
+
+```ts
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { drizzle } from "drizzle-orm/d1";
+
+type Bindings = { DB: D1Database };
+
+const app = new Hono<{ Bindings: Bindings }>();
+
+app.use("/*", cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+}));
+
+app.get("/api/items", async (c) => {
+  const db = drizzle(c.env.DB);
+  const items = await db.select().from(schema.items);
+  return c.json(items);
+});
+
+export default app;
+```
+
+## Auth Pattern (Better Auth + Hono + Drizzle)
+
+### Server Setup
+
+```ts
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+
+// Auth instance
+export const auth = betterAuth({
+  database: drizzleAdapter(db, {
+    provider: "sqlite",
+    schema: {
+      ...schema,
+      user: schema.users,
+      session: schema.sessions,
+      account: schema.accounts,
+    },
+  }),
+  experimental: { joins: true }, // 2-3x perf improvement
+
+  emailAndPassword: {
+    enabled: true,
+    minPasswordLength: 8,
+    maxPasswordLength: 128,
+    requireEmailVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      void sendEmail({ to: user.email, subject: "Verify email", text: url });
+    },
+    sendResetPassword: async ({ user, url }) => {
+      void sendEmail({ to: user.email, subject: "Reset password", text: url });
+    },
+    resetPasswordTokenExpiresIn: 3600,
+  },
+
+  session: {
+    expiresIn: 60 * 60 * 24 * 7,  // 7 days
+    updateAge: 60 * 60 * 24,      // refresh daily
+    freshAge: 60 * 5,             // 5 min for sensitive ops
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+      strategy: "jwe", // compact|jwt|jwe
+    },
+  },
+
+  rateLimit: {
+    window: 60,
+    max: 100,
+    storage: "database",
+    customRules: {
+      "/sign-in/email": { window: 10, max: 3 },
+      "/two-factor/verify": { window: 10, max: 3 },
+    },
+  },
+
+  advanced: {
+    ipAddress: { ipAddressHeaders: ["cf-connecting-ip"] },
+  },
+});
+
+// Hono app
+const app = new Hono();
+
+// CORS before routes
+app.use("/api/auth/*", cors({
+  origin: process.env.FRONTEND_URL,
+  allowHeaders: ["Content-Type", "Authorization"],
+  allowMethods: ["POST", "GET", "OPTIONS"],
+  credentials: true,
+}));
+
+// Auth handler
+app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
+
+// Session middleware
+app.use("*", async (c, next) => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  c.set("user", session?.user || null);
+  c.set("session", session?.session || null);
+  await next();
+});
+
+// Protected route
+app.get("/api/me", (c) => {
+  if (!c.get("user")) return c.body(null, 401);
+  return c.json({ user: c.get("user") });
+});
+```
+
+### Client Setup
+
+```ts
+import { createAuthClient } from "better-auth/react";
+
+export const authClient = createAuthClient({
+  baseURL: process.env.API_URL,
+  fetchOptions: {
+    credentials: "include",
+    onError: (ctx) => {
+      if (ctx.response.status === 429) {
+        const retry = ctx.response.headers.get("X-Retry-After");
+        toast.error(`Rate limited. Retry in ${retry}s`);
+      }
+    },
+  },
+});
+
+// Sign up
+await authClient.signUp.email({ name, email, password });
+
+// Sign in
+await authClient.signIn.email({ email, password, rememberMe: true });
+
+// Get session
+const { data: session } = await authClient.getSession();
+const { data: session } = authClient.useSession(); // reactive
+
+// Password reset
+await authClient.requestPasswordReset({ email, redirectTo: "/reset" });
+await authClient.resetPassword({ newPassword, token });
+
+// Session management
+await authClient.listSessions();
+await authClient.revokeSession({ id });
+await authClient.revokeOtherSessions();
+
+// Sign out
+await authClient.signOut();
+```
+
+### Migrations
+
 ```bash
-# Interactive selections:
-Frontend: React + TanStack Start
-Backend: Hono
-API: ORPC
-Database: SQLite (Cloudflare D1) or PostgreSQL
-ORM: Drizzle
-Auth: Better Auth
-Styling: Tailwind CSS + shadcn/ui
-Add-ons: Turborepo (if multi-package)
+pnpm dlx @better-auth/cli@latest generate
+pnpm drizzle-kit generate
+pnpm drizzle-kit migrate
 ```
 
-**What you get**: Type-safe full-stack app ready for Cloudflare Workers deployment
-
-#### 2. **Content Site with Interactivity** (Marketing, Blog, Docs)
-```bash
-# Interactive selections:
-Frontend: React + TanStack Start
-Backend: Hono (optional, for dynamic features)
-Styling: Tailwind CSS + shadcn/ui
-Add-ons: Starlight (if building documentation)
-```
-
-**What you get**: Fast static site with interactive components, ready for Cloudflare Pages
-
-#### 3. **API Service** (Microservice, Backend Only)
-```bash
-# Interactive selections:
-Frontend: None
-Backend: Hono
-API: ORPC
-Database: SQLite (D1) or PostgreSQL
-ORM: Drizzle
-Auth: Better Auth (if needed)
-```
-
-**What you get**: Standalone API service ready for Cloudflare Workers
-
-#### 4. **Monorepo with Multiple Apps**
-```bash
-# Interactive selections:
-Frontend: React + TanStack Start
-Backend: Hono
-API: ORPC
-Database: SQLite or PostgreSQL
-ORM: Drizzle
-Auth: Better Auth
-Add-ons: Turborepo ✓
-```
-
-**What you get**: Monorepo structure with shared packages (UI components, utilities, types)
-
-### After Bootstrapping
-
-Once your project is created:
-
-1. **Follow the UI-first workflow**: See [Development Strategy Guide](docs/development-strategy.md)
-2. **Configure Cloudflare**: Set up D1, R2, and other services as needed
-3. **Setup deployment**: Use [Alchemy](https://alchemy.run) for streamlined Cloudflare deployments
-
----
-
-## 🏗️ Infrastructure & Deployment
-
-### Cloudflare ☁️
-**Primary infrastructure provider**
-- Cloudflare Workers for serverless compute
-- Cloudflare Pages for static sites
-- Cloudflare D1 for SQL databases
-- Cloudflare R2 for object storage
-- Cloudflare KV for key-value storage
-- Cloudflare Images for image optimization and delivery
-- Cloudflare Durable Objects when needed
-
-**Rationale:** Deploy at the edge globally, excellent DX, integrated ecosystem
-
-### Alchemy ⚗️
-**Deployment & Configuration Management**
-- Use [alchemy.run](https://alchemy.run) for deploying and handling configuration
-- Streamlines deployment workflows
-
----
-
-## 🚀 Application Framework
-
-### Framework Selection Guide
-
-**Choose based on your project needs:**
-
-- **Astro alone** 📄 → Pure content, no app logic (fastest, simplest)
-- **Astro + TanStack Start** 📄⚡ → Content that needs SEO + interactive app features
-- **TanStack Start alone** ⚡ → Full app where SEO doesn't matter
-
-### TanStack Start
-**Primary application framework**
-- Full-stack React framework
-- Built on Vinxi and Nitro
-- Type-safe routing and data loading
-- Excellent for SPAs and SSR apps
-
-**When to use:** Default choice for any new application
-
-### Astro + TanStack Start
-**For content-heavy, SEO-critical applications**
-- Integrate Astro as a Vite plugin with TanStack Start
-- Reference: [astro-tanstack-start](https://github.com/tannerlinsley/astro-tanstack-start) | [Announcement tweet](https://x.com/tannerlinsley/status/1976720820442747299)
-- Best of both worlds: Astro's content capabilities + TanStack Start's interactivity
-
-**When to use:** Marketing sites, blogs, documentation sites, any content requiring strong SEO
-
----
-
-## 🔌 API Development
-
-### Hono
-**Web framework for Cloudflare Workers**
-- Ultra-fast, lightweight
-- Excellent TypeScript support
-- Perfect for edge runtime
-
-### ORPC
-**Type-safe RPC layer**
-- End-to-end type safety
-- Works seamlessly with Hono
-- Eliminates API boilerplate
-
-### Drizzle ORM
-**Database toolkit**
-- Type-safe SQL query builder
-- Excellent DX with autocomplete
-- Supports Cloudflare D1, PostgreSQL, MySQL
-- Drizzle Kit for migrations
-
-**Stack combination:** `Hono + ORPC + Drizzle` for robust, type-safe APIs
-
----
-
-## 🔐 Authentication & Authorization
-
-### Better Auth
-**Modern authentication library**
-- Flexible, extensible
-- Multiple providers support
-- Works great with the edge
-- Type-safe session management
-
-**When to use:** Any application requiring user authentication
-
----
-
-## 📁 File Management
-
-### Better Upload
-**File upload handling**
-- Optimized for modern stacks
-- Handles file uploads efficiently
-- Integrates well with R2/S3
-
----
-
-## 🎨 Styling & UI
-
-### Tailwind CSS v4
-**Utility-first CSS framework**
-- Latest version with improved performance
-- Oxide engine for faster builds
-- Best-in-class DX
-
-### shadcn/ui
-**Component library**
-- Copy-paste components
-- Built on Radix UI primitives
-- Fully customizable
-- Accessible by default
-
-### shadcn Ecosystem & Derived Libraries
-
-**Component Registries:**
-- **[Registry Directory](https://registry.directory/)** - Central hub for discovering shadcn components and libraries
-
-**Premium Component Libraries:**
-- **[Intent UI](https://intentui.com/)** - Professional component library with comprehensive design system
-  - [Design System](https://design.intentui.com/) - Intent UI's design guidelines and patterns
-- **[RE UI](https://reui.io/)** - Refined components and patterns for modern applications
-- **[Tailark](https://tailark.com/)** - Marketing-focused blocks (hero, pricing, testimonials, CTAs) with 100+ variants
-- **[shadcnblocks](https://www.shadcnblocks.com/)** - 959+ premium blocks with Tailwind 4 support
-- **[Coss UI](https://coss.com/ui/)** - Modern UI library based on Cal.com's design, built on Base UI
-- **[Origin UI](https://originui.com/)** - Beautiful, production-ready components
-- **[Tweak CN](https://tweakcn.com/)** - Enhanced shadcn components with extra features
-- **[Kibo UI](https://kibo-ui.com/)** - Modern component collection
-- **[Animate UI](https://animate-ui.com/)** - Animation-focused components built on shadcn
-
-**When to use:**
-- Start with base shadcn/ui for core components
-- Use Intent UI or RE UI for polished, production-ready component variants
-- Use Tailark or shadcnblocks for marketing pages and landing pages
-- Use Coss UI for calendar/scheduling-heavy applications or Cal.com-inspired designs
-- Use Origin UI, Tweak CN, Kibo UI for general component enhancements
-- Use Animate UI for animation-rich interfaces
-- Mix and match components as needed
-
----
-
-## 🧰 TanStack Ecosystem
-
-Leverage the full TanStack suite:
-
-### TanStack Query
-**Data synchronization**
-- Server state management
-- Caching, background updates
-- Optimistic updates
-
-### TanStack Router
-**Type-safe routing** (included in TanStack Start)
-- File-based or code-based routing
-- Type-safe navigation and params
-
-### TanStack Form
-**Type-safe form management**
-- Schema validation
-- Field-level subscriptions
-- Great DX
-
-### TanStack Table
-**Headless table library**
-- Powerful data tables
-- Sorting, filtering, pagination
-- Fully customizable
-
----
-
-## 📦 Monorepo & Build Tools
-
-### Turborepo
-**Monorepo build system**
-- Fast, incremental builds
-- Remote caching
-- Perfect for multi-package projects
-- Pipeline orchestration
-
-**When to use:** Projects with multiple apps/packages
-
-### Ultracite
-**Zero-configuration linter & formatter**
-- Built on Biome (Rust-based, extremely fast)
-- Replaces ESLint + Prettier + Husky
-- AI-ready (works with Claude Code, Cursor, Copilot)
-- Unified configuration across monorepo packages
-- Subsecond code analysis
-
-**When to use:** Any project, especially monorepos. Simplifies code quality tooling to a single dependency.
-
----
-
-## 💳 Payments & Subscriptions
-
-### Polar.sh
-**Modern payment infrastructure**
-- Subscriptions and one-time payments
-- Built for developers
-- Clean API, great DX
-
----
-
-## 📚 Documentation
-
-### Starlight (Astro)
-**Documentation framework**
-- Built on Astro
-- Beautiful, fast documentation sites
-- SEO-optimized
-- Great component library
-
-**When to use:** Any project needing public documentation
-
----
-
-## 🤖 AI Integration
-
-### AI SDK
-**AI application development**
-- Vercel AI SDK recommended
-- Stream AI responses
-- Multiple provider support (OpenAI, Anthropic, etc.)
-- React hooks for UI integration
-
-### AI SDK Elements
-**Pre-built AI UI components**
-- [AI SDK Elements](https://ai-sdk.dev/elements/overview) - Ready-to-use AI interface components
-- Built on shadcn/ui
-- Chat interfaces, streaming displays, message components
-
-**When to use:** Features requiring LLM integration, chat interfaces, AI-powered tools
-
----
-
-## 🔍 SEO
-
-### Astro SEO Guide
-**Comprehensive SEO implementation for Astro**
-- 📖 **[SEO for Astro Guide](docs/astro-seo-guide.md)** - Complete guide for implementing SEO in Astro applications
-
-**Key topics covered:**
-- Meta tags and metadata implementation
-- Sitemap generation with @astrojs/sitemap
-- Robots.txt configuration
-- Structured data (JSON-LD) schemas
-- Cache headers and performance optimization
-- Core Web Vitals optimization
-- Image optimization best practices
-- Content strategy and semantic HTML
-- Monitoring with Google Search Console
-
-**When to use:** Any Astro project, especially content-heavy sites, blogs, marketing sites, and e-commerce platforms
-
-**Core Principles:**
-- Astro's zero-JavaScript default gives massive SEO advantages
-- Performance alone isn't enough - proper metadata and structure matter
-- Search engines reward clean HTML, accurate metadata, and structured data
-- In 2025, structured content benefits both search engines and LLMs
-
----
-
-## 🗺️ Decision Tree
-
-### Choosing your framework
-1. **Static content site** (blog, landing page, docs): **Astro alone** → Deploy to Cloudflare Pages
-2. **Content site + interactivity** (marketing site with product demos, blog with interactive features): **Astro + TanStack Start** → Deploy to Cloudflare Pages
-3. **Full app, no SEO needed** (dashboards, internal tools, SPAs): **TanStack Start alone** → Deploy to Cloudflare Workers
-4. **API-only service**: **Hono + ORPC + Drizzle** → Deploy to Cloudflare Workers
-5. **Multiple projects/packages**: Add **Turborepo**
-6. **Documentation site**: **Starlight** (built on Astro)
-
-### Need a specific feature?
-- **Auth** 🔐: Better Auth
-- **Uploads** 📁: Better Upload
-- **Payments** 💳: Polar.sh
-- **Forms** 📝: TanStack Form
-- **Tables** 📊: TanStack Table
-- **Database** 🗄️: Drizzle + Cloudflare D1
-- **Styling** 🎨: Tailwind CSS v4 + shadcn/ui
-- **AI** 🤖: AI SDK
-
----
-
-## ⚡ Quick Start Templates
-
-### Fenod Stack - Full-stack App
-```
-TanStack Start
-+ Hono + ORPC
-+ Drizzle + D1
-+ Better Auth
-+ Tailwind + shadcn
-→ Deploy to Cloudflare Workers
-```
-
-### Fenod Stack - Content Site
-```
-Astro + TanStack Start
-+ Tailwind + shadcn
-+ (optional) Better Auth
-→ Deploy to Cloudflare Pages
-```
-
-### Fenod Stack - API Service
-```
-Hono
-+ ORPC
-+ Drizzle + D1
-+ Better Auth
-→ Deploy to Cloudflare Workers
-```
-
----
-
-## 🔗 Resources
-
-### Core Stack
-- [TanStack Start](https://tanstack.com/start)
-- [Astro](https://astro.build)
-- [Hono](https://hono.dev)
-- [ORPC](https://orpc.unnoq.com)
-- [Drizzle](https://orm.drizzle.team)
-- [Better Auth](https://www.better-auth.com)
-- [Better Upload](https://better-upload.dev)
-- [Cloudflare Developers](https://developers.cloudflare.com)
-- [Turborepo](https://turbo.build)
-- [Ultracite](https://github.com/haydenbleasel/ultracite)
-- [Polar.sh](https://polar.sh)
-- [AI SDK](https://sdk.vercel.ai)
-
-### Tools & CLI
-- [create-better-t-stack](https://github.com/AmanVarshney01/create-better-t-stack) - Project bootstrapping CLI
-- [better-t-stack.dev/new](https://better-t-stack.dev/new) - Visual stack builder
-
-### UI & Components
-- [shadcn/ui](https://ui.shadcn.com)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Registry Directory](https://registry.directory/) - Discover shadcn components
-- [Intent UI](https://intentui.com/) & [Design System](https://design.intentui.com/)
-- [RE UI](https://reui.io/)
-- [Tailark](https://tailark.com/) - Marketing blocks
-- [shadcnblocks](https://www.shadcnblocks.com/) - Premium blocks collection
-- [Coss UI](https://coss.com/ui/) - Cal.com-inspired components
-- [Origin UI](https://originui.com/)
-- [Tweak CN](https://tweakcn.com/)
-- [Kibo UI](https://kibo-ui.com/)
-- [Animate UI](https://animate-ui.com/)
-- [AI SDK Elements](https://ai-sdk.dev/elements/overview)
-
----
-
-**Last Updated:** November 2025
+## UI Components
+
+| Library | Use For |
+|---------|---------|
+| [shadcn/ui](https://ui.shadcn.com) | Base components |
+| [Intent UI](https://intentui.com) | Production polish |
+| [RE UI](https://reui.io) | Production polish |
+| [Tailark](https://tailark.com) | Marketing blocks |
+| [shadcnblocks](https://shadcnblocks.com) | Marketing blocks |
+| [Origin UI](https://originui.com) | Component variants |
+| [Coss UI](https://coss.com/ui) | Cal.com style |
+| [Animate UI](https://animate-ui.com) | Animations |
+| [Registry Directory](https://registry.directory) | Discover more |
+
+## TanStack
+
+| Package | Use |
+|---------|-----|
+| Start | Full-stack React framework |
+| Query | Server state, caching, optimistic updates |
+| Router | Type-safe routing (included in Start) |
+| Form | Type-safe forms with validation |
+| Table | Headless data tables |
+
+## Tools
+
+| Tool | Use |
+|------|-----|
+| Tailwind v4 | Styling |
+| Turborepo | Monorepo builds |
+| Ultracite | Linting (Biome-based) |
+| Better Upload | File uploads to R2 |
+| Polar.sh | Payments |
+| AI SDK | LLM integration |
+| AI SDK Elements | Chat UI components |
+
+## Links
+
+**Core:** [TanStack Start](https://tanstack.com/start) | [Astro](https://astro.build) | [Hono](https://hono.dev) | [ORPC](https://orpc.unnoq.com) | [Drizzle](https://orm.drizzle.team) | [Better Auth](https://better-auth.com)
+
+**Infra:** [Cloudflare](https://developers.cloudflare.com) | [Alchemy](https://alchemy.run) | [Turborepo](https://turbo.build)
+
+**UI:** [shadcn/ui](https://ui.shadcn.com) | [Tailwind](https://tailwindcss.com) | [AI SDK Elements](https://ai-sdk.dev/elements)
+
+**Tools:** [Better Upload](https://better-upload.dev) | [Polar.sh](https://polar.sh) | [AI SDK](https://sdk.vercel.ai) | [Ultracite](https://github.com/haydenbleasel/ultracite) | [Starlight](https://starlight.astro.build)
