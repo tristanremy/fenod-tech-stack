@@ -67,8 +67,6 @@ pnpm create better-t-stack@latest my-app
 - Styling: `Tailwind CSS` (+ shadcn/ui will be added in Phase 2)
 - Add-ons: `Ultracite` (for linting/formatting)
 
-**Alternative - Visual Builder**: Visit [better-t-stack.dev/new](https://better-t-stack.dev/new) to configure visually.
-
 ```bash
 # Navigate to project
 cd my-app
