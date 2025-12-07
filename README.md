@@ -76,6 +76,17 @@ my-app/
 | KV | Key-value store |
 | Images | Image optimization |
 
+### Naming Convention
+
+**Pattern:** `{project}-{resource}` for production, `{project}-{resource}-preview` for preview/staging
+
+| Resource | Production | Preview |
+|----------|------------|---------|
+| D1 | `myapp-db` | `myapp-db-preview` |
+| R2 | `myapp-storage` | `myapp-storage-preview` |
+| KV | `myapp-kv` | `myapp-kv-preview` |
+| Worker | `myapp-api` | `myapp-api-preview` |
+
 Deploy with [Alchemy](https://alchemy.run)
 
 ## API Pattern (Hono + ORPC + Drizzle)
