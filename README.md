@@ -1,6 +1,6 @@
 # Fenod Stack
 
-> [Development Strategy](docs/development-strategy.md) | [Data Fetching](docs/tanstack-data-fetching.md) | [Debugging](docs/debugging.md) | [MCP Guide](docs/mcp-guide.md) | [Astro SEO](docs/astro-seo-guide.md) | [App Improvement Guide](docs/app-improvement-guide.md)
+> [Development Strategy](docs/DEVELOPMENT-STRATEGY.md) | [Data Fetching](docs/TANSTACK-DATA-FETCHING.md) | [Debugging](docs/DEBUGGING.md) | [MCP Guide](docs/MCP-GUIDE.md) | [Astro SEO](docs/ASTRO-SEO-GUIDE.md) | [App Improvement Guide](docs/APP-IMPROVEMENT-GUIDE.md)
 
 ## Decision Matrix
 
