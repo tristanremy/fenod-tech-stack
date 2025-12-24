@@ -1,5 +1,9 @@
 # Fenod Stack
 
+**Fenod** builds modern websites, web apps, and AI-powered products using cutting-edge technology. We ship fast, iterate often, and leverage AI throughout our development workflow.
+
+This is our internal reference for the tools, patterns, and best practices we use daily.
+
 > [Development Strategy](docs/DEVELOPMENT-STRATEGY.md) | [Data Fetching](docs/TANSTACK-DATA-FETCHING.md) | [Debugging](docs/DEBUGGING.md) | [MCP Guide](docs/MCP-GUIDE.md) | [Astro SEO](docs/ASTRO-SEO-GUIDE.md) | [App Improvement Guide](docs/APP-IMPROVEMENT-GUIDE.md)
 
 ## Decision Matrix
