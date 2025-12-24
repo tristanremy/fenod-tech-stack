@@ -1,6 +1,6 @@
 # Fenod Stack
 
-> [Development Strategy](docs/development-strategy.md) | [Debugging](docs/debugging.md) | [MCP Guide](docs/mcp-guide.md) | [Astro SEO](docs/astro-seo-guide.md)
+> [Development Strategy](docs/development-strategy.md) | [Data Fetching](docs/tanstack-data-fetching.md) | [Debugging](docs/debugging.md) | [MCP Guide](docs/mcp-guide.md) | [Astro SEO](docs/astro-seo-guide.md) | [App Improvement Guide](docs/app-improvement-guide.md)
 
 ## Decision Matrix
 
@@ -19,7 +19,9 @@
 pnpm create better-t-stack@latest
 ```
 
-## Monorepo Structure
+## Monorepo Structure (Slices Architecture)
+
+> **Architecture**: Feature-based slices instead of technical layers. Each feature contains its own router, service, and types.
 
 ```
 my-app/
@@ -27,29 +29,41 @@ my-app/
 │   ├── web/                    # TanStack Start frontend
 │   │   ├── src/
 │   │   │   ├── components/
-│   │   │   │   └── ui/         # shadcn components
-│   │   │   ├── functions/      # Server functions
+│   │   │   │   ├── ui/         # shadcn base components
+│   │   │   │   ├── shared/     # Cross-feature components
+│   │   │   │   └── {feature}/  # Feature-specific components
+│   │   │   ├── features/       # Feature slices (alternative)
+│   │   │   │   └── {feature}/
+│   │   │   │       ├── components/
+│   │   │   │       ├── hooks/
+│   │   │   │       └── index.ts
+│   │   │   ├── hooks/          # Shared hooks
 │   │   │   ├── lib/
 │   │   │   │   ├── auth-client.ts
+│   │   │   │   ├── orpc.ts     # ORPC client setup
 │   │   │   │   └── utils.ts
-│   │   │   ├── middleware/
-│   │   │   ├── routes/
-│   │   │   │   ├── __root.tsx
-│   │   │   │   ├── index.tsx
-│   │   │   │   └── dashboard.tsx
-│   │   │   └── utils/
-│   │   │       └── orpc.ts     # ORPC client setup
+│   │   │   └── routes/
+│   │   │       ├── __root.tsx
+│   │   │       └── {route}.tsx
 │   │   └── package.json
 │   └── server/                 # Hono + ORPC backend
 │       ├── src/
+│       │   ├── {feature}/      # Feature API routes (if not in packages/api)
+│       │   │   ├── api.ts
+│       │   │   └── service.ts
 │       │   └── index.ts
 │       └── package.json
 ├── packages/
-│   ├── api/                    # ORPC router definitions
+│   ├── api/                    # ORPC routers (slices)
 │   │   └── src/
-│   │       ├── index.ts        # Procedures (public/protected)
+│   │       ├── routers/
+│   │       │   ├── {feature}/  # Feature slice
+│   │       │   │   ├── index.ts
+│   │       │   │   ├── router.ts   # ORPC endpoints
+│   │       │   │   └── service.ts  # Business logic + DB
+│   │       │   └── index.ts    # Root router
 │   │       ├── context.ts      # API context
-│   │       └── routers/
+│   │       └── index.ts        # Procedures (public/protected)
 │   ├── auth/                   # Better Auth config
 │   │   └── src/
 │   │       └── index.ts
@@ -58,12 +72,23 @@ my-app/
 │   │       ├── index.ts
 │   │       ├── schema/
 │   │       └── migrations/
-│   └── config/                 # Shared TypeScript config
+│   └── shared/                 # Shared types, schemas, utils
+│       └── src/
+│           ├── types.ts
+│           └── schemas.ts
 ├── package.json
 ├── pnpm-workspace.yaml
 ├── turbo.json
 └── alchemy.run.ts              # Cloudflare deployment
 ```
+
+### Slices vs Layers
+
+| Traditional Layers | Slices Architecture |
+|-------------------|---------------------|
+| `controllers/`, `services/`, `repositories/` | `features/{feature}/router.ts + service.ts` |
+| Cross-cutting changes affect multiple folders | Changes stay within feature folder |
+| Technical grouping | Business domain grouping |
 
 ## Cloudflare Services
 
@@ -89,7 +114,7 @@ my-app/
 
 Deploy with [Alchemy](https://alchemy.run)
 
-## API Pattern (Hono + ORPC + Drizzle)
+## API Pattern (Hono + ORPC + Drizzle) - Slices Architecture
 
 ### packages/api/src/index.ts - Procedures
 
@@ -128,57 +153,96 @@ export async function createContext({ context }: CreateContextOptions) {
 export type Context = Awaited<ReturnType<typeof createContext>>;
 ```
 
-### packages/api/src/routers/index.ts
+### packages/api/src/routers/index.ts - Root Router
 
 ```ts
-import { protectedProcedure, publicProcedure } from "../index";
 import { todoRouter } from "./todo";
+import { eventRouter } from "./event";
+import { publicProcedure } from "../index";
 
 export const appRouter = {
   healthCheck: publicProcedure.handler(() => "OK"),
-  privateData: protectedProcedure.handler(({ context }) => ({
-    message: "This is private",
-    user: context.session?.user,
-  })),
   todo: todoRouter,
+  event: eventRouter,
 };
 ```
 
-### packages/api/src/routers/todo.ts - CRUD Example
+### Feature Slice: packages/api/src/routers/todo/
+
+Each feature is a slice with its own router and service:
+
+```
+routers/todo/
+├── index.ts      # Public exports
+├── router.ts     # ORPC endpoints
+└── service.ts    # Business logic + DB operations
+```
+
+#### router.ts - ORPC Endpoints
 
 ```ts
-import { eq } from "drizzle-orm";
 import z from "zod";
-import { db } from "@my-app/db";
-import { todo } from "@my-app/db/schema/todo";
-import { publicProcedure } from "../index";
+import { publicProcedure, protectedProcedure } from "../../index";
+import * as todoService from "./service";
 
 export const todoRouter = {
   getAll: publicProcedure.handler(async () => {
-    return await db.select().from(todo);
+    return await todoService.list();
   }),
 
-  create: publicProcedure
+  create: protectedProcedure
     .input(z.object({ text: z.string().min(1) }))
-    .handler(async ({ input }) => {
-      return await db.insert(todo).values({ text: input.text });
+    .handler(async ({ input, context }) => {
+      return await todoService.create(input.text, context.session.user.id);
     }),
 
-  toggle: publicProcedure
+  toggle: protectedProcedure
     .input(z.object({ id: z.number(), completed: z.boolean() }))
     .handler(async ({ input }) => {
-      return await db
-        .update(todo)
-        .set({ completed: input.completed })
-        .where(eq(todo.id, input.id));
+      return await todoService.toggle(input.id, input.completed);
     }),
 
-  delete: publicProcedure
+  delete: protectedProcedure
     .input(z.object({ id: z.number() }))
     .handler(async ({ input }) => {
-      return await db.delete(todo).where(eq(todo.id, input.id));
+      return await todoService.remove(input.id);
     }),
 };
+```
+
+#### service.ts - Business Logic + DB
+
+```ts
+import { eq } from "drizzle-orm";
+import { db } from "@my-app/db";
+import { todo } from "@my-app/db/schema/todo";
+
+export async function list() {
+  return await db.select().from(todo);
+}
+
+export async function create(text: string, userId: string) {
+  return await db.insert(todo).values({ text, createdBy: userId }).returning();
+}
+
+export async function toggle(id: number, completed: boolean) {
+  return await db
+    .update(todo)
+    .set({ completed, updatedAt: new Date() })
+    .where(eq(todo.id, id))
+    .returning();
+}
+
+export async function remove(id: number) {
+  return await db.delete(todo).where(eq(todo.id, id));
+}
+```
+
+#### index.ts - Public Exports
+
+```ts
+export { todoRouter } from "./router";
+export * as todoService from "./service";
 ```
 
 ### apps/server/src/index.ts - Hono Server
