@@ -1,6 +1,16 @@
+<p align="center">
+  <a href="https://fenod.fr">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://fenod.fr/favicon.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://fenod.fr/favicon.svg">
+      <img alt="Fenod" src="https://fenod.fr/favicon.svg" width="80">
+    </picture>
+  </a>
+</p>
+
 # Fenod Stack
 
-**Fenod** builds modern websites, web apps, and AI-powered products using cutting-edge technology. We ship fast, iterate often, and leverage AI throughout our development workflow.
+**[Fenod](https://fenod.fr)** builds modern websites, web apps, and AI-powered products using cutting-edge technology. We ship fast, iterate often, and leverage AI throughout our development workflow.
 
 This is our internal reference for the tools, patterns, and best practices we use daily.
 
