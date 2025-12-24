@@ -6,18 +6,20 @@
 
 | Need | Stack | Deploy |
 |------|-------|--------|
-| Full-stack app | TanStack Start + Hono + ORPC + Drizzle + D1 + Better Auth | CF Workers |
-| Content + SEO | Astro + TanStack Start | CF Pages |
-| SPA (no SEO) | TanStack Start | CF Workers |
-| API only | Hono + ORPC + Drizzle | CF Workers |
-| Docs site | Starlight | CF Pages |
-| Monorepo | Add Turborepo to any above | - |
+| Full-stack app | [TanStack Start](https://tanstack.com/start) + [Hono](https://hono.dev) + [ORPC](https://orpc.unnoq.com) + [Drizzle](https://orm.drizzle.team) + [D1](https://developers.cloudflare.com/d1/) + [Better Auth](https://better-auth.com) | CF Workers |
+| Content + SEO | [Astro](https://astro.build) + [TanStack Start](https://tanstack.com/start) | CF Pages |
+| SPA (no SEO) | [TanStack Start](https://tanstack.com/start) | CF Workers |
+| API only | [Hono](https://hono.dev) + [ORPC](https://orpc.unnoq.com) + [Drizzle](https://orm.drizzle.team) | CF Workers |
+| Docs site | [Starlight](https://starlight.astro.build) | CF Pages |
+| Monorepo | Add [Turborepo](https://turbo.build) to any above | - |
 
 ## Bootstrap
 
 ```bash
 pnpm create better-t-stack@latest
 ```
+
+> [create-better-t-stack](https://github.com/AmanVarshney01/create-better-t-stack) - CLI to scaffold the full stack
 
 ## Monorepo Structure (Slices Architecture)
 
@@ -94,12 +96,12 @@ my-app/
 
 | Service | Use |
 |---------|-----|
-| Workers | Serverless compute |
-| Pages | Static sites |
-| D1 | SQLite database |
-| R2 | Object storage |
-| KV | Key-value store |
-| Images | Image optimization |
+| [Workers](https://developers.cloudflare.com/workers/) | Serverless compute |
+| [Pages](https://developers.cloudflare.com/pages/) | Static sites |
+| [D1](https://developers.cloudflare.com/d1/) | SQLite database |
+| [R2](https://developers.cloudflare.com/r2/) | Object storage |
+| [KV](https://developers.cloudflare.com/kv/) | Key-value store |
+| [Images](https://developers.cloudflare.com/images/) | Image optimization |
 
 ### Naming Convention
 
@@ -452,11 +454,11 @@ pnpm drizzle-kit migrate
 
 | Package | Use |
 |---------|-----|
-| Start | Full-stack React framework |
-| Query | Server state, caching, optimistic updates |
-| Router | Type-safe routing (included in Start) |
-| Form | Type-safe forms with validation |
-| Table | Headless data tables |
+| [Start](https://tanstack.com/start) | Full-stack React framework |
+| [Query](https://tanstack.com/query) | Server state, caching, optimistic updates |
+| [Router](https://tanstack.com/router) | Type-safe routing (included in Start) |
+| [Form](https://tanstack.com/form) | Type-safe forms with validation |
+| [Table](https://tanstack.com/table) | Headless data tables |
 
 ### ORPC Client Setup (apps/web/src/utils/orpc.ts)
 
@@ -812,13 +814,13 @@ export function cn(...inputs: ClassValue[]) {
 
 | Tool | Use |
 |------|-----|
-| Tailwind v4 | Styling |
-| Turborepo | Monorepo builds |
-| Ultracite | Linting (Biome-based) |
-| Better Upload | File uploads to R2 |
-| Polar.sh | Payments |
-| AI SDK | LLM integration |
-| AI SDK Elements | Chat UI components |
+| [Tailwind v4](https://tailwindcss.com) | Styling |
+| [Turborepo](https://turbo.build) | Monorepo builds |
+| [Ultracite](https://github.com/haydenbleasel/ultracite) | Linting (Biome-based) |
+| [Better Upload](https://better-upload.dev) | File uploads to R2 |
+| [Polar.sh](https://polar.sh) | Payments |
+| [AI SDK](https://sdk.vercel.ai) | LLM integration |
+| [AI SDK Elements](https://ai-sdk.dev/elements) | Chat UI components |
 
 ## Links
 
