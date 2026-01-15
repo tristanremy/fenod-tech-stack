@@ -70,6 +70,22 @@ packages/api/src/routers/
 | Cross-cutting changes affect multiple folders | Changes stay within feature folder |
 | Technical grouping | Business domain grouping |
 
+### Why Not Hexagonal/Clean Architecture?
+
+Hexagonal architecture (ports & adapters) adds indirection that pays off in large, long-lived enterprise systems. For our context—small teams shipping fast to Cloudflare edge—the overhead isn't worth it:
+
+| Hexagonal | Slices (our choice) |
+|-----------|---------------------|
+| Abstracts DB behind repository interfaces | Service calls Drizzle directly |
+| Domain layer has no framework imports | Service imports `drizzle-orm` |
+| Swappable adapters (PostgreSQL → MongoDB) | We're committed to D1/SQLite |
+| 4+ files per feature (port, adapter, usecase, entity) | 2 files per feature (router, service) |
+| Optimizes for "what if we change X" | Optimizes for "ship and iterate" |
+
+**When hexagonal makes sense:** regulated industries, 10+ year codebases, teams > 20 devs, or genuinely uncertain infrastructure.
+
+**When slices win:** startups, MVPs, small teams, known tech stack, rapid iteration. You can always extract abstractions later when pain emerges—YAGNI until then.
+
 ### Monorepo Structure
 
 ```
