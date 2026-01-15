@@ -245,24 +245,381 @@ export const postRouter = {
 
 #### Error Handling
 
+##### Standard Error Codes
+
+Define consistent error codes across your API:
+
 ```typescript
 // packages/shared/src/errors.ts
-export class BusinessError extends ORPCError {
-  constructor(code: string, message: string, public details?: unknown) {
+export const ErrorCode = {
+  // Auth
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
+  SESSION_EXPIRED: 'SESSION_EXPIRED',
+
+  // Validation
+  VALIDATION: 'VALIDATION',
+  INVALID_INPUT: 'INVALID_INPUT',
+
+  // Resources
+  NOT_FOUND: 'NOT_FOUND',
+  ALREADY_EXISTS: 'ALREADY_EXISTS',
+  CONFLICT: 'CONFLICT',
+
+  // Business Logic
+  INSUFFICIENT_STOCK: 'INSUFFICIENT_STOCK',
+  PAYMENT_FAILED: 'PAYMENT_FAILED',
+  RATE_LIMITED: 'RATE_LIMITED',
+
+  // Server
+  INTERNAL_ERROR: 'INTERNAL_ERROR',
+  SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
+} as const;
+
+export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
+```
+
+##### Custom Error Class
+
+```typescript
+// packages/shared/src/errors.ts
+import { ORPCError } from '@orpc/server';
+
+export interface ErrorDetails {
+  field?: string;
+  expected?: unknown;
+  received?: unknown;
+  [key: string]: unknown;
+}
+
+export class AppError extends ORPCError {
+  constructor(
+    public readonly code: ErrorCode,
+    message: string,
+    public readonly details?: ErrorDetails
+  ) {
     super(code, message);
+    this.name = 'AppError';
+  }
+
+  toJSON() {
+    return {
+      code: this.code,
+      message: this.message,
+      details: this.details,
+    };
   }
 }
 
-// service.ts usage
-export async function purchase(productId: string, quantity: number) {
-  const stock = await getStock(productId);
-  if (stock < quantity) {
-    throw new BusinessError("INSUFFICIENT_STOCK", "Not enough items", {
-      available: stock,
+// Convenience constructors
+export const Errors = {
+  unauthorized: (message = 'Authentication required') =>
+    new AppError(ErrorCode.UNAUTHORIZED, message),
+
+  forbidden: (message = 'Access denied') =>
+    new AppError(ErrorCode.FORBIDDEN, message),
+
+  notFound: (resource: string) =>
+    new AppError(ErrorCode.NOT_FOUND, `${resource} not found`),
+
+  validation: (field: string, message: string) =>
+    new AppError(ErrorCode.VALIDATION, message, { field }),
+
+  conflict: (message: string) =>
+    new AppError(ErrorCode.CONFLICT, message),
+
+  internal: (message = 'An unexpected error occurred') =>
+    new AppError(ErrorCode.INTERNAL_ERROR, message),
+};
+```
+
+##### Service Layer Usage
+
+```typescript
+// packages/api/src/routers/order/service.ts
+import { Errors } from '@/shared/errors';
+
+export async function purchase(productId: string, quantity: number, userId: string) {
+  const product = await db.select().from(products).where(eq(products.id, productId)).get();
+
+  if (!product) {
+    throw Errors.notFound('Product');
+  }
+
+  if (product.stock < quantity) {
+    throw new AppError(ErrorCode.INSUFFICIENT_STOCK, 'Not enough items in stock', {
+      available: product.stock,
       requested: quantity,
     });
   }
-  // proceed...
+
+  // Business logic continues...
+}
+```
+
+##### Global Error Handler (Hono)
+
+```typescript
+// packages/api/src/index.ts
+import { Hono } from 'hono';
+import { AppError, ErrorCode } from '@/shared/errors';
+
+const app = new Hono();
+
+app.onError((err, c) => {
+  // Log for debugging (appears in wrangler tail)
+  console.error(JSON.stringify({
+    type: 'error',
+    path: c.req.path,
+    method: c.req.method,
+    error: err.message,
+    stack: err.stack,
+    timestamp: new Date().toISOString(),
+  }));
+
+  // Return AppError as-is
+  if (err instanceof AppError) {
+    const status = getHttpStatus(err.code);
+    return c.json(err.toJSON(), status);
+  }
+
+  // Zod validation errors
+  if (err.name === 'ZodError') {
+    return c.json({
+      code: ErrorCode.VALIDATION,
+      message: 'Validation failed',
+      details: { errors: err.errors },
+    }, 400);
+  }
+
+  // Never expose internal errors to client
+  return c.json({
+    code: ErrorCode.INTERNAL_ERROR,
+    message: 'An unexpected error occurred',
+  }, 500);
+});
+
+function getHttpStatus(code: ErrorCode): number {
+  switch (code) {
+    case ErrorCode.UNAUTHORIZED:
+    case ErrorCode.SESSION_EXPIRED:
+      return 401;
+    case ErrorCode.FORBIDDEN:
+      return 403;
+    case ErrorCode.NOT_FOUND:
+      return 404;
+    case ErrorCode.CONFLICT:
+    case ErrorCode.ALREADY_EXISTS:
+      return 409;
+    case ErrorCode.VALIDATION:
+    case ErrorCode.INVALID_INPUT:
+      return 400;
+    case ErrorCode.RATE_LIMITED:
+      return 429;
+    case ErrorCode.SERVICE_UNAVAILABLE:
+      return 503;
+    default:
+      return 500;
+  }
+}
+```
+
+##### Client-Side Error Handling
+
+```typescript
+// packages/web/src/lib/api/error-handler.ts
+import { ErrorCode, type ErrorDetails } from '@/shared/errors';
+
+export interface APIError {
+  code: ErrorCode;
+  message: string;
+  details?: ErrorDetails;
+}
+
+export function isAPIError(error: unknown): error is APIError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    'message' in error
+  );
+}
+
+export function getErrorMessage(error: unknown): string {
+  if (isAPIError(error)) {
+    return error.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return 'An unexpected error occurred';
+}
+
+export function isAuthError(error: unknown): boolean {
+  return isAPIError(error) && (
+    error.code === ErrorCode.UNAUTHORIZED ||
+    error.code === ErrorCode.SESSION_EXPIRED
+  );
+}
+```
+
+##### React Error Boundary
+
+```tsx
+// packages/web/src/components/error-boundary.tsx
+import { Component, type ReactNode } from 'react';
+import { isAuthError, getErrorMessage } from '@/lib/api/error-handler';
+import { Button } from '@/components/ui/button';
+import { AlertCircle } from 'lucide-react';
+
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+  onReset?: () => void;
+}
+
+interface State {
+  hasError: boolean;
+  error?: Error;
+}
+
+export class ErrorBoundary extends Component<Props, State> {
+  state: State = { hasError: false };
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error) {
+    // Log to error tracking service
+    console.error('ErrorBoundary caught:', error);
+
+    // Redirect to login on auth errors
+    if (isAuthError(error)) {
+      window.location.href = '/login';
+    }
+  }
+
+  handleReset = () => {
+    this.setState({ hasError: false, error: undefined });
+    this.props.onReset?.();
+  };
+
+  render() {
+    if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+
+      return (
+        <div className="flex flex-col items-center justify-center p-8 text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
+          <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
+          <p className="text-gray-600 mb-4">
+            {getErrorMessage(this.state.error)}
+          </p>
+          <Button onClick={this.handleReset}>Try again</Button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+```
+
+##### Query Error Handler
+
+```tsx
+// packages/web/src/lib/api/query-client.ts
+import { QueryClient } from '@tanstack/react-query';
+import { isAuthError, isAPIError, ErrorCode } from '@/lib/api/error-handler';
+import { toast } from 'sonner';
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        // Don't retry auth errors
+        if (isAuthError(error)) return false;
+        // Don't retry validation errors
+        if (isAPIError(error) && error.code === ErrorCode.VALIDATION) return false;
+        // Retry others up to 2 times
+        return failureCount < 2;
+      },
+      staleTime: 60 * 1000,
+    },
+    mutations: {
+      onError: (error) => {
+        // Global error toast for mutations
+        if (isAPIError(error)) {
+          toast.error(error.message);
+        } else {
+          toast.error('An unexpected error occurred');
+        }
+      },
+    },
+  },
+});
+```
+
+##### Usage in Components
+
+```tsx
+// packages/web/src/routes/customers/index.tsx
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { ErrorBoundary } from '@/components/error-boundary';
+import { isAPIError, ErrorCode } from '@/lib/api/error-handler';
+import { toast } from 'sonner';
+
+function CustomerList() {
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['customers'],
+    queryFn: () => api.customer.list.query({}),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.customer.delete.mutate({ id }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      toast.success('Customer deleted');
+    },
+    onError: (error) => {
+      // Handle specific error codes
+      if (isAPIError(error)) {
+        if (error.code === ErrorCode.FORBIDDEN) {
+          toast.error('You do not have permission to delete this customer');
+        } else if (error.code === ErrorCode.CONFLICT) {
+          toast.error('Cannot delete customer with active orders');
+        }
+        // Other errors handled by global handler
+      }
+    },
+  });
+
+  if (isLoading) return <LoadingState />;
+  if (error) return <ErrorState error={error} />;
+
+  return (
+    <div>
+      {data?.map((customer) => (
+        <CustomerRow
+          key={customer.id}
+          customer={customer}
+          onDelete={() => deleteMutation.mutate(customer.id)}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Wrap with error boundary
+export default function CustomersPage() {
+  return (
+    <ErrorBoundary>
+      <CustomerList />
+    </ErrorBoundary>
+  );
 }
 ```
 
