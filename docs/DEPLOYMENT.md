@@ -368,52 +368,149 @@ wrangler d1 execute my-db --remote --file ./packages/db/migrations/0002_new_feat
 
 ---
 
-## wrangler.toml Configuration
+## Wrangler Configuration
+
+### wrangler.jsonc (Recommended)
+
+```jsonc
+// wrangler.jsonc
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "my-app-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-01-01",
+  "compatibility_flags": ["nodejs_compat_v2"],
+
+  // Smart Placement: auto-locate compute near data sources
+  "placement": { "mode": "smart" },
+
+  // Observability (10% sampling)
+  "observability": { "enabled": true, "head_sampling_rate": 0.1 },
+
+  // Environment variables
+  "vars": {
+    "BETTER_AUTH_URL": "http://localhost:8787"
+  },
+
+  // D1 Database
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "my-db",
+      "database_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    }
+  ],
+
+  // KV Namespace
+  "kv_namespaces": [
+    { "binding": "KV", "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" }
+  ],
+
+  // R2 Bucket
+  "r2_buckets": [
+    { "binding": "R2", "bucket_name": "my-uploads" }
+  ],
+
+  // Queues
+  "queues": {
+    "producers": [{ "binding": "MY_QUEUE", "queue": "my-queue" }]
+  },
+
+  // Vectorize
+  "vectorize": [
+    { "binding": "VECTORIZE", "index_name": "doc-search" }
+  ],
+
+  // Workers AI
+  "ai": { "binding": "AI" },
+
+  // Workflows
+  "workflows": [
+    {
+      "name": "user-lifecycle",
+      "binding": "USER_WORKFLOW",
+      "class_name": "UserLifecycleWorkflow"
+    }
+  ],
+
+  // Durable Objects (for Agents SDK)
+  "durable_objects": {
+    "bindings": [
+      { "name": "CHAT_AGENT", "class_name": "ChatAgent" }
+    ]
+  },
+
+  // Cron Triggers
+  "triggers": {
+    "crons": ["0 */6 * * *"]
+  },
+
+  // Environment overrides
+  "env": {
+    "production": {
+      "vars": { "BETTER_AUTH_URL": "https://api.myapp.com" },
+      "routes": [{ "pattern": "api.myapp.com", "custom_domain": true }],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "prod-db",
+          "database_id": "yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy"
+        }
+      ]
+    }
+  }
+}
+```
+
+### Key Configuration Options
+
+| Option | Purpose |
+|--------|---------|
+| `compatibility_date` | Use current date for new projects |
+| `compatibility_flags` | `nodejs_compat_v2` enables Node.js built-ins |
+| `placement.mode: "smart"` | Auto-locate compute near data sources |
+| `observability` | Enable tracing with configurable sampling |
+
+### Legacy wrangler.toml
+
+<details>
+<summary>Click to expand wrangler.toml format</summary>
 
 ```toml
-# wrangler.toml
 name = "my-app-api"
 main = "src/index.ts"
-compatibility_date = "2024-01-01"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat_v2"]
+
+[placement]
+mode = "smart"
 
 [vars]
 BETTER_AUTH_URL = "http://localhost:8787"
 
-# Development environment
-[env.development]
-vars = { BETTER_AUTH_URL = "http://localhost:8787" }
-
-[[env.development.d1_databases]]
+[[d1_databases]]
 binding = "DB"
 database_name = "dev-db"
 database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
-[[env.development.kv_namespaces]]
+[[kv_namespaces]]
 binding = "KV"
 id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
-[[env.development.r2_buckets]]
+[[r2_buckets]]
 binding = "R2"
 bucket_name = "dev-uploads"
 
-# Production environment
 [env.production]
 vars = { BETTER_AUTH_URL = "https://api.myapp.com" }
-routes = [{ pattern = "api.myapp.com", custom_domain = true }]
 
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "prod-db"
 database_id = "yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy"
-
-[[env.production.kv_namespaces]]
-binding = "KV"
-id = "yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy"
-
-[[env.production.r2_buckets]]
-binding = "R2"
-bucket_name = "prod-uploads"
 ```
+
+</details>
 
 ---
 

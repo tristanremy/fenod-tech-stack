@@ -137,6 +137,11 @@ my-app/
 | [D1](https://developers.cloudflare.com/d1/) | SQLite database |
 | [R2](https://developers.cloudflare.com/r2/) | Object storage |
 | [KV](https://developers.cloudflare.com/kv/) | Key-value store |
+| [Queues](https://developers.cloudflare.com/queues/) | Message queues |
+| [Workflows](https://developers.cloudflare.com/workflows/) | Durable multi-step jobs |
+| [Vectorize](https://developers.cloudflare.com/vectorize/) | Vector database (RAG) |
+| [Workers AI](https://developers.cloudflare.com/workers-ai/) | AI inference |
+| [Durable Objects](https://developers.cloudflare.com/durable-objects/) | Stateful coordination |
 
 ---
 
@@ -208,12 +213,12 @@ my-app/
 
 | Guide | Description |
 |-------|-------------|
-| [Code Patterns](docs/CODE-PATTERNS.md) | Copy-paste patterns for API, auth, forms, UI |
+| [Code Patterns](docs/CODE-PATTERNS.md) | API, auth, forms, UI, Workflows, Queues, Vectorize, Agents |
 | [Development Strategy](docs/DEVELOPMENT-STRATEGY.md) | UI-first workflow, phased development |
 | [Migration Guide](docs/MIGRATION.md) | From `create-better-t-stack` to production |
 | [App Improvement Guide](docs/APP-IMPROVEMENT-GUIDE.md) | Performance, security, error handling |
 | [Testing Guide](docs/TESTING.md) | Vitest, Playwright, slice testing |
-| [Deployment Guide](docs/DEPLOYMENT.md) | Alchemy, Wrangler, CI/CD |
+| [Deployment Guide](docs/DEPLOYMENT.md) | Alchemy, Wrangler (jsonc), CI/CD |
 | [Data Fetching](docs/TANSTACK-DATA-FETCHING.md) | Query vs Router loaders |
 | [Debugging](docs/DEBUGGING.md) | Wrangler tail, DevTools, logging |
 | [MCP Guide](docs/MCP-GUIDE.md) | MCP server integration |

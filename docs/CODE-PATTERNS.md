@@ -16,6 +16,12 @@
 - [AI Integration](#ai-integration)
 - [File Upload](#file-upload)
 - [TanStack Table](#tanstack-table)
+- [TanStack Start + Cloudflare Workers](#tanstack-start--cloudflare-workers)
+- [Auxiliary Workers](#auxiliary-workers)
+- [Cloudflare Workflows](#cloudflare-workflows)
+- [Cloudflare Queues](#cloudflare-queues)
+- [Vectorize (RAG)](#vectorize-rag)
+- [Agents SDK](#agents-sdk)
 - [Configuration](#configuration)
 
 ---
@@ -1177,6 +1183,852 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   );
 }
 ```
+
+---
+
+## TanStack Start + Cloudflare Workers
+
+When deploying TanStack Start to Cloudflare Workers, accessing bindings (D1, KV, env vars) requires specific configuration.
+
+### Vite Config for Cloudflare
+
+```ts
+// vite.config.ts
+import { defineConfig } from "vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import { cloudflare } from "@cloudflare/vite-plugin";
+import viteReact from "@vitejs/plugin-react";
+import tsConfigPaths from "vite-tsconfig-paths";
+import tailwindcss from "@tailwindcss/vite";
+
+export default defineConfig({
+  plugins: [
+    tailwindcss(),
+    tsConfigPaths({ projects: ["./tsconfig.json"] }),
+    cloudflare({ viteEnvironment: { name: "ssr" } }),
+    tanstackStart(),
+    viteReact(),
+  ],
+});
+```
+
+### Wrangler Config
+
+```jsonc
+// wrangler.jsonc
+{
+  "name": "my-app",
+  "compatibility_date": "2025-01-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "@tanstack/react-start/server-entry",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "my-db",
+      "database_id": "your-database-id"
+    }
+  ],
+  "vars": {
+    "BETTER_AUTH_SECRET": "your-secret",
+    "BETTER_AUTH_URL": "https://your-app.workers.dev"
+  }
+}
+```
+
+Key points:
+- `main` must be `@tanstack/react-start/server-entry` (NOT `dist/server/server.js`)
+- No `assets` config needed - the cloudflare vite plugin handles it
+
+### Accessing Bindings in Server Handlers
+
+Use `import { env } from "cloudflare:workers"` to access bindings:
+
+```ts
+// src/lib/env.ts
+import type { D1Database } from "@cloudflare/workers-types";
+
+export interface CloudflareEnv {
+  DB: D1Database;
+  BETTER_AUTH_SECRET: string;
+  BETTER_AUTH_URL: string;
+}
+
+declare module "cloudflare:workers" {
+  const env: CloudflareEnv;
+}
+```
+
+```ts
+// src/routes/api/example.ts
+import { createFileRoute } from "@tanstack/react-router";
+import { env } from "cloudflare:workers";
+import type { CloudflareEnv } from "~/lib/env";
+
+export const Route = createFileRoute("/api/example")({
+  server: {
+    handlers: {
+      GET: async ({ request }) => {
+        const cfEnv = env as CloudflareEnv;
+        
+        if (!cfEnv?.DB) {
+          return new Response(JSON.stringify({ error: "Server configuration error" }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        // Use cfEnv.DB for Drizzle, cfEnv.BETTER_AUTH_SECRET for auth, etc.
+        const { drizzle } = await import("drizzle-orm/d1");
+        const db = drizzle(cfEnv.DB);
+        
+        // ... your logic
+      },
+    },
+  },
+});
+```
+
+### Better Auth with Cloudflare
+
+```ts
+// src/lib/auth.ts
+import type { D1Database } from "@cloudflare/workers-types";
+import { betterAuth } from "better-auth";
+import { withCloudflare } from "better-auth-cloudflare";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { drizzle } from "drizzle-orm/d1";
+import { schema } from "~/db";
+import type { CloudflareEnv } from "~/lib/env";
+
+export function createAuth(env?: CloudflareEnv, cf?: unknown) {
+  const db = env ? drizzle(env.DB, { schema }) : ({} as ReturnType<typeof drizzle>);
+
+  return betterAuth({
+    ...withCloudflare(
+      {
+        autoDetectIpAddress: true,
+        cf: cf || {},
+        d1: env
+          ? {
+              db,
+              options: {
+                usePlural: true, // tables: users, sessions, accounts
+                debugLogs: false,
+              },
+            }
+          : undefined,
+      },
+      {
+        secret: env?.BETTER_AUTH_SECRET,
+        baseURL: env?.BETTER_AUTH_URL,
+        trustedOrigins: [
+          "https://your-app.workers.dev",
+          "http://localhost:5173",
+        ],
+        emailAndPassword: { enabled: true },
+        session: {
+          cookieCache: { enabled: true, maxAge: 60 * 5 },
+        },
+      }
+    ),
+    ...(env
+      ? {}
+      : {
+          database: drizzleAdapter({} as D1Database, {
+            provider: "sqlite",
+            usePlural: true,
+          }),
+        }),
+  });
+}
+
+// Export for CLI schema generation
+export const auth = createAuth();
+```
+
+### Auth Route Handler
+
+```ts
+// src/routes/api/auth/$.ts
+import { createFileRoute } from "@tanstack/react-router";
+import { env } from "cloudflare:workers";
+import type { CloudflareEnv } from "~/lib/env";
+
+export const Route = createFileRoute("/api/auth/$")({
+  server: {
+    handlers: {
+      OPTIONS: async () => {
+        return new Response(null, {
+          status: 204,
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+          },
+        });
+      },
+      GET: async ({ request }) => {
+        const cfEnv = env as CloudflareEnv;
+        if (!cfEnv?.DB) {
+          return new Response(JSON.stringify({ error: "Server configuration error" }), {
+            status: 500,
+          });
+        }
+        
+        const cf = (request as unknown as { cf?: unknown }).cf;
+        const { createAuth } = await import("~/lib/auth");
+        const auth = createAuth(cfEnv, cf);
+        return auth.handler(request);
+      },
+      POST: async ({ request }) => {
+        const cfEnv = env as CloudflareEnv;
+        if (!cfEnv?.DB) {
+          return new Response(JSON.stringify({ error: "Server configuration error" }), {
+            status: 500,
+          });
+        }
+        
+        const cf = (request as unknown as { cf?: unknown }).cf;
+        const { createAuth } = await import("~/lib/auth");
+        const auth = createAuth(cfEnv, cf);
+        return auth.handler(request);
+      },
+    },
+  },
+});
+```
+
+### Common Pitfalls
+
+| Issue | Solution |
+|-------|----------|
+| Error 1101 on deploy | Use dynamic `await import()` for drizzle-orm, better-auth |
+| "Server configuration error" | Check `wrangler.jsonc` main is `@tanstack/react-start/server-entry` |
+| "model 'user' not found" | Set `usePlural: true` if tables are `users`, `sessions` (plural) |
+| Missing geolocation fields | Run `npx @better-auth/cli generate` and apply migration |
+
+---
+
+## Auxiliary Workers
+
+Run additional Workers alongside your main TanStack Start app for background tasks, scheduled jobs, or queue consumers.
+
+### Vite Config
+
+```ts
+// vite.config.ts
+import { defineConfig } from "vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import { cloudflare } from "@cloudflare/vite-plugin";
+
+export default defineConfig({
+  plugins: [
+    tanstackStart(),
+    cloudflare({
+      viteEnvironment: { name: "ssr" },
+      auxiliaryWorkers: [
+        { configPath: "./wrangler.queue-consumer.jsonc" },
+        { configPath: "./wrangler.scheduled.jsonc" },
+      ],
+    }),
+  ],
+});
+```
+
+### Auxiliary Worker Config
+
+```jsonc
+// wrangler.queue-consumer.jsonc
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "my-app-queue-consumer",
+  "main": "src/workers/queue-consumer.ts",
+  "compatibility_date": "2025-01-01",
+  "compatibility_flags": ["nodejs_compat_v2"],
+  "queues": {
+    "consumers": [{ "queue": "my-queue", "max_batch_size": 10 }]
+  }
+}
+```
+
+### Service Binding (Main → Auxiliary)
+
+```jsonc
+// wrangler.jsonc (main app)
+{
+  "services": [
+    { "binding": "QUEUE_WORKER", "service": "my-app-queue-consumer" }
+  ]
+}
+```
+
+**Requirements:** Vite 7+, `@cloudflare/vite-plugin`
+
+---
+
+## Cloudflare Workflows
+
+Durable multi-step jobs with automatic retries, state persistence, and long-running execution (minutes → weeks).
+
+### When to Use
+
+- User lifecycle (onboarding → trial reminder → conversion check)
+- Data pipelines with retry logic
+- Human-in-the-loop approvals
+- Scheduled tasks that span days
+
+### Workflow Class
+
+```ts
+// src/workflows/user-lifecycle.ts
+import { WorkflowEntrypoint, WorkflowStep, WorkflowEvent } from "cloudflare:workers";
+
+type Env = { USER_WORKFLOW: Workflow; DB: D1Database };
+type Params = { userId: string; email: string };
+
+export class UserLifecycleWorkflow extends WorkflowEntrypoint<Env, Params> {
+  async run(event: WorkflowEvent<Params>, step: WorkflowStep) {
+    await step.do("send welcome email", async () => {
+      await sendEmail(event.payload.email, "Welcome!");
+    });
+
+    await step.sleep("trial period", "7 days");
+
+    const hasConverted = await step.do("check conversion", async () => {
+      const user = await this.env.DB.prepare(
+        "SELECT subscription_status FROM users WHERE id = ?"
+      ).bind(event.payload.userId).first();
+      return user?.subscription_status === "active";
+    });
+
+    if (!hasConverted) {
+      await step.do("send trial ending email", async () => {
+        await sendEmail(event.payload.email, "Your trial is ending soon");
+      });
+    }
+  }
+}
+```
+
+### Configuration
+
+```jsonc
+// wrangler.jsonc
+{
+  "workflows": [
+    {
+      "name": "user-lifecycle-workflow",
+      "binding": "USER_WORKFLOW",
+      "class_name": "UserLifecycleWorkflow"
+    }
+  ]
+}
+```
+
+### Triggering Workflows
+
+```ts
+// From API route or server function
+const instance = await env.USER_WORKFLOW.create({
+  id: `user-${userId}-onboarding`,
+  params: { userId, email },
+});
+
+// Check status
+const status = await instance.status();
+
+// Send event (for waitForEvent steps)
+await instance.sendEvent({ type: "approved", payload: { approvedBy: adminId } });
+```
+
+### Step Options
+
+```ts
+await step.do(
+  "fetch external API",
+  {
+    retries: { limit: 5, delay: "30s", backoff: "exponential" },
+    timeout: "2 minutes",
+  },
+  async () => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Fetch failed");
+    return res.json();
+  }
+);
+```
+
+### Best Practices
+
+| Do | Don't |
+|----|-------|
+| One API call per step | Giant steps with multiple calls |
+| Return state from steps | Store state in variables outside steps |
+| Use deterministic step names | Dynamic names like `step-${Date.now()}` |
+| Store large data in R2, return refs | Return 1MB+ from steps |
+
+**For AI agents with tool calls:** See [Durable AI Agent](#durable-ai-agent-workflows--agents-sdk) pattern combining Workflows + Agents SDK.
+
+---
+
+## Cloudflare Queues
+
+Async message processing with guaranteed at-least-once delivery.
+
+### When to Use
+
+- Background job processing
+- API buffering / rate limiting
+- Event-driven workflows
+- Decoupling services
+
+### Producer (Send Messages)
+
+```ts
+// From any Worker or server function
+await env.MY_QUEUE.send({
+  type: "process-image",
+  imageId: "123",
+  userId: "user-456",
+});
+
+// Batch send
+await env.MY_QUEUE.sendBatch([
+  { body: { type: "email", to: "a@example.com" } },
+  { body: { type: "email", to: "b@example.com" } },
+]);
+```
+
+### Consumer (Process Messages)
+
+```ts
+// src/workers/queue-consumer.ts
+export default {
+  async queue(batch: MessageBatch, env: Env): Promise<void> {
+    for (const msg of batch.messages) {
+      try {
+        await processMessage(msg.body, env);
+        msg.ack();
+      } catch (error) {
+        msg.retry({ delaySeconds: 60 });
+      }
+    }
+  },
+};
+
+async function processMessage(body: unknown, env: Env) {
+  const message = body as { type: string; [key: string]: unknown };
+  
+  switch (message.type) {
+    case "process-image":
+      await processImage(message.imageId as string, env);
+      break;
+    case "send-email":
+      await sendEmail(message.to as string, message.subject as string);
+      break;
+  }
+}
+```
+
+### Configuration
+
+```jsonc
+// wrangler.jsonc
+{
+  "queues": {
+    "producers": [{ "binding": "MY_QUEUE", "queue": "my-queue" }],
+    "consumers": [
+      {
+        "queue": "my-queue",
+        "max_batch_size": 10,
+        "max_retries": 3,
+        "dead_letter_queue": "my-queue-dlq"
+      }
+    ]
+  }
+}
+```
+
+### CLI Commands
+
+```bash
+wrangler queues create my-queue
+wrangler queues create my-queue-dlq
+wrangler queues consumer add my-queue my-worker
+```
+
+---
+
+## Vectorize (RAG)
+
+Vector database for semantic search, recommendations, and RAG applications.
+
+### Setup
+
+```bash
+# Create index (immutable after creation)
+wrangler vectorize create doc-search --dimensions=768 --metric=cosine
+
+# Create metadata indexes BEFORE inserting vectors
+wrangler vectorize create-metadata-index doc-search --property-name=category --type=string
+wrangler vectorize create-metadata-index doc-search --property-name=published --type=number
+```
+
+### Configuration
+
+```jsonc
+// wrangler.jsonc
+{
+  "vectorize": [
+    { "binding": "VECTORIZE", "index_name": "doc-search" }
+  ],
+  "ai": { "binding": "AI" }
+}
+```
+
+### Indexing Documents
+
+```ts
+// Generate embeddings and store
+async function indexDocument(doc: Document, env: Env) {
+  const embeddings = await env.AI.run("@cf/baai/bge-base-en-v1.5", {
+    text: [doc.content],
+  });
+
+  await env.VECTORIZE.upsert([
+    {
+      id: doc.id,
+      values: embeddings.data[0],
+      metadata: {
+        title: doc.title,
+        category: doc.category,
+        published: Math.floor(doc.publishedAt.getTime() / 1000),
+        url: doc.url,
+      },
+    },
+  ]);
+}
+```
+
+### RAG Query Pattern
+
+```ts
+async function ragQuery(query: string, env: Env) {
+  // 1. Generate query embedding
+  const embeddings = await env.AI.run("@cf/baai/bge-base-en-v1.5", {
+    text: [query],
+  });
+
+  // 2. Search Vectorize
+  const matches = await env.VECTORIZE.query(embeddings.data[0], {
+    topK: 5,
+    returnMetadata: "all",
+    filter: { category: "docs" },
+  });
+
+  // 3. Fetch full documents from R2/D1
+  const documents = await Promise.all(
+    matches.matches.map(async (match) => {
+      const obj = await env.R2_DOCS.get(match.metadata?.url as string);
+      return obj?.text();
+    })
+  );
+
+  // 4. Generate response with context
+  const context = documents.filter(Boolean).join("\n\n");
+  const response = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+    messages: [
+      { role: "system", content: `Answer based on context:\n${context}` },
+      { role: "user", content: query },
+    ],
+  });
+
+  return { answer: response.response, sources: matches.matches };
+}
+```
+
+### Embedding Models
+
+| Model | Dimensions | Best For |
+|-------|------------|----------|
+| `@cf/baai/bge-base-en-v1.5` | 768 | English text (balanced) |
+| `@cf/baai/bge-small-en-v1.5` | 384 | Fast, lower accuracy |
+| `@cf/baai/bge-large-en-v1.5` | 1024 | Higher accuracy |
+
+### Best Practices
+
+- Create metadata indexes BEFORE inserting vectors
+- Use `upsert` for updates (insert ignores duplicates)
+- Batch inserts: 1000-2500 vectors per batch
+- Use namespaces for tenant isolation (faster than metadata filters)
+- `returnMetadata: "indexed"` for speed, `"all"` when needed
+
+---
+
+## Agents SDK
+
+Stateful AI agents with persistent memory, WebSockets, and scheduling.
+
+### When to Use
+
+- Chat interfaces with persistent memory
+- Real-time collaborative AI
+- Long-running AI workflows
+- Per-user AI state
+
+### Agent Class
+
+```ts
+// src/agents/chat-agent.ts
+import { Agent } from "agents";
+
+interface AgentState {
+  messages: Array<{ role: string; content: string }>;
+  preferences: Record<string, unknown>;
+}
+
+export class ChatAgent extends Agent<Env, AgentState> {
+  onStart() {
+    this.sql`CREATE TABLE IF NOT EXISTS conversations (
+      id TEXT PRIMARY KEY,
+      messages TEXT,
+      created_at INTEGER DEFAULT (unixepoch())
+    )`;
+  }
+
+  async onRequest(request: Request): Promise<Response> {
+    const { message } = await request.json();
+
+    // Add to state
+    this.state.messages.push({ role: "user", content: message });
+
+    // Generate response
+    const response = await this.env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+      messages: this.state.messages,
+    });
+
+    this.state.messages.push({ role: "assistant", content: response.response });
+
+    return Response.json({ response: response.response });
+  }
+
+  onStateUpdate(state: AgentState) {
+    // Persist to SQL on state change
+    this.sql`INSERT OR REPLACE INTO conversations (id, messages) 
+             VALUES (${this.id}, ${JSON.stringify(state.messages)})`;
+  }
+}
+```
+
+### Configuration
+
+```jsonc
+// wrangler.jsonc
+{
+  "durable_objects": {
+    "bindings": [
+      { "name": "CHAT_AGENT", "class_name": "ChatAgent" }
+    ]
+  },
+  "ai": { "binding": "AI" }
+}
+```
+
+### Usage
+
+```ts
+// Get or create agent per user
+const id = env.CHAT_AGENT.idFromName(`user-${userId}`);
+const agent = env.CHAT_AGENT.get(id);
+
+// Send message
+const response = await agent.fetch(request);
+```
+
+### WebSocket Support
+
+```ts
+export class RealtimeAgent extends Agent<Env> {
+  onConnect(connection: Connection) {
+    connection.send(JSON.stringify({ type: "connected", agentId: this.id }));
+  }
+
+  onMessage(connection: Connection, message: string) {
+    const data = JSON.parse(message);
+    // Process and broadcast
+    this.broadcast(JSON.stringify({ type: "update", data }));
+  }
+
+  onDisconnect(connection: Connection) {
+    // Cleanup
+  }
+}
+```
+
+### Durable AI Agent (Workflows + Agents SDK)
+
+Combine Workflows for durable execution with Agents SDK for real-time UI updates.
+
+**Workflow with Tool Calls:**
+
+```ts
+// src/workflows/research-agent.ts
+import { WorkflowEntrypoint, WorkflowStep, WorkflowEvent } from "cloudflare:workers";
+import Anthropic from "@anthropic-ai/sdk";
+
+type Params = { task: string; agentId: string };
+
+export class ResearchWorkflow extends WorkflowEntrypoint<Env, Params> {
+  async run(event: WorkflowEvent<Params>, step: WorkflowStep) {
+    const client = new Anthropic({ apiKey: this.env.ANTHROPIC_API_KEY });
+    const messages: Anthropic.MessageParam[] = [
+      { role: "user", content: event.payload.task },
+    ];
+
+    const tools = [
+      {
+        name: "search_repos",
+        description: "Search GitHub repositories",
+        input_schema: {
+          type: "object" as const,
+          properties: { query: { type: "string" } },
+          required: ["query"],
+        },
+      },
+    ];
+
+    for (let turn = 0; turn < 10; turn++) {
+      // Push progress to Agent for real-time UI
+      await this.pushProgress(event.payload.agentId, {
+        status: "thinking",
+        turn,
+      });
+
+      const response = await step.do(
+        `llm-turn-${turn}`,
+        { retries: { limit: 3, delay: "10 seconds", backoff: "exponential" } },
+        async () => {
+          const msg = await client.messages.create({
+            model: "claude-sonnet-4-5-20250929",
+            max_tokens: 4096,
+            tools,
+            messages,
+          });
+          return JSON.parse(JSON.stringify(msg));
+        }
+      );
+
+      messages.push({ role: "assistant", content: response.content });
+
+      if (response.stop_reason === "end_turn") {
+        const textBlock = response.content.find(
+          (b): b is Anthropic.TextBlock => b.type === "text"
+        );
+        return { status: "complete", result: textBlock?.text };
+      }
+
+      // Execute tool calls
+      const toolResults: Anthropic.ToolResultBlockParam[] = [];
+      for (const block of response.content) {
+        if (block.type !== "tool_use") continue;
+
+        await this.pushProgress(event.payload.agentId, {
+          status: "tool_call",
+          tool: block.name,
+        });
+
+        const result = await step.do(`tool-${turn}-${block.id}`, async () => {
+          return await this.executeTool(block.name, block.input);
+        });
+
+        toolResults.push({
+          type: "tool_result",
+          tool_use_id: block.id,
+          content: result,
+        });
+      }
+
+      messages.push({ role: "user", content: toolResults });
+    }
+
+    return { status: "max_turns_reached" };
+  }
+
+  private async pushProgress(agentId: string, progress: unknown) {
+    const agent = this.env.RESEARCH_AGENT.get(
+      this.env.RESEARCH_AGENT.idFromName(agentId)
+    );
+    await agent.updateProgress(progress);
+  }
+
+  private async executeTool(name: string, input: unknown): Promise<string> {
+    // Tool implementations
+    return `Result for ${name}`;
+  }
+}
+```
+
+**Agent for Real-time Updates:**
+
+```ts
+// src/agents/research-agent.ts
+import { Agent } from "agents";
+
+interface State {
+  status: string;
+  progress: unknown[];
+}
+
+export class ResearchAgent extends Agent<Env, State> {
+  initialState: State = { status: "idle", progress: [] };
+
+  async updateProgress(progress: unknown) {
+    this.setState({
+      ...this.state,
+      progress: [...this.state.progress, progress],
+    });
+  }
+
+  async startResearch(task: string) {
+    const instance = await this.env.RESEARCH_WORKFLOW.create({
+      params: { task, agentId: this.name },
+    });
+    this.setState({ ...this.state, status: "running" });
+    return instance.id;
+  }
+}
+```
+
+**React Client:**
+
+```tsx
+import { useAgent } from "agents/react";
+
+function ResearchUI() {
+  const [state, setState] = useState({ status: "idle", progress: [] });
+
+  useAgent({
+    agent: "research-agent",
+    name: `user-${userId}`,
+    onStateUpdate: (newState) => setState(newState),
+  });
+
+  return (
+    <div>
+      <p>Status: {state.status}</p>
+      {state.progress.map((p, i) => (
+        <div key={i}>{JSON.stringify(p)}</div>
+      ))}
+    </div>
+  );
+}
+```
+
+| Pattern | Use Case |
+|---------|----------|
+| Workflow alone | Background tasks, no UI needed |
+| Agent alone | Real-time chat, short interactions |
+| Workflow + Agent | Long-running AI with real-time progress |
 
 ---
 
