@@ -184,6 +184,101 @@ app.use("/*", async (c, next) => {
 export default app;
 ```
 
+### Security Configuration (v4.11.4+)
+
+Since Hono v4.11.4, JWT middleware requires explicit `alg` configuration to prevent algorithm confusion attacks.
+
+```ts
+import { jwt } from "hono/jwt";
+
+app.use(
+  "/api/*",
+  jwt({
+    secret: env.JWT_SECRET,
+    alg: "HS256", // REQUIRED - prevents algorithm confusion
+  })
+);
+```
+
+For JWKS (asymmetric keys):
+
+```ts
+import { jwk } from "hono/jwk";
+
+app.use(
+  "/api/*",
+  jwk({
+    jwks_uri: "https://example.com/.well-known/jwks.json",
+    alg: ["RS256"], // REQUIRED - asymmetric algorithms only
+  })
+);
+```
+
+### CSRF with Async Origin Validation (v4.10.8+)
+
+```ts
+import { csrf } from "hono/csrf";
+
+app.use(
+  csrf({
+    origin: async (origin, c) => {
+      const allowedOrigins = await getAllowedOrigins(c.env.DB);
+      return allowedOrigins.includes(origin);
+    },
+  })
+);
+```
+
+### Context Storage with Safe Access (v4.11.0+)
+
+Use `tryGetContext()` when context availability isn't guaranteed:
+
+```ts
+import { tryGetContext } from "hono/context-storage";
+
+function getOptionalUser() {
+  const context = tryGetContext<Env>();
+  return context?.var.user ?? null;
+}
+```
+
+### Custom NotFoundResponse Type (v4.11.0+)
+
+Improve client-side type inference for 404 responses:
+
+```ts
+import { Hono, TypedResponse } from "hono";
+
+declare module "hono" {
+  interface NotFoundResponse
+    extends Response,
+      TypedResponse<{ error: string }, 404, "json"> {}
+}
+
+const app = new Hono()
+  .get("/posts/:id", async (c) => {
+    const post = await getPost(c.req.param("id"));
+    if (!post) {
+      return c.notFound(); // Now typed as { error: string } with 404
+    }
+    return c.json({ post }, 200);
+  })
+  .notFound((c) => c.json({ error: "not found" }, 404));
+```
+
+### Typed URL for Hono Client (v4.11.0+)
+
+Get precise URL types for use with SWR/React Query:
+
+```ts
+const client = hc<typeof app, "http://localhost:8787">(
+  "http://localhost:8787/"
+);
+
+const url = client.api.posts.$url();
+// TypedURL with precise protocol, host, and path
+```
+
 ---
 
 ## Server Functions
@@ -1557,6 +1652,83 @@ await step.do(
   }
 );
 ```
+
+### Waiting for External Events (Webhooks)
+
+Workflows can pause execution and wait for external events like payment webhooks, approval flows, or third-party callbacks.
+
+```ts
+// src/workflows/payment.ts
+import { WorkflowEntrypoint, WorkflowStep, WorkflowEvent } from "cloudflare:workers";
+
+export class PaymentWorkflow extends WorkflowEntrypoint<Env, { userId: string }> {
+  async run(event: WorkflowEvent<{ userId: string }>, step: WorkflowStep) {
+    // Step 1: Create checkout session
+    const session = await step.do("create stripe session", async () => {
+      const stripe = new Stripe(this.env.STRIPE_SECRET_KEY);
+      return await stripe.checkout.sessions.create({
+        mode: "subscription",
+        customer_email: event.payload.email,
+        success_url: `${this.env.APP_URL}/success`,
+        cancel_url: `${this.env.APP_URL}/cancel`,
+        metadata: { workflowId: event.instanceId },
+      });
+    });
+
+    // Step 2: Wait for Stripe webhook (pauses execution)
+    const stripeEvent = await step.waitForEvent("stripe.paid", {
+      timeout: "24 hours",
+    });
+
+    // Step 3: Continue after payment confirmed
+    await step.do("activate subscription", async () => {
+      await this.env.DB.prepare(
+        "UPDATE users SET subscription_status = 'active' WHERE id = ?"
+      ).bind(event.payload.userId).run();
+    });
+
+    return { status: "completed", sessionId: session.id };
+  }
+}
+```
+
+**Webhook Handler (receives external event and resumes workflow):**
+
+```ts
+// src/routes/api/webhooks/stripe.ts
+app.post("/api/webhooks/stripe", async (c) => {
+  const sig = c.req.header("stripe-signature");
+  const body = await c.req.text();
+  
+  const event = stripe.webhooks.constructEvent(
+    body,
+    sig!,
+    c.env.STRIPE_WEBHOOK_SECRET
+  );
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    const workflowId = session.metadata?.workflowId;
+
+    if (workflowId) {
+      // Resume the waiting workflow
+      const instance = await c.env.PAYMENT_WORKFLOW.get(workflowId);
+      await instance.sendEvent({
+        type: "stripe.paid",
+        payload: { sessionId: session.id, customerId: session.customer },
+      });
+    }
+  }
+
+  return c.json({ received: true });
+});
+```
+
+**Use cases:**
+- Payment confirmation (Stripe, Paddle)
+- Human approval workflows
+- Third-party API callbacks
+- Email verification flows
 
 ### Best Practices
 
