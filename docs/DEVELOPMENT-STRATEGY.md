@@ -1,6 +1,6 @@
 # Development Strategy: UI-First Workflow
 
-[:gb: English](./DEVELOPMENT-STRATEGY.md) | [:fr: Français](./fr/DEVELOPMENT-STRATEGY.md)
+[Disponible en français](./fr/DEVELOPMENT-STRATEGY.md)
 
 > **Philosophy**: Build and validate the entire user experience with dummy data before implementing backend logic. This approach allows for rapid iteration, early stakeholder feedback, and clear separation of concerns.
 

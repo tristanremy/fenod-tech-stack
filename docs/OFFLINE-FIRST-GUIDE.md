@@ -1,6 +1,6 @@
 # Offline-First Guide
 
-[:gb: English](./OFFLINE-FIRST-GUIDE.md) | [:fr: Français](./fr/OFFLINE-FIRST-GUIDE.md)
+[Disponible en français](./fr/OFFLINE-FIRST-GUIDE.md)
 
 > Back to [README](../README.md)
 

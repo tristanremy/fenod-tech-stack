@@ -1,5 +1,5 @@
 # Guide de Migration
 
-[:gb: English](../MIGRATION.md) | [:fr: Français](./MIGRATION.md)
+[Available in English](../MIGRATION.md)
 
 > Traduction en cours. Voir la [version anglaise](../MIGRATION.md).

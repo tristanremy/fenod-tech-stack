@@ -1,6 +1,6 @@
 # Debugging
 
-[:gb: English](./DEBUGGING.md) | [:fr: Français](./fr/DEBUGGING.md)
+[Disponible en français](./fr/DEBUGGING.md)
 
 ## Chrome DevTools MCP
 

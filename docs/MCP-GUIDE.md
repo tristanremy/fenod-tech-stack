@@ -1,6 +1,6 @@
 # MCP with Claude Code
 
-[:gb: English](./MCP-GUIDE.md) | [:fr: Français](./fr/MCP-GUIDE.md)
+[Disponible en français](./fr/MCP-GUIDE.md)
 
 ## The Problem
 

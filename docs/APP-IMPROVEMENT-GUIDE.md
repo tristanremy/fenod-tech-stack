@@ -1,6 +1,6 @@
 # App Improvement Guide
 
-[:gb: English](./APP-IMPROVEMENT-GUIDE.md) | [:fr: Français](./fr/APP-IMPROVEMENT-GUIDE.md)
+[Disponible en français](./fr/APP-IMPROVEMENT-GUIDE.md)
 
 > Architecture review and refactoring guide for apps built on the Fenod Stack.
 

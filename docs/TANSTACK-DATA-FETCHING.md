@@ -1,6 +1,6 @@
 # TanStack Data Fetching: Query vs Router Loaders
 
-[:gb: English](./TANSTACK-DATA-FETCHING.md) | [:fr: Français](./fr/TANSTACK-DATA-FETCHING.md)
+[Disponible en français](./fr/TANSTACK-DATA-FETCHING.md)
 
 > With TanStack Router/Start, React Query becomes **optional** for read-only data. Use loaders for simplicity, Query for reactivity.
 

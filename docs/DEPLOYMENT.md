@@ -1,6 +1,6 @@
 # Deployment Guide
 
-[:gb: English](./DEPLOYMENT.md) | [:fr: Français](./fr/DEPLOYMENT.md)
+[Disponible en français](./fr/DEPLOYMENT.md)
 
 > Deploy to Cloudflare with Alchemy, manage environments, and validate configuration.
 

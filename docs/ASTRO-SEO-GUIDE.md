@@ -1,6 +1,6 @@
 # SEO for Astro: Making the Fastest Framework Also the Smartest
 
-[:gb: English](./ASTRO-SEO-GUIDE.md) | [:fr: Français](./fr/ASTRO-SEO-GUIDE.md)
+[Disponible en français](./fr/ASTRO-SEO-GUIDE.md)
 
 > **Philosophy**: Astro's "content-first, JavaScript-last" approach gives you a massive SEO advantage. But to turn that raw performance into actual organic visibility, you need to wire structured data, routing, metadata, and caching correctly.
 
