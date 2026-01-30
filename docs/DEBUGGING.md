@@ -1,5 +1,7 @@
 # Debugging
 
+[:gb: English](./DEBUGGING.md) | [:fr: Français](./fr/DEBUGGING.md)
+
 ## Chrome DevTools MCP
 
 Use [chrome-devtools-mcp](https://github.com/anthropics/anthropic-quickstarts/tree/main/mcp-chrome-devtools) to let Claude inspect browser state directly.

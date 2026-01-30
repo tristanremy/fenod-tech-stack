@@ -1,5 +1,7 @@
 # MCP with Claude Code
 
+[:gb: English](./MCP-GUIDE.md) | [:fr: Français](./fr/MCP-GUIDE.md)
+
 ## The Problem
 
 With hundreds of MCP servers and thousands of tools:

@@ -1,5 +1,7 @@
 # Code Patterns
 
+[:gb: English](./CODE-PATTERNS.md) | [:fr: Français](./fr/CODE-PATTERNS.md)
+
 > Copy-paste patterns for common implementations. For architecture context, see [README](../README.md).
 
 ## Table of Contents

@@ -1,5 +1,7 @@
 # App Improvement Guide
 
+[:gb: English](./APP-IMPROVEMENT-GUIDE.md) | [:fr: Français](./fr/APP-IMPROVEMENT-GUIDE.md)
+
 > Architecture review and refactoring guide for apps built on the Fenod Stack.
 
 ## Stack Context
@@ -103,6 +105,47 @@ const mutation = useMutation(
   })
 );
 ```
+
+### Single Flight Mutations (Performance Optimization)
+
+Mutate data + update UI in one network roundtrip. Use when mutations affect multiple UI elements.
+
+**When to use:**
+- Mutation updates list + count + summary (multiple queries)
+- Performance-critical dashboards
+- Mobile/slow connection users
+
+**When to skip:**
+- Simple CRUD with one query
+- Standard invalidation is fast enough
+
+```typescript
+// Server function: fetch updated data during mutation
+const editTodo = createServerFn({ method: "POST" })
+  .validator(z.object({ id: z.number(), text: z.string() }))
+  .handler(async ({ input }) => {
+    await db.update(todo).set({ text: input.text }).where(eq(todo.id, input.id));
+
+    // Fetch all affected data in same request
+    const [todos, count] = await Promise.all([
+      db.select().from(todo),
+      db.select({ count: sql`count(*)` }).from(todo),
+    ]);
+
+    return { todos, count };
+  });
+
+// Client: update cache directly, no refetch needed
+const mutation = useMutation({
+  mutationFn: editTodo,
+  onSuccess: (data) => {
+    queryClient.setQueryData(["todos"], data.todos);
+    queryClient.setQueryData(["todos", "count"], data.count);
+  },
+});
+```
+
+**Reference:** [Frontend Masters deep dive](https://frontendmasters.com/blog/single-flight-mutations-in-tanstack-start-part-1/)
 
 #### Cloudflare
 

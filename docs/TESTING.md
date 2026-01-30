@@ -1,5 +1,7 @@
 # Testing Guide
 
+[:gb: English](./TESTING.md) | [:fr: Français](./fr/TESTING.md)
+
 > Test slices in isolation, routes with integration tests, and user flows end-to-end.
 
 ## Stack

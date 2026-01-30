@@ -1,29 +1,29 @@
-# Offline-First Guide
+# Guide Offline-First
 
-[:gb: English](./OFFLINE-FIRST-GUIDE.md) | [:fr: Français](./fr/OFFLINE-FIRST-GUIDE.md)
+[:gb: English](../OFFLINE-FIRST-GUIDE.md) | [:fr: Français](./OFFLINE-FIRST-GUIDE.md)
 
-> Back to [README](../README.md)
+> Retour au [README](../../README.md)
 
-## When to Implement Offline-First
+## Quand implémenter l'offline-first
 
-| Context | Recommended Level |
+| Contexte | Niveau recommandé |
 | --- | --- |
-| Marketing / brochure site | Not necessary |
-| Admin dashboard | Basic cache |
-| Field business app (technicians, craftsmen) | Full offline |
-| Critical forms (inventories, reports) | Full offline |
-| E-commerce catalog | Basic cache |
-| Real-time payments app | Network-first required |
+| Site vitrine / marketing | Pas nécessaire |
+| Dashboard admin | Cache basique |
+| App métier terrain (artisans, techniciens) | Offline complet |
+| Formulaires critiques (inventaires, rapports) | Offline complet |
+| E-commerce catalogue | Cache basique |
+| App avec paiements temps réel | Network-first obligatoire |
 
-**80/20 Rule**: Only implement offline-first if your users regularly work in dead zones or with unstable connections. Otherwise, TanStack Query cache is enough.
+**Règle 80/20** : Implémenter l'offline-first uniquement si tes utilisateurs travaillent régulièrement en zone blanche ou avec connexion instable. Sinon, le cache TanStack Query suffit.
 
 ---
 
-## Offline Support Levels
+## Niveaux d'offline support
 
-### Level 1: Basic Cache (TanStack Query persist)
+### Niveau 1 : Cache basique (TanStack Query persist)
 
-Previously loaded data stays available. No offline actions possible.
+Les données déjà chargées restent disponibles. Aucune action offline possible.
 
 ```bash
 pnpm add @tanstack/query-sync-storage-persister @tanstack/react-query-persist-client
@@ -63,9 +63,9 @@ if (typeof window !== "undefined") {
 }
 ```
 
-### Level 2: Optimistic Updates (Smooth UX)
+### Niveau 2 : Optimistic updates (UX fluide)
 
-UI responds immediately, syncs in background.
+L'UI répond immédiatement, sync en background.
 
 ```typescript
 // apps/web/src/hooks/use-todo-mutations.ts
@@ -104,11 +104,11 @@ export function useCreateTodo() {
         if (context?.previous) {
           queryClient.setQueryData(["todo", "getAll"], context.previous);
         }
-        toast.error("Creation failed");
+        toast.error("Échec de la création");
       },
 
       onSuccess: () => {
-        toast.success("Task created");
+        toast.success("Tâche créée");
       },
 
       onSettled: () => {
@@ -120,13 +120,13 @@ export function useCreateTodo() {
 }
 ```
 
-### Level 3: Full Offline (IndexedDB + sync queue)
+### Niveau 3 : Offline complet (IndexedDB + sync queue)
 
-Actions possible without network, automatic sync on reconnection.
+Actions possibles sans réseau, synchronisation automatique au retour online.
 
 ---
 
-## Full Offline Architecture
+## Architecture Offline Complet
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -136,10 +136,10 @@ Actions possible without network, automatic sync on reconnection.
 │              (cache + optimistic updates)                │
 ├─────────────────────────────────────────────────────────┤
 │                   IndexedDB                              │
-│           (local data + action queue)                    │
+│         (données locales + queue d'actions)              │
 ├─────────────────────────────────────────────────────────┤
 │                  Sync Manager                            │
-│           (detects online, replays actions)              │
+│          (détecte online, replay actions)                │
 ├─────────────────────────────────────────────────────────┤
 │                  Service Worker                          │
 │            (cache assets + API fallback)                 │
@@ -151,7 +151,7 @@ Actions possible without network, automatic sync on reconnection.
 
 ---
 
-## Implementation
+## Implémentation
 
 ### 1. IndexedDB Store
 
@@ -387,7 +387,7 @@ export function OfflineIndicator() {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-amber-950 px-4 py-2 text-center text-sm font-medium flex items-center justify-center gap-2">
       <WifiOff className="h-4 w-4" />
-      <span>Offline mode — Changes will sync when back online</span>
+      <span>Mode hors ligne — Les modifications seront synchronisées au retour de la connexion</span>
     </div>
   );
 }
@@ -428,7 +428,7 @@ export function useOfflineMutation<TData, TVariables>({
 
       // Queue for later sync
       await queueAction(actionType, table, variables);
-      toast.info("Action saved, will sync when online");
+      toast.info("Action enregistrée, sera synchronisée en ligne");
       return null as TData;
     },
 
@@ -447,7 +447,7 @@ export function useOfflineMutation<TData, TVariables>({
       if (context?.previous) {
         queryClient.setQueryData(queryKey, context.previous);
       }
-      toast.error("Operation failed");
+      toast.error("Erreur lors de l'opération");
     },
 
     onSettled: () => {
@@ -463,7 +463,7 @@ export function useOfflineMutation<TData, TVariables>({
 
 ## PWA Setup
 
-### vite-plugin-pwa (recommended)
+### vite-plugin-pwa (recommandé)
 
 ```bash
 pnpm add -D vite-plugin-pwa
@@ -476,15 +476,15 @@ import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   plugins: [
-    // ... other plugins
+    // ... autres plugins
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "robots.txt", "icons/*.svg"],
 
       manifest: {
-        name: "My Application",
-        short_name: "MyApp",
-        description: "Offline-first business application",
+        name: "Mon Application",
+        short_name: "MonApp",
+        description: "Application métier offline-first",
         theme_color: "#3b82f6",
         background_color: "#ffffff",
         display: "standalone",
@@ -559,40 +559,40 @@ export default defineConfig({
 });
 ```
 
-### Minimal PWA Icons
+### Icônes PWA minimales
 
-Create at minimum these files in `public/icons/`:
+Crée au minimum ces fichiers dans `public/icons/` :
 
 ```
 public/
 ├── icons/
 │   ├── icon-192.png   # 192x192px
 │   ├── icon-512.png   # 512x512px
-│   └── icon-512-maskable.png  # 512x512px with safe zone
+│   └── icon-512-maskable.png  # 512x512px avec safe zone
 ├── favicon.ico
 └── robots.txt
 ```
 
-**Tip**: Use [PWA Asset Generator](https://github.com/nickytonline/pwa-asset-generator) or [Maskable.app](https://maskable.app/) to generate icons.
+**Tip** : Utilise [PWA Asset Generator](https://github.com/nickytonline/pwa-asset-generator) ou [Maskable.app](https://maskable.app/) pour générer les icônes.
 
 ---
 
 ## Caching Strategies
 
-### When to Use Each Strategy
+### Quand utiliser chaque stratégie
 
-| Strategy | Use Case | Example |
-|----------|----------|---------|
-| **Cache First** | Static assets, rarely modified | Fonts, images, CSS, JS bundles |
-| **Network First** | Fresh data important, fallback acceptable | API calls, user data |
-| **Stale While Revalidate** | Frequently accessed, freshness less critical | Product lists, articles |
-| **Network Only** | Critical real-time data | Payments, transactions |
-| **Cache Only** | Precached assets only | App shell, offline page |
+| Stratégie | Utilisation | Exemple |
+|-----------|-------------|---------|
+| **Cache First** | Assets statiques, rarement modifiés | Fonts, images, CSS, JS bundles |
+| **Network First** | Données fraîches importantes, fallback acceptable | API calls, user data |
+| **Stale While Revalidate** | Données fréquemment accédées, fraîcheur moins critique | Liste de produits, articles |
+| **Network Only** | Données temps réel critiques | Paiements, transactions |
+| **Cache Only** | Assets précachés uniquement | App shell, offline page |
 
-### Workbox Strategies in Detail
+### Workbox Strategies en détail
 
 ```typescript
-// Cache First - Fast, uses cache first
+// Cache First - Rapide, utilise le cache en priorité
 {
   urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
   handler: "CacheFirst",
@@ -600,12 +600,12 @@ public/
     cacheName: "images",
     expiration: {
       maxEntries: 100,
-      maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+      maxAgeSeconds: 30 * 24 * 60 * 60, // 30 jours
     },
   },
 }
 
-// Network First - Fresh, falls back to cache if offline
+// Network First - Frais, fallback sur cache si offline
 {
   urlPattern: /\/api\/.*/,
   handler: "NetworkFirst",
@@ -619,7 +619,7 @@ public/
   },
 }
 
-// Stale While Revalidate - Fast AND fresh (in background)
+// Stale While Revalidate - Rapide ET frais (en background)
 {
   urlPattern: /\/api\/products/,
   handler: "StaleWhileRevalidate",
@@ -639,15 +639,15 @@ public/
 
 ### Chrome DevTools
 
-1. Open DevTools (F12)
-2. Go to "Network" tab
-3. Check "Offline" in the throttling dropdown
-4. Test the app
+1. Ouvrir DevTools (F12)
+2. Tab "Network"
+3. Cocher "Offline" dans le dropdown throttling
+4. Tester l'app
 
-### Test Script
+### Script de test
 
 ```typescript
-// For dev testing
+// Pour tester en dev
 export function simulateOffline(durationMs: number = 5000) {
   const originalFetch = window.fetch;
 
@@ -664,38 +664,38 @@ export function simulateOffline(durationMs: number = 5000) {
 
 ---
 
-## Deployment Checklist
+## Checklist Déploiement
 
-- [ ] Valid manifest (`/manifest.webmanifest`)
-- [ ] Service worker registered
-- [ ] 192px and 512px icons present
-- [ ] HTTPS enabled (required for PWA)
+- [ ] Manifest valide (`/manifest.webmanifest`)
+- [ ] Service worker enregistré
+- [ ] Icônes 192px et 512px présentes
+- [ ] HTTPS activé (obligatoire pour PWA)
 - [ ] `start_url` accessible offline
 - [ ] Lighthouse PWA score > 90
 
-### Test Commands
+### Commandes de test
 
 ```bash
-# Production build
+# Build production
 pnpm build
 
-# Serve locally (simulates prod)
+# Serve localement (simule prod)
 pnpm preview
 
-# Lighthouse audit
+# Audit Lighthouse
 npx lighthouse http://localhost:4173 --view
 ```
 
 ---
 
-## Advanced Patterns
+## Patterns Avancés
 
 ### Conflict Resolution
 
-For cases where the same item is modified offline on multiple devices:
+Pour les cas où le même item est modifié offline sur plusieurs devices :
 
 ```typescript
-// Simple "Last Write Wins" strategy
+// Stratégie "Last Write Wins" simple
 interface SyncableItem {
   id: string;
   updatedAt: number; // timestamp
@@ -703,12 +703,12 @@ interface SyncableItem {
 }
 
 async function resolveConflict(local: SyncableItem, remote: SyncableItem) {
-  // Most recent wins
+  // Le plus récent gagne
   return local.updatedAt > remote.updatedAt ? local : remote;
 }
 ```
 
-### Background Sync API (if supported)
+### Background Sync API (si supporté)
 
 ```typescript
 // Service worker - sync tag
@@ -727,10 +727,10 @@ async function requestBackgroundSync() {
 }
 ```
 
-### Storage Quota
+### Quota Storage
 
 ```typescript
-// Check available space
+// Vérifier l'espace disponible
 async function checkStorageQuota() {
   if ("storage" in navigator && "estimate" in navigator.storage) {
     const { usage, quota } = await navigator.storage.estimate();
@@ -745,9 +745,9 @@ async function checkStorageQuota() {
 }
 ```
 
-### IndexedDB Persister (Alternative to localStorage)
+### IndexedDB Persister (Alternative à localStorage)
 
-For larger data, use IndexedDB instead of localStorage:
+Pour des données plus volumineuses, utilise IndexedDB au lieu de localStorage :
 
 ```typescript
 // apps/web/src/lib/idb-persister.ts
@@ -769,7 +769,7 @@ export function createIDBPersister(idbValidKey: IDBValidKey = "reactQuery"): Per
 }
 ```
 
-Usage:
+Usage :
 
 ```typescript
 import { createIDBPersister } from "@/lib/idb-persister";
@@ -791,20 +791,20 @@ function App() {
 
 ---
 
-## Common Pitfalls
+## Pièges courants
 
-| Pitfall | Solution |
-|---------|----------|
-| localStorage limited to ~5MB | Use IndexedDB for large data |
-| Stale service worker cache | Implement versioning and update prompt |
-| Mutations lost on reload | Persist mutation queue in IndexedDB |
-| Data conflicts | Implement Last-Write-Wins or merge strategy |
-| Cache never invalidated | Configure appropriate `maxAge` and `maxEntries` |
-| SSR hydration mismatch | Create persister only on client side |
+| Piège | Solution |
+|-------|----------|
+| localStorage limité à ~5MB | Utiliser IndexedDB pour données volumineuses |
+| Service worker cache stale | Implémenter versioning et update prompt |
+| Mutations perdues au reload | Persister la mutation queue dans IndexedDB |
+| Conflits de données | Implémenter Last-Write-Wins ou merge strategy |
+| Cache jamais invalidé | Configurer `maxAge` et `maxEntries` appropriés |
+| SSR hydration mismatch | Créer persister uniquement côté client |
 
 ---
 
-## Resources
+## Ressources
 
 - [Workbox Documentation](https://developer.chrome.com/docs/workbox/)
 - [vite-plugin-pwa](https://vite-pwa-org.netlify.app/)

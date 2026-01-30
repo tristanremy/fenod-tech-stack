@@ -1,5 +1,7 @@
 # Migration Guide
 
+[:gb: English](./MIGRATION.md) | [:fr: Français](./fr/MIGRATION.md)
+
 > From `create-better-t-stack` scaffold to production-ready Fenod patterns.
 
 ## Overview
