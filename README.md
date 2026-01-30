@@ -223,6 +223,7 @@ my-app/
 | [Debugging](docs/DEBUGGING.md) | Wrangler tail, DevTools, logging |
 | [MCP Guide](docs/MCP-GUIDE.md) | MCP server integration |
 | [Astro SEO](docs/ASTRO-SEO-GUIDE.md) | SEO patterns for Astro sites |
+| [Offline-First](docs/OFFLINE-FIRST-GUIDE.md) | PWA, IndexedDB, sync strategies |
 
 ---
 
