@@ -248,7 +248,8 @@ my-app/
 |------|---------|
 | [Tailwind v4](https://tailwindcss.com) | Styling |
 | [Turborepo](https://turbo.build) | Monorepo builds |
-| [Ultracite](https://github.com/haydenbleasel/ultracite) | Linting (Biome-based) |
+| [Ultracite](https://ultracite.dev) | Linting & formatting (Oxlint + Oxfmt backend) |
+| [tsgo](https://github.com/microsoft/typescript-go) | Type-checking |
 | [Better Upload](https://better-upload.dev) | File uploads to R2 |
 | [Polar.sh](https://polar.sh) | Payments |
 | [AI SDK](https://sdk.vercel.ai) | LLM integration |

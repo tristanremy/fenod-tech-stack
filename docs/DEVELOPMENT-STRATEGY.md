@@ -67,7 +67,7 @@ pnpm create better-t-stack@latest my-app
 - ORM: `Drizzle`
 - Auth: `Better Auth` (select Yes)
 - Styling: `Tailwind CSS` (+ shadcn/ui will be added in Phase 2)
-- Add-ons: `Ultracite` (for linting/formatting)
+- Add-ons: `Ultracite` (Oxlint + Oxfmt backend for linting/formatting), `tsgo` (for type-checking)
 
 ```bash
 # Navigate to project

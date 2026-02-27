@@ -476,6 +476,90 @@ const { data: session } = authClient.useSession();
 await authClient.signOut();
 ```
 
+### Seeding the First Admin User
+
+When public sign-up is disabled, you need to seed the first admin user directly. Better Auth's `auth.api.signUpEmail` swallows errors and `auth.api.hashPassword` doesn't exist — use `better-auth/crypto` instead.
+
+**The pattern**: temporary POST endpoint that creates tables, hashes password, and inserts user + account + role via raw D1 SQL. Remove after use.
+
+```ts
+// apps/server/src/routes/auth.ts (temporary seed endpoint)
+import { auth } from "@my-app/auth";
+import { hashPassword } from "better-auth/crypto";
+import { Hono } from "hono";
+
+const authRoutes = new Hono();
+
+// Block public sign-up
+authRoutes.post("/sign-up/email", (c) =>
+  c.json({ error: "Sign up is disabled. Contact an administrator." }, 403),
+);
+
+// Temporary — remove after seeding
+authRoutes.post("/seed-admin", async (c) => {
+  try {
+    const { env } = await import("cloudflare:workers");
+    const raw = env.DB as D1Database;
+
+    // Create auth tables (Better Auth expects these)
+    await raw.exec(`
+      CREATE TABLE IF NOT EXISTS user (id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, email_verified INTEGER NOT NULL DEFAULT 0, image TEXT, created_at INTEGER NOT NULL DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)), updated_at INTEGER NOT NULL DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)));
+      CREATE TABLE IF NOT EXISTS session (id TEXT PRIMARY KEY, expires_at INTEGER NOT NULL, token TEXT NOT NULL UNIQUE, created_at INTEGER NOT NULL DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)), updated_at INTEGER NOT NULL DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)), ip_address TEXT, user_agent TEXT, user_id TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE);
+      CREATE TABLE IF NOT EXISTS account (id TEXT PRIMARY KEY, account_id TEXT NOT NULL, provider_id TEXT NOT NULL, user_id TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE, access_token TEXT, refresh_token TEXT, id_token TEXT, access_token_expires_at INTEGER, refresh_token_expires_at INTEGER, scope TEXT, password TEXT, created_at INTEGER NOT NULL DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)), updated_at INTEGER NOT NULL DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)));
+      CREATE TABLE IF NOT EXISTS verification (id TEXT PRIMARY KEY, identifier TEXT NOT NULL, value TEXT NOT NULL, expires_at INTEGER NOT NULL, created_at INTEGER NOT NULL DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)), updated_at INTEGER NOT NULL DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)));
+    `);
+
+    // Admin plugin columns (if using better-auth admin plugin)
+    await raw.exec("ALTER TABLE user ADD COLUMN role TEXT").catch(() => {});
+    await raw.exec("ALTER TABLE user ADD COLUMN banned INTEGER DEFAULT 0").catch(() => {});
+    await raw.exec("ALTER TABLE user ADD COLUMN ban_reason TEXT").catch(() => {});
+    await raw.exec("ALTER TABLE user ADD COLUMN ban_expires INTEGER").catch(() => {});
+
+    const uid = crypto.randomUUID();
+    const aid = crypto.randomUUID();
+    const now = Date.now();
+
+    // Hash password using Better Auth's own crypto
+    const hashedPassword = await hashPassword("admin1234");
+
+    await raw.batch([
+      raw.prepare(
+        `INSERT OR IGNORE INTO user (id, name, email, email_verified, created_at, updated_at, role) VALUES (?, ?, ?, 1, ?, ?, 'admin')`
+      ).bind(uid, "Admin", "admin@my-app.local", now, now),
+      raw.prepare(
+        `INSERT OR IGNORE INTO account (id, account_id, provider_id, user_id, password, created_at, updated_at) VALUES (?, ?, 'credential', ?, ?, ?, ?)`
+      ).bind(aid, uid, uid, hashedPassword, now, now),
+    ]);
+
+    return c.json({ ok: true, email: "admin@my-app.local", userId: uid });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return c.json({ error: message }, 500);
+  }
+});
+
+authRoutes.on(["POST", "GET"], "/*", (c) => auth.handler(c.req.raw));
+
+export { authRoutes };
+```
+
+**Run it:**
+
+```bash
+curl -X POST http://localhost:3000/api/auth/seed-admin
+```
+
+**Then remove the `seed-admin` route and the `better-auth/crypto` import.**
+
+**Key pitfalls:**
+| Pitfall | Solution |
+|---------|----------|
+| `auth.api.hashPassword` doesn't exist | Use `import { hashPassword } from "better-auth/crypto"` |
+| `auth.api.signUpEmail` swallows errors | Bypass it entirely — insert via raw SQL |
+| D1 tables not created yet | Use `CREATE TABLE IF NOT EXISTS` in the seed endpoint |
+| Admin plugin columns missing | `ALTER TABLE user ADD COLUMN role TEXT` (with `.catch(() => {})` for idempotency) |
+| Direct SQLite file writes invisible to miniflare | Always go through the running worker's D1 binding |
+
 ---
 
 ## TanStack Router
