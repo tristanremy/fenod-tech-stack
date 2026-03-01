@@ -610,21 +610,20 @@ export const queryClient = new QueryClient({
 
 ```tsx
 // packages/web/src/routes/customers/index.tsx
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { orpc } from '@/lib/orpc';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { isAPIError, ErrorCode } from '@/lib/api/error-handler';
 import { toast } from 'sonner';
 
 function CustomerList() {
-  const { data, error, isLoading } = useQuery({
-    queryKey: ['customers'],
-    queryFn: () => api.customer.list.query({}),
-  });
+  const queryClient = useQueryClient();
+  const { data, error, isLoading } = useQuery(orpc.customer.list.queryOptions({}));
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.customer.delete.mutate({ id }),
+    ...orpc.customer.delete.mutationOptions(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      queryClient.invalidateQueries({ queryKey: orpc.customer.list.queryOptions({}).queryKey });
       toast.success('Customer deleted');
     },
     onError: (error) => {

@@ -194,9 +194,8 @@ packages/api/src/routers/
 
 ```ts
 // test/helpers/client.ts
-import { createORPCClient } from '@orpc/client'
+import { createRouterClient } from '@orpc/server'
 import { appRouter } from '@/api/router'
-import type { AppRouter } from '@/api/router'
 
 export function createTestClient(context: Partial<Context> = {}) {
   const defaultContext: Context = {
@@ -206,12 +205,8 @@ export function createTestClient(context: Partial<Context> = {}) {
   }
 
   return {
-    client: createORPCClient<AppRouter>({
-      // Direct router call for testing
-      fetch: async (input) => {
-        const result = await appRouter.call(input, defaultContext)
-        return new Response(JSON.stringify(result))
-      },
+    client: createRouterClient(appRouter, {
+      context: defaultContext,
     }),
     context: defaultContext,
   }
@@ -234,7 +229,7 @@ describe('orderRouter', () => {
     it('requires authentication', async () => {
       const { client } = createTestClient()
 
-      await expect(client.order.list.query({})).rejects.toThrow('UNAUTHORIZED')
+      await expect(client.order.list({})).rejects.toThrow('UNAUTHORIZED')
     })
 
     it('returns user orders only', async () => {
@@ -245,7 +240,7 @@ describe('orderRouter', () => {
         { id: 2, userId: 1, total: 200 },
       ])
 
-      const orders = await client.order.list.query({})
+      const orders = await client.order.list({})
 
       expect(orders).toHaveLength(2)
       expect(context.db.where).toHaveBeenCalledWith(
@@ -259,7 +254,7 @@ describe('orderRouter', () => {
       const { client } = createAuthedTestClient()
 
       await expect(
-        client.order.create.mutate({ items: [] })
+        client.order.create({ items: [] })
       ).rejects.toThrow('VALIDATION')
     })
 
@@ -268,7 +263,7 @@ describe('orderRouter', () => {
 
       context.db.returning.mockResolvedValue([{ id: 1, total: 45 }])
 
-      const order = await client.order.create.mutate({
+      const order = await client.order.create({
         items: [
           { productId: 'p1', quantity: 2 },
           { productId: 'p2', quantity: 1 },
@@ -287,7 +282,7 @@ describe('orderRouter', () => {
       context.db.returning.mockResolvedValue([{ id: 1, userId: 2 }]) // Different user
 
       await expect(
-        client.order.delete.mutate({ id: 1 })
+        client.order.delete({ id: 1 })
       ).rejects.toThrow('FORBIDDEN')
     })
   })

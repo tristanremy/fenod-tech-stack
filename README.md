@@ -42,10 +42,17 @@
 ## Quick Start
 
 ```bash
-pnpm create better-t-stack@latest
+pnpm create @tanstack/start@latest my-app
 ```
 
-> [create-better-t-stack](https://github.com/AmanVarshney01/create-better-t-stack) scaffolds the full stack. See [Migration Guide](docs/MIGRATION.md) to go from scaffold to production.
+For the full fenod stack with add-ons:
+
+```bash
+pnpm create @tanstack/start@latest my-app \
+  --add-ons oRPC,drizzle,better-auth,shadcn,tanstack-query,cloudflare
+```
+
+> The official [TanStack CLI](https://github.com/TanStack/cli) scaffolds a TanStack Start project with optional add-ons. Hono must be added manually after scaffolding if needed as HTTP layer. See [Migration Guide](docs/MIGRATION.md) to go from scaffold to production.
 
 ---
 
@@ -215,7 +222,7 @@ my-app/
 |-------|-------------|
 | [Code Patterns](docs/CODE-PATTERNS.md) | API, auth, forms, UI, Workflows, Queues, Vectorize, Agents |
 | [Development Strategy](docs/DEVELOPMENT-STRATEGY.md) | UI-first workflow, phased development |
-| [Migration Guide](docs/MIGRATION.md) | From `create-better-t-stack` to production |
+| [Migration Guide](docs/MIGRATION.md) | From TanStack CLI scaffold to production |
 | [App Improvement Guide](docs/APP-IMPROVEMENT-GUIDE.md) | Performance, security, error handling |
 | [Testing Guide](docs/TESTING.md) | Vitest, Playwright, slice testing |
 | [Deployment Guide](docs/DEPLOYMENT.md) | Alchemy, Wrangler (jsonc), CI/CD |
@@ -254,6 +261,7 @@ my-app/
 | [Polar.sh](https://polar.sh) | Payments |
 | [AI SDK](https://sdk.vercel.ai) | LLM integration |
 | [Alchemy](https://alchemy.run) | Cloudflare IaC |
+| [Husky](https://typicode.github.io/husky/) + [lint-staged](https://github.com/lint-staged/lint-staged) | Git hooks (pre-commit, pre-push) |
 
 ---
 

@@ -403,18 +403,9 @@ function BulkImportButton({ urls }: { urls: string[] }) {
 
 ```ts
 import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
 export const auth = betterAuth({
-  database: drizzleAdapter(db, {
-    provider: "sqlite",
-    schema: {
-      ...schema,
-      user: schema.users,
-      session: schema.sessions,
-      account: schema.accounts,
-    },
-  }),
+  database: env.DB, // D1 binding — auto-detected in v1.5.0+
   experimental: { joins: true },
 
   emailAndPassword: {
@@ -619,12 +610,10 @@ export const Route = createFileRoute("/dashboard")({
   component: DashboardRoute,
   beforeLoad: async () => {
     const session = await getUser();
-    return { session };
-  },
-  loader: async ({ context }) => {
-    if (!context.session) {
+    if (!session) {
       throw redirect({ to: "/login" });
     }
+    return { session };
   },
 });
 
@@ -762,21 +751,23 @@ export const queryClient = new QueryClient({
 ### Usage
 
 ```tsx
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@/utils/orpc";
 
 function TodosRoute() {
   const todos = useQuery(orpc.todo.getAll.queryOptions());
 
+  const queryClient = useQueryClient();
+
   const createMutation = useMutation(
     orpc.todo.create.mutationOptions({
-      onSuccess: () => todos.refetch(),
+      onSuccess: () => queryClient.invalidateQueries({ queryKey: orpc.todo.getAll.queryOptions().queryKey }),
     })
   );
 
   const toggleMutation = useMutation(
     orpc.todo.toggle.mutationOptions({
-      onSuccess: () => todos.refetch(),
+      onSuccess: () => queryClient.invalidateQueries({ queryKey: orpc.todo.getAll.queryOptions().queryKey }),
     })
   );
 
@@ -1475,56 +1466,31 @@ export const Route = createFileRoute("/api/example")({
 // src/lib/auth.ts
 import type { D1Database } from "@cloudflare/workers-types";
 import { betterAuth } from "better-auth";
-import { withCloudflare } from "better-auth-cloudflare";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { drizzle } from "drizzle-orm/d1";
-import { schema } from "~/db";
 import type { CloudflareEnv } from "~/lib/env";
 
-export function createAuth(env?: CloudflareEnv, cf?: unknown) {
-  const db = env ? drizzle(env.DB, { schema }) : ({} as ReturnType<typeof drizzle>);
-
+export function createAuth(env: CloudflareEnv) {
   return betterAuth({
-    ...withCloudflare(
-      {
-        autoDetectIpAddress: true,
-        cf: cf || {},
-        d1: env
-          ? {
-              db,
-              options: {
-                usePlural: true, // tables: users, sessions, accounts
-                debugLogs: false,
-              },
-            }
-          : undefined,
-      },
-      {
-        secret: env?.BETTER_AUTH_SECRET,
-        baseURL: env?.BETTER_AUTH_URL,
-        trustedOrigins: [
-          "https://your-app.workers.dev",
-          "http://localhost:5173",
-        ],
-        emailAndPassword: { enabled: true },
-        session: {
-          cookieCache: { enabled: true, maxAge: 60 * 5 },
-        },
-      }
-    ),
-    ...(env
-      ? {}
-      : {
-          database: drizzleAdapter({} as D1Database, {
-            provider: "sqlite",
-            usePlural: true,
-          }),
-        }),
+    database: env.DB, // D1 binding — auto-detected in v1.5.0+
+    secret: env.BETTER_AUTH_SECRET,
+    baseURL: env.BETTER_AUTH_URL,
+    trustedOrigins: [
+      "https://your-app.workers.dev",
+      "http://localhost:5173",
+    ],
+    emailAndPassword: { enabled: true },
+    session: {
+      cookieCache: { enabled: true, maxAge: 60 * 5 },
+    },
+    advanced: {
+      ipAddress: { ipAddressHeaders: ["cf-connecting-ip"] },
+    },
   });
 }
 
-// Export for CLI schema generation
-export const auth = createAuth();
+// Export for CLI schema generation (outside Workers runtime)
+export const auth = betterAuth({
+  database: {} as D1Database,
+});
 ```
 
 ### Auth Route Handler
@@ -1555,10 +1521,9 @@ export const Route = createFileRoute("/api/auth/$")({
             status: 500,
           });
         }
-        
-        const cf = (request as unknown as { cf?: unknown }).cf;
+
         const { createAuth } = await import("~/lib/auth");
-        const auth = createAuth(cfEnv, cf);
+        const auth = createAuth(cfEnv);
         return auth.handler(request);
       },
       POST: async ({ request }) => {
@@ -1568,10 +1533,9 @@ export const Route = createFileRoute("/api/auth/$")({
             status: 500,
           });
         }
-        
-        const cf = (request as unknown as { cf?: unknown }).cf;
+
         const { createAuth } = await import("~/lib/auth");
-        const auth = createAuth(cfEnv, cf);
+        const auth = createAuth(cfEnv);
         return auth.handler(request);
       },
     },
@@ -1583,10 +1547,11 @@ export const Route = createFileRoute("/api/auth/$")({
 
 | Issue | Solution |
 |-------|----------|
-| Error 1101 on deploy | Use dynamic `await import()` for drizzle-orm, better-auth |
+| Error 1101 on deploy | Use dynamic `await import()` for better-auth |
 | "Server configuration error" | Check `wrangler.jsonc` main is `@tanstack/react-start/server-entry` |
-| "model 'user' not found" | Set `usePlural: true` if tables are `users`, `sessions` (plural) |
-| Missing geolocation fields | Run `npx @better-auth/cli generate` and apply migration |
+| Auth fails on Workers | Enable `nodejs_compat` compatibility flag in `wrangler.toml` |
+| "model 'user' not found" | Set `usePlural: true` in schema if tables are `users`, `sessions` (plural) |
+| Missing geolocation fields | Run `pnpm dlx @better-auth/cli generate` and apply migration |
 
 ---
 
@@ -1625,7 +1590,7 @@ export default defineConfig({
   "name": "my-app-queue-consumer",
   "main": "src/workers/queue-consumer.ts",
   "compatibility_date": "2025-01-01",
-  "compatibility_flags": ["nodejs_compat_v2"],
+  "compatibility_flags": ["nodejs_compat"],
   "queues": {
     "consumers": [{ "queue": "my-queue", "max_batch_size": 10 }]
   }
@@ -1862,7 +1827,7 @@ await env.MY_QUEUE.sendBatch([
 ```ts
 // src/workers/queue-consumer.ts
 export default {
-  async queue(batch: MessageBatch, env: Env): Promise<void> {
+  async queue(batch: MessageBatch<QueueMessage>, env: Env): Promise<void> {
     for (const msg of batch.messages) {
       try {
         await processMessage(msg.body, env);
@@ -1874,15 +1839,17 @@ export default {
   },
 };
 
-async function processMessage(body: unknown, env: Env) {
-  const message = body as { type: string; [key: string]: unknown };
-  
-  switch (message.type) {
+type QueueMessage =
+  | { type: "process-image"; imageId: string }
+  | { type: "send-email"; to: string; subject: string };
+
+async function processMessage(body: QueueMessage, env: Env) {
+  switch (body.type) {
     case "process-image":
-      await processImage(message.imageId as string, env);
+      await processImage(body.imageId, env);
       break;
     case "send-email":
-      await sendEmail(message.to as string, message.subject as string);
+      await sendEmail(body.to, body.subject);
       break;
   }
 }
@@ -2329,3 +2296,58 @@ export const startInstance = createStart(() => ({
   requestMiddleware: [loggingMiddleware],
 }));
 ```
+
+---
+
+## Git Hooks (Husky + lint-staged)
+
+Enforce code quality automatically on every commit and push. Pre-commit runs fast checks on staged files only; pre-push runs the full pipeline before code reaches remote.
+
+### Install
+
+```bash
+pnpm add -D husky lint-staged
+pnpm exec husky init
+```
+
+### Root `package.json`
+
+```json
+{
+  "scripts": {
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "fmt": "oxfmt .",
+    "fmt:check": "oxfmt --check .",
+    "typecheck": "tsgo --noEmit -p apps/web/tsconfig.json && tsgo --noEmit -p apps/server/tsconfig.json",
+    "test": "turbo test",
+    "build": "turbo build",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": ["oxfmt", "oxlint"],
+    "*.{json,md,css}": ["oxfmt"]
+  }
+}
+```
+
+### `.husky/pre-commit`
+
+```bash
+pnpm exec lint-staged
+```
+
+### `.husky/pre-push`
+
+```bash
+pnpm typecheck && pnpm test && pnpm build
+```
+
+### Why This Split
+
+| Hook | Runs | Speed | Purpose |
+|------|------|-------|---------|
+| `pre-commit` | On staged files only | ~2s | Format + lint — fast feedback loop |
+| `pre-push` | Full project | ~30-60s | Types, tests, build — catches breaking changes |
+
+The `prepare` script ensures Husky hooks are installed automatically after `pnpm install`.

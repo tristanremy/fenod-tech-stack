@@ -46,40 +46,40 @@ Phase 9: Polish & Optimization (ongoing)
 
 ### 1.1 Initialize Project
 
-Use **[create-better-t-stack](https://github.com/AmanVarshney01/create-better-t-stack)** to bootstrap your project with all the right dependencies:
+Use the official **[TanStack CLI](https://github.com/TanStack/cli)** to bootstrap your project:
 
 ```bash
-# Using bun (recommended for speed)
-bun create better-t-stack@latest my-app
-
-# Or npm
-npx create-better-t-stack@latest my-app
-
-# Or pnpm
-pnpm create better-t-stack@latest my-app
+pnpm create @tanstack/start@latest my-app
 ```
 
-**Interactive selections:**
-- Frontend: `React + TanStack Start`
-- Backend: `Hono`
-- API: `ORPC`
-- Database: `SQLite` (for D1) or `PostgreSQL`
-- ORM: `Drizzle`
-- Auth: `Better Auth` (select Yes)
-- Styling: `Tailwind CSS` (+ shadcn/ui will be added in Phase 2)
-- Add-ons: `Ultracite` (Oxlint + Oxfmt backend for linting/formatting), `tsgo` (for type-checking)
+For the full fenod stack in one command:
 
 ```bash
-# Navigate to project
-cd my-app
+pnpm create @tanstack/start@latest my-app \
+  --add-ons oRPC,drizzle,better-auth,shadcn,tanstack-query,cloudflare
+```
 
-# Install additional dependencies for icons
-npm install lucide-react
+**Interactive selections (if not using --add-ons):**
+- API: `oRPC`
+- Auth: `Better Auth`
+- ORM: `Drizzle` (select SQLite for D1)
+- Deploy: `Cloudflare`
+- UI: `shadcn`
+- Additional: `TanStack Query`
+
+Then add Hono and dev tooling:
+
+```bash
+cd my-app
+pnpm add hono
+pnpm add -D husky lint-staged
+pnpm exec husky init
+pnpm add -D lucide-react
 ```
 
 ### 1.2 Verify Tailwind CSS v4 Setup
 
-> **Note**: If you selected Tailwind CSS during `create-better-t-stack` setup, this should already be configured. Verify and customize as needed.
+> If you used the TanStack CLI with the `shadcn` add-on, Tailwind should already be configured. Verify and customize as needed.
 
 ```js
 // vite.config.ts (should already exist)
@@ -217,7 +217,7 @@ function Customers() {
 ### 2.1 Initialize shadcn/ui
 
 ```bash
-npx shadcn@latest init
+pnpm dlx shadcn@latest init
 
 # Select options:
 # - TypeScript: Yes
@@ -230,26 +230,26 @@ npx shadcn@latest init
 
 ```bash
 # Install components you'll likely need
-npx shadcn@latest add button
-npx shadcn@latest add card
-npx shadcn@latest add input
-npx shadcn@latest add label
-npx shadcn@latest add table
-npx shadcn@latest add dialog
-npx shadcn@latest add dropdown-menu
-npx shadcn@latest add select
-npx shadcn@latest add badge
-npx shadcn@latest add avatar
-npx shadcn@latest add tabs
-npx shadcn@latest add skeleton
+pnpm dlx shadcn@latest add button
+pnpm dlx shadcn@latest add card
+pnpm dlx shadcn@latest add input
+pnpm dlx shadcn@latest add label
+pnpm dlx shadcn@latest add table
+pnpm dlx shadcn@latest add dialog
+pnpm dlx shadcn@latest add dropdown-menu
+pnpm dlx shadcn@latest add select
+pnpm dlx shadcn@latest add badge
+pnpm dlx shadcn@latest add avatar
+pnpm dlx shadcn@latest add tabs
+pnpm dlx shadcn@latest add skeleton
 ```
 
 ### 2.3 Setup MCP for AI Components (Optional)
 
 ```bash
 # Install AI SDK for enhanced components
-npm install ai @ai-sdk/react
-npm install @ai-sdk/anthropic  # or your preferred provider
+pnpm add ai @ai-sdk/react
+pnpm add @ai-sdk/anthropic  # or your preferred provider
 ```
 
 ```tsx
@@ -811,13 +811,13 @@ export function ErrorMessage({ title, message }: { title?: string; message: stri
 
 ### 5.1 Verify Drizzle Installation
 
-> **Note**: If you selected Drizzle during `create-better-t-stack` setup, these dependencies should already be installed. Verify your `package.json`.
+> If you used the TanStack CLI with the `drizzle` add-on, these dependencies should already be installed. Verify your `package.json`.
 
 ```bash
 # Only run if Drizzle is not already installed
-npm install drizzle-orm
-npm install -D drizzle-kit
-npm install @cloudflare/workers-types
+pnpm add drizzle-orm
+pnpm add -D drizzle-kit
+pnpm add -D @cloudflare/workers-types
 ```
 
 ### 5.2 Create Schema from UI Needs
@@ -892,13 +892,13 @@ export default defineConfig({
 
 ```bash
 # Generate migration from schema
-npx drizzle-kit generate
+pnpm drizzle-kit generate
 
 # Apply migration to local D1
-npx wrangler d1 execute fenod-db --local --file=./db/migrations/0000_initial.sql
+pnpm wrangler d1 execute fenod-db --local --file=./db/migrations/0000_initial.sql
 
 # Apply migration to remote D1 (when ready)
-npx wrangler d1 execute fenod-db --remote --file=./db/migrations/0000_initial.sql
+pnpm wrangler d1 execute fenod-db --remote --file=./db/migrations/0000_initial.sql
 ```
 
 **Checkpoint**: ✅ Database schema matches UI requirements
@@ -911,173 +911,119 @@ npx wrangler d1 execute fenod-db --remote --file=./db/migrations/0000_initial.sq
 
 ### 6.1 Verify API Dependencies
 
-> **Note**: If you selected Hono and ORPC during `create-better-t-stack` setup, these should already be installed and have basic structure scaffolded.
+> If you used the TanStack CLI with the `oRPC` add-on, these should already be installed and have basic structure scaffolded.
 
 ```bash
 # Only run if not already installed
-npm install hono @orpc/server @orpc/client
+pnpm add hono @orpc/server @orpc/client
 ```
 
-```tsx
-// api/context.ts
-import { drizzle } from 'drizzle-orm/d1'
-import type { DrizzleD1Database } from 'drizzle-orm/d1'
-import * as schema from '@/db/schema'
+```ts
+// packages/api/src/context.ts
+import type { Context as HonoContext } from "hono";
+import { auth } from "@my-app/auth";
 
-export type Context = {
-  db: DrizzleD1Database<typeof schema>
-  user?: { id: number; email: string }  // Will be populated in Phase 8
+export type CreateContextOptions = { context: HonoContext };
+
+export async function createContext({ context }: CreateContextOptions) {
+  const session = await auth.api.getSession({
+    headers: context.req.raw.headers,
+  });
+  return { session };
 }
 
-export function createContext(env: Env): Context {
-  return {
-    db: drizzle(env.DB, { schema }),
-  }
-}
+export type Context = Awaited<ReturnType<typeof createContext>>;
 ```
 
 ### 6.2 Create ORPC Procedures
 
-```tsx
-// api/procedures/customers.ts
-import { z } from 'zod'
-import { procedure } from '@/api/trpc'
-import { customers, insertCustomerSchema } from '@/db/schema/customers'
-import { eq, like, or } from 'drizzle-orm'
+```ts
+// packages/api/src/routers/customer/router.ts
+import z from "zod";
+import { publicProcedure, protectedProcedure } from "../../index";
+import { insertCustomerSchema } from "@my-app/db/schema/customers";
+import * as customerService from "./service";
 
-// List customers with optional search
-export const listCustomers = procedure
-  .input(z.object({
-    search: z.string().optional(),
-    limit: z.number().default(50),
-    offset: z.number().default(0),
-  }))
-  .query(async ({ input, ctx }) => {
-    let query = ctx.db.select().from(customers)
+export const customerRouter = {
+  list: publicProcedure
+    .input(z.object({
+      search: z.string().optional(),
+      limit: z.number().default(50),
+      offset: z.number().default(0),
+    }))
+    .handler(async ({ input }) => {
+      return await customerService.list(input);
+    }),
 
-    if (input.search) {
-      query = query.where(
-        or(
-          like(customers.name, `%${input.search}%`),
-          like(customers.email, `%${input.search}%`)
-        )
-      )
-    }
+  get: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .handler(async ({ input }) => {
+      return await customerService.getById(input.id);
+    }),
 
-    const results = await query
-      .limit(input.limit)
-      .offset(input.offset)
+  create: protectedProcedure
+    .input(insertCustomerSchema)
+    .handler(async ({ input, context }) => {
+      return await customerService.create(input, context.session.user.id);
+    }),
 
-    return results
-  })
+  update: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      data: insertCustomerSchema.partial(),
+    }))
+    .handler(async ({ input }) => {
+      return await customerService.update(input.id, input.data);
+    }),
 
-// Get single customer
-export const getCustomer = procedure
-  .input(z.object({ id: z.number() }))
-  .query(async ({ input, ctx }) => {
-    const [customer] = await ctx.db
-      .select()
-      .from(customers)
-      .where(eq(customers.id, input.id))
-      .limit(1)
-
-    if (!customer) {
-      throw new Error('Customer not found')
-    }
-
-    return customer
-  })
-
-// Create customer
-export const createCustomer = procedure
-  .input(insertCustomerSchema)
-  .mutation(async ({ input, ctx }) => {
-    const [customer] = await ctx.db
-      .insert(customers)
-      .values(input)
-      .returning()
-
-    return customer
-  })
-
-// Update customer
-export const updateCustomer = procedure
-  .input(z.object({
-    id: z.number(),
-    data: insertCustomerSchema.partial(),
-  }))
-  .mutation(async ({ input, ctx }) => {
-    const [customer] = await ctx.db
-      .update(customers)
-      .set({ ...input.data, updatedAt: new Date() })
-      .where(eq(customers.id, input.id))
-      .returning()
-
-    if (!customer) {
-      throw new Error('Customer not found')
-    }
-
-    return customer
-  })
-
-// Delete customer
-export const deleteCustomer = procedure
-  .input(z.object({ id: z.number() }))
-  .mutation(async ({ input, ctx }) => {
-    await ctx.db
-      .delete(customers)
-      .where(eq(customers.id, input.id))
-
-    return { success: true }
-  })
+  delete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .handler(async ({ input }) => {
+      return await customerService.remove(input.id);
+    }),
+};
 ```
 
 ### 6.3 Create Router
 
-```tsx
-// api/router.ts
-import { router } from '@/api/trpc'
-import * as customerProcedures from './procedures/customers'
+```ts
+// packages/api/src/routers/index.ts
+import { publicProcedure } from "../index";
+import { customerRouter } from "./customer/router";
 
-export const appRouter = router({
-  customers: {
-    list: customerProcedures.listCustomers,
-    get: customerProcedures.getCustomer,
-    create: customerProcedures.createCustomer,
-    update: customerProcedures.updateCustomer,
-    delete: customerProcedures.deleteCustomer,
-  },
-})
-
-export type AppRouter = typeof appRouter
+export const appRouter = {
+  healthCheck: publicProcedure.handler(() => "OK"),
+  customers: customerRouter,
+};
 ```
 
 ### 6.4 Setup Hono API Server
 
-```tsx
-// api/index.ts
-import { Hono } from 'hono'
-import { cors } from 'hono/cors'
-import { createORPCHandler } from '@orpc/server/hono'
-import { appRouter } from './router'
-import { createContext } from './context'
+```ts
+// apps/server/src/index.ts
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { RPCHandler } from "@orpc/server/fetch";
+import { appRouter } from "@my-app/api/routers/index";
+import { createContext } from "@my-app/api/context";
 
-const app = new Hono<{ Bindings: Env }>()
+const app = new Hono<{ Bindings: Env }>();
 
-app.use('*', cors())
+app.use("/*", cors());
 
-app.use('/api/*', async (c, next) => {
-  const ctx = createContext(c.env)
-  c.set('ctx', ctx)
-  await next()
-})
+const rpcHandler = new RPCHandler(appRouter);
 
-app.use('/api/orpc/*', createORPCHandler({
-  router: appRouter,
-  createContext: (c) => c.get('ctx'),
-}))
+app.use("/*", async (c, next) => {
+  const context = await createContext({ context: c });
+  const result = await rpcHandler.handle(c.req.raw, {
+    prefix: "/rpc",
+    context,
+  });
+  if (result.matched) return c.newResponse(result.response.body);
+  await next();
+});
 
-export default app
+export default app;
 ```
 
 **Checkpoint**: ✅ API endpoints work, types are safe end-to-end
@@ -1090,20 +1036,27 @@ export default app
 
 ### 7.1 Setup ORPC Client
 
-```tsx
-// lib/api/client.ts
-import { createORPCClient } from '@orpc/client'
-import type { AppRouter } from '@/api/router'
+```ts
+// apps/web/src/utils/orpc.ts
+import { createORPCClient } from "@orpc/client";
+import { RPCLink } from "@orpc/client/fetch";
+import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 
-export const api = createORPCClient<AppRouter>({
-  baseURL: '/api/orpc',
-})
+const link = new RPCLink({
+  url: "/rpc",
+  fetch(url, options) {
+    return fetch(url, { ...options, credentials: "include" });
+  },
+});
+
+const client = createORPCClient(link);
+export const orpc = createTanstackQueryUtils(client);
 ```
 
 ### 7.2 Setup TanStack Query
 
 ```bash
-npm install @tanstack/react-query
+pnpm add @tanstack/react-query
 ```
 
 ```tsx
@@ -1137,18 +1090,17 @@ function RootLayout() {
 
 ```tsx
 // app/routes/customers/index.tsx (updated)
-import { useQuery } from '@tanstack/react-query'
-import { api } from '@/lib/api/client'
-import { LoadingCard } from '@/components/ui/loading-card'
-import { ErrorMessage } from '@/components/ui/error-message'
+import { useQuery } from "@tanstack/react-query";
+import { orpc } from "@/utils/orpc";
+import { LoadingCard } from "@/components/ui/loading-card";
+import { ErrorMessage } from "@/components/ui/error-message";
 
 function Customers() {
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: customers, isLoading, error } = useQuery({
-    queryKey: ['customers', searchQuery],
-    queryFn: () => api.customers.list.query({ search: searchQuery }),
-  })
+  const { data: customers, isLoading, error } = useQuery(
+    orpc.customers.list.queryOptions({ search: searchQuery })
+  );
 
   if (isLoading) {
     return (
@@ -1160,11 +1112,11 @@ function Customers() {
           <LoadingCard />
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
-    return <ErrorMessage message="Failed to load customers" />
+    return <ErrorMessage message="Failed to load customers" />;
   }
 
   return (
@@ -1180,7 +1132,7 @@ function Customers() {
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }
 ```
 
@@ -1188,48 +1140,48 @@ function Customers() {
 
 ```tsx
 // app/routes/customers/new.tsx (updated)
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { api } from '@/lib/api/client'
-import { useNavigate } from '@tanstack/react-router'
-import { toast } from 'sonner' // npm install sonner
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { orpc } from "@/utils/orpc";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner"; // pnpm add sonner
 
 function NewCustomer() {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const createMutation = useMutation({
-    mutationFn: (data: NewCustomer) => api.customers.create.mutate(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] })
-      toast.success('Customer created successfully')
-      navigate({ to: '/customers' })
-    },
-    onError: (error) => {
-      toast.error('Failed to create customer')
-      console.error(error)
-    },
-  })
+  const createMutation = useMutation(
+    orpc.customers.create.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: orpc.customers.list.queryOptions({}).queryKey });
+        toast.success("Customer created successfully");
+        navigate({ to: "/customers" });
+      },
+      onError: () => {
+        toast.error("Failed to create customer");
+      },
+    })
+  );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
 
     createMutation.mutate({
-      name: formData.get('name') as string,
-      email: formData.get('email') as string,
-      phone: formData.get('phone') as string,
-      status: formData.get('status') as 'active' | 'inactive',
-    })
-  }
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      phone: formData.get("phone") as string,
+      status: formData.get("status") as "active" | "inactive",
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit}>
       {/* Same form UI */}
       <Button type="submit" disabled={createMutation.isPending}>
-        {createMutation.isPending ? 'Creating...' : 'Create Customer'}
+        {createMutation.isPending ? "Creating..." : "Create Customer"}
       </Button>
     </form>
-  )
+  );
 }
 ```
 
@@ -1243,22 +1195,19 @@ function NewCustomer() {
 
 ### 8.1 Verify Better Auth Installation
 
-> **Note**: If you selected Better Auth during `create-better-t-stack` setup, it should already be installed with basic configuration. Review and customize as needed.
+> If you used the TanStack CLI with the `better-auth` add-on, it should already be installed with basic configuration. Review and customize as needed.
 
 ```bash
 # Only run if Better Auth is not already installed
-npm install better-auth
+pnpm add better-auth
 ```
 
-```tsx
+```ts
 // lib/auth/config.ts
 import { betterAuth } from 'better-auth'
-import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 
 export const auth = betterAuth({
-  database: drizzleAdapter(db, {
-    provider: 'sqlite',
-  }),
+  database: env.DB, // D1 binding — auto-detected in v1.5.0+
   emailAndPassword: {
     enabled: true,
   },
@@ -1273,58 +1222,49 @@ export const auth = betterAuth({
 
 ### 8.2 Add Auth to API Context
 
-```tsx
-// api/context.ts (updated)
-import { auth } from '@/lib/auth/config'
+```ts
+// packages/api/src/context.ts (updated with auth)
+import type { Context as HonoContext } from "hono";
+import { auth } from "@my-app/auth";
 
-export async function createContext(req: Request, env: Env): Promise<Context> {
-  const session = await auth.api.getSession({ headers: req.headers })
-
-  return {
-    db: drizzle(env.DB, { schema }),
-    user: session?.user,
-  }
+export async function createContext({ context }: { context: HonoContext }) {
+  const session = await auth.api.getSession({
+    headers: context.req.raw.headers,
+  });
+  return { session };
 }
 ```
 
 ### 8.3 Protected Routes
 
-```tsx
-// api/middleware/auth.ts
-import { procedure } from '@/api/trpc'
+```ts
+// packages/api/src/index.ts
+import { ORPCError, os } from "@orpc/server";
+import type { Context } from "./context";
 
-export const protectedProcedure = procedure.use(async ({ ctx, next }) => {
-  if (!ctx.user) {
-    throw new Error('Unauthorized')
+export const o = os.$context<Context>();
+export const publicProcedure = o;
+
+const requireAuth = o.middleware(async ({ context, next }) => {
+  if (!context.session?.user) {
+    throw new ORPCError("UNAUTHORIZED");
   }
+  return next({ context: { session: context.session } });
+});
 
-  return next({
-    ctx: {
-      ...ctx,
-      user: ctx.user, // Now guaranteed to exist
-    },
-  })
-})
+export const protectedProcedure = publicProcedure.use(requireAuth);
 ```
 
-```tsx
-// api/procedures/customers.ts (updated)
-import { protectedProcedure } from '@/api/middleware/auth'
+```ts
+// packages/api/src/routers/customer/router.ts (updated)
+import { protectedProcedure } from "../../index";
+import { insertCustomerSchema } from "@my-app/db/schema/customers";
 
 export const createCustomer = protectedProcedure
   .input(insertCustomerSchema)
-  .mutation(async ({ input, ctx }) => {
-    // ctx.user is now guaranteed to exist
-    const [customer] = await ctx.db
-      .insert(customers)
-      .values({
-        ...input,
-        createdBy: ctx.user.id, // Track who created it
-      })
-      .returning()
-
-    return customer
-  })
+  .handler(async ({ input, context }) => {
+    return await customerService.create(input, context.session.user.id);
+  });
 ```
 
 ### 8.4 Frontend Auth
@@ -1389,54 +1329,50 @@ export function Navigation() {
 
 ```tsx
 // app/routes/customers/index.tsx (optimistic delete)
-const deleteMutation = useMutation({
-  mutationFn: (id: number) => api.customers.delete.mutate({ id }),
-  onMutate: async (id) => {
-    // Cancel outgoing refetches
-    await queryClient.cancelQueries({ queryKey: ['customers'] })
+const listQueryKey = orpc.customers.list.queryOptions({}).queryKey;
 
-    // Snapshot previous value
-    const previousCustomers = queryClient.getQueryData(['customers'])
-
-    // Optimistically update
-    queryClient.setQueryData(['customers'], (old: Customer[]) =>
-      old.filter(c => c.id !== id)
-    )
-
-    return { previousCustomers }
-  },
-  onError: (err, id, context) => {
-    // Rollback on error
-    queryClient.setQueryData(['customers'], context?.previousCustomers)
-    toast.error('Failed to delete customer')
-  },
-  onSettled: () => {
-    queryClient.invalidateQueries({ queryKey: ['customers'] })
-  },
-})
+const deleteMutation = useMutation(
+  orpc.customers.delete.mutationOptions({
+    onMutate: async (input) => {
+      await queryClient.cancelQueries({ queryKey: listQueryKey });
+      const previousCustomers = queryClient.getQueryData(listQueryKey);
+      queryClient.setQueryData(listQueryKey, (old: Customer[]) =>
+        old.filter(c => c.id !== input.id)
+      );
+      return { previousCustomers };
+    },
+    onError: (_err, _input, context) => {
+      queryClient.setQueryData(listQueryKey, context?.previousCustomers);
+      toast.error("Failed to delete customer");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: listQueryKey });
+    },
+  })
+);
 ```
 
 ### 9.2 Add Prefetching
 
 ```tsx
 // app/routes/customers/index.tsx (prefetch on hover)
-import { useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from "@tanstack/react-query";
+import { orpc } from "@/utils/orpc";
 
-function CustomerRow({ customer }: { customer: Customer }) {
-  const queryClient = useQueryClient()
+  function CustomerRow({ customer }: { customer: Customer }) {
+  const queryClient = useQueryClient();
 
   const prefetchCustomer = () => {
-    queryClient.prefetchQuery({
-      queryKey: ['customer', customer.id],
-      queryFn: () => api.customers.get.query({ id: customer.id }),
-    })
-  }
+    queryClient.prefetchQuery(
+      orpc.customers.get.queryOptions({ id: customer.id })
+    );
+  };
 
   return (
     <TableRow onMouseEnter={prefetchCustomer}>
       {/* ... */}
     </TableRow>
-  )
+  );
 }
 ```
 
@@ -1444,25 +1380,24 @@ function CustomerRow({ customer }: { customer: Customer }) {
 
 ```tsx
 // app/routes/customers/$customerId.tsx
-import { Suspense } from 'react'
+import { Suspense } from "react";
+import { orpc } from "@/utils/orpc";
 
-export const Route = createFileRoute('/customers/$customerId')({
+export const Route = createFileRoute("/customers/$customerId")({
   component: CustomerDetail,
   loader: ({ params }) => {
-    // Prefetch data before component renders
-    return queryClient.ensureQueryData({
-      queryKey: ['customer', params.customerId],
-      queryFn: () => api.customers.get.query({ id: Number(params.customerId) }),
-    })
+    return queryClient.ensureQueryData(
+      orpc.customers.get.queryOptions({ id: Number(params.customerId) })
+    );
   },
-})
+});
 
 function CustomerDetail() {
   return (
     <Suspense fallback={<LoadingCard />}>
       <CustomerContent />
     </Suspense>
-  )
+  );
 }
 ```
 
@@ -1545,7 +1480,7 @@ function RootLayout() {
 ### Setup AI-Powered Components
 
 ```bash
-npm install ai @ai-sdk/react @ai-sdk/anthropic
+pnpm add ai @ai-sdk/react @ai-sdk/anthropic
 ```
 
 ```tsx

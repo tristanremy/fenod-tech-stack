@@ -8,7 +8,7 @@ Use [chrome-devtools-mcp](https://github.com/anthropics/anthropic-quickstarts/tr
 
 ```bash
 # Install
-npx @anthropic-ai/chrome-devtools-mcp
+pnpm dlx @anthropic-ai/chrome-devtools-mcp
 ```
 
 Claude can then:

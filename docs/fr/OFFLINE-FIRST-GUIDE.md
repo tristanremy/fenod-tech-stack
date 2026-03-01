@@ -683,7 +683,7 @@ pnpm build
 pnpm preview
 
 # Audit Lighthouse
-npx lighthouse http://localhost:4173 --view
+pnpm dlx lighthouse http://localhost:4173 --view
 ```
 
 ---

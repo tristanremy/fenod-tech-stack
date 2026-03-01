@@ -92,7 +92,7 @@ A sitemap helps search engines discover and index your content efficiently.
 #### Installation
 
 ```bash
-npm install @astrojs/sitemap
+pnpm add @astrojs/sitemap
 ```
 
 #### Configuration
@@ -162,7 +162,7 @@ The `robots.txt` file guides search engine crawlers on which pages to crawl and 
 #### Using astro-robots-txt Plugin
 
 ```bash
-npm install astro-robots-txt
+pnpm add astro-robots-txt
 ```
 
 ```js

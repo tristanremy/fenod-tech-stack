@@ -2,11 +2,11 @@
 
 [Disponible en français](./fr/MIGRATION.md)
 
-> From `create-better-t-stack` scaffold to production-ready Fenod patterns.
+> From TanStack CLI scaffold to production-ready Fenod patterns.
 
 ## Overview
 
-`create-better-t-stack` gives you a working foundation. This guide transforms it into a production-ready codebase with:
+The TanStack CLI (`pnpm create @tanstack/start@latest`) gives you a working foundation. This guide transforms it into a production-ready codebase with:
 
 - Slices architecture (feature-based organization)
 - Type-safe error handling
@@ -18,18 +18,17 @@
 
 ## Starting Point
 
-After running `pnpm create better-t-stack@latest`, you have:
+After running `pnpm create @tanstack/start@latest my-app --add-ons oRPC,drizzle,better-auth,shadcn,tanstack-query,cloudflare`, you have:
 
 ```
 my-app/
-├── apps/
-│   └── web/                  # TanStack Start frontend
-├── packages/
-│   ├── api/                  # Hono + ORPC backend
-│   └── db/                   # Drizzle schema
+├── app/                      # TanStack Start app
+│   ├── routes/               # File-based routes
+│   └── client.tsx            # Client entry
+├── app.config.ts             # TanStack Start config
 ├── package.json
-├── pnpm-workspace.yaml
-└── turbo.json
+├── tsconfig.json
+└── ...
 ```
 
 ---
@@ -285,14 +284,14 @@ import * as userService from './service';
 export const userRouter = {
   getById: publicProcedure
     .input(z.object({ id: z.string() }))
-    .query(({ input }) => userService.getById(input.id)),
+    .handler(({ input }) => userService.getById(input.id)),
 
   update: protectedProcedure
     .input(z.object({
       name: z.string().optional(),
       email: z.string().email().optional(),
     }))
-    .mutation(({ input, ctx }) => userService.update(ctx.user.id, input)),
+    .handler(({ input, context }) => userService.update(context.user.id, input)),
 };
 ```
 
