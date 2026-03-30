@@ -1152,6 +1152,8 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
 
 ## AI Integration
 
+> **See also:** For provider comparison, model selection guide, and setup patterns, see [AI Providers](../AI-PROVIDERS.md).
+
 ### Chat API Route
 
 ```ts
@@ -1993,6 +1995,8 @@ async function ragQuery(query: string, env: Env) {
 ## Agents SDK
 
 Stateful AI agents with persistent memory, WebSockets, and scheduling.
+
+> **See also:** For a full decision matrix between Workers, Dynamic Workers, and Containers, see [Cloudflare Compute](../CLOUDFLARE-COMPUTE.md).
 
 ### When to Use
 

@@ -10,7 +10,7 @@
 
 # Fenod Stack
 
-**[Fenod](https://fenod.fr)** builds modern websites, web apps, and AI-powered products using cutting-edge technology. This is our internal reference for the tools, patterns, and best practices we use daily.
+**[Fenod](https://fenod.fr)** builds modern websites, web apps, and AI-powered products using cutting-edge technology. This is our internal reference for the stack, workflows, AI-assisted development patterns, and best practices we use daily.
 
 ## Table of Contents
 
@@ -220,6 +220,13 @@ my-app/
 
 | Guide | Description |
 |-------|-------------|
+| [Documentation Hub](docs/README.md) | Reading paths and categorized documentation map |
+| [Stack Overview](docs/STACK-OVERVIEW.md) | Recommended defaults, tradeoffs, and operating mode |
+| [AI Development Workflow](docs/AI-DEVELOPMENT-WORKFLOW.md) | How Cursor, Claude Code, MCP, and verification fit together |
+| [TDD with AI](docs/TDD-WITH-AI.md) | Red/green/refactor adapted to AI-assisted delivery |
+| [Local Toolchain Snapshot](docs/LOCAL-TOOLCHAIN.md) | Machine audit and recommendations for this setup |
+| [Cloudflare Compute](docs/CLOUDFLARE-COMPUTE.md) | Worker vs Dynamic Worker vs Container: when to use each |
+| [AI Providers](docs/AI-PROVIDERS.md) | Workers AI, AI Gateway, Replicate — model guide and provider comparison |
 | [Code Patterns](docs/CODE-PATTERNS.md) | API, auth, forms, UI, Workflows, Queues, Vectorize, Agents |
 | [Development Strategy](docs/DEVELOPMENT-STRATEGY.md) | UI-first workflow, phased development |
 | [Migration Guide](docs/MIGRATION.md) | From TanStack CLI scaffold to production |

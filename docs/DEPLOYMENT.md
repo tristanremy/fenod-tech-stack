@@ -473,6 +473,8 @@ wrangler d1 execute my-db --remote --file ./packages/db/migrations/0002_new_feat
 | `placement.mode: "smart"` | Auto-locate compute near data sources |
 | `observability` | Enable tracing with configurable sampling |
 
+> For Workers, Dynamic Workers, and Containers, see the [Cloudflare Compute](../CLOUDFLARE-COMPUTE.md) decision matrix.
+
 ### Legacy wrangler.toml
 
 <details>
