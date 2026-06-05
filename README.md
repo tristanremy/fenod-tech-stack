@@ -284,7 +284,7 @@ Cloudflare is the default deployment target. Use OAuth for local Wrangler work, 
 | [tsgo](https://github.com/microsoft/typescript-go) | Type-checking |
 | [Better Upload](https://better-upload.dev) | File uploads to R2 |
 | [Polar.sh](https://polar.sh) | Payments |
-| [AI SDK](https://sdk.vercel.ai) | LLM integration |
+| [TanStack AI](https://tanstack.com/ai) | Default AI toolkit for chat, streaming, tool calling, and agent workflows |
 | [React Doctor](https://www.react.doctor/) | React best-practice, security, performance, and architecture checks before PR merge |
 | [Alchemy](https://alchemy.run) | Cloudflare IaC |
 | [Infisical](https://infisical.com) | Secret storage and environment injection |
@@ -298,4 +298,4 @@ Cloudflare is the default deployment target. Use OAuth for local Wrangler work, 
 
 **Infra:** [Cloudflare](https://developers.cloudflare.com) | [Alchemy](https://alchemy.run) | [Infisical](https://infisical.com) | [Turborepo](https://turbo.build)
 
-**UI:** [shadcn/ui](https://ui.shadcn.com) | [Tailwind](https://tailwindcss.com) | [AI SDK Elements](https://ai-sdk.dev/elements)
+**UI:** [shadcn/ui](https://ui.shadcn.com) | [Tailwind](https://tailwindcss.com) | [TanStack AI React](https://tanstack.com/ai)

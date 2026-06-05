@@ -244,23 +244,19 @@ pnpm dlx shadcn@latest add tabs
 pnpm dlx shadcn@latest add skeleton
 ```
 
-### 2.3 Setup MCP for AI Components (Optional)
+### 2.3 Setup TanStack AI Components (Optional)
 
 ```bash
-# Install AI SDK for enhanced components
-pnpm add ai @ai-sdk/react
-pnpm add @ai-sdk/anthropic  # or your preferred provider
+# Install TanStack AI for chat, streaming, tools, and typed React state
+pnpm add @tanstack/ai @tanstack/ai-react
+pnpm add @tanstack/ai-anthropic # or your preferred provider adapter
 ```
 
 ```tsx
 // lib/ai/config.ts
-import { anthropic } from '@ai-sdk/anthropic'
-import { createAI } from 'ai/rsc'
+import { anthropicText } from '@tanstack/ai-anthropic'
 
-export const ai = createAI({
-  model: anthropic('claude-3-5-sonnet-20241022'),
-  // Configure based on your needs
-})
+export const chatModel = anthropicText('claude-3-5-sonnet-20241022')
 ```
 
 ### 2.4 Create Component Utilities
@@ -1480,38 +1476,40 @@ function RootLayout() {
 ### Setup AI-Powered Components
 
 ```bash
-pnpm add ai @ai-sdk/react @ai-sdk/anthropic
+pnpm add @tanstack/ai @tanstack/ai-react @tanstack/ai-anthropic
 ```
 
 ```tsx
 // lib/ai/chat-api.ts
-import { anthropic } from '@ai-sdk/anthropic'
-import { streamText } from 'ai'
+import { chat, toServerSentEventsResponse } from '@tanstack/ai'
+import { anthropicText } from '@tanstack/ai-anthropic'
 
 export async function POST(request: Request) {
   const { messages } = await request.json()
 
-  const result = await streamText({
-    model: anthropic('claude-3-5-sonnet-20241022'),
+  const stream = chat({
+    adapter: anthropicText('claude-3-5-sonnet-20241022'),
     messages,
   })
 
-  return result.toDataStreamResponse()
+  return toServerSentEventsResponse(stream)
 }
 ```
 
 ```tsx
 // components/ai/customer-insights.tsx
-import { useChat } from '@ai-sdk/react'
+import { fetchServerSentEvents, useChat } from '@tanstack/ai-react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 
 export function CustomerInsights({ customer }: { customer: Customer }) {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: '/api/ai/chat',
+  const [input, setInput] = useState('')
+  const { messages, sendMessage, isLoading } = useChat({
+    connection: fetchServerSentEvents('/api/ai/chat'),
     initialMessages: [{
       role: 'system',
-      content: `You are analyzing customer data for: ${JSON.stringify(customer)}`
+      parts: [{ type: 'text', content: `You are analyzing customer data for: ${JSON.stringify(customer)}` }],
     }],
   })
 
@@ -1522,15 +1520,27 @@ export function CustomerInsights({ customer }: { customer: Customer }) {
       <div className="space-y-4 mb-4">
         {messages.map((m) => (
           <div key={m.id} className={m.role === 'user' ? 'text-right' : ''}>
-            <p className="text-sm">{m.content}</p>
+            <p className="text-sm">
+              {m.parts.map((part, index) =>
+                part.type === 'text' ? <span key={index}>{part.content}</span> : null
+              )}
+            </p>
           </div>
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-2">
+      <form
+        onSubmit={(event) => {
+          event.preventDefault()
+          if (!input.trim() || isLoading) return
+          sendMessage(input)
+          setInput('')
+        }}
+        className="flex gap-2"
+      >
         <Input
           value={input}
-          onChange={handleInputChange}
+          onChange={(event) => setInput(event.target.value)}
           placeholder="Ask about this customer..."
           disabled={isLoading}
         />
@@ -1560,7 +1570,7 @@ Use this checklist to track your progress:
 - [ ] shadcn/ui initialized
 - [ ] Core components installed (button, card, input, table, etc.)
 - [ ] Component utilities configured (cn, etc.)
-- [ ] MCP/AI SDK installed (if needed)
+- [ ] MCP/TanStack AI installed (if needed)
 
 ### Phase 3: Page Layouts ☐
 - [ ] Dashboard with stats cards

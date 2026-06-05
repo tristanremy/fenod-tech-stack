@@ -120,7 +120,7 @@ Claude can:
 | Server | Use |
 |--------|-----|
 | `mcp-server-cloudflare` | Manage Workers, KV, R2, D1 |
-| `workers-ai-provider` | AI models on Workers |
+| `@cloudflare/tanstack-ai` | TanStack AI adapters for Workers AI and AI Gateway |
 
 ### Setup
 

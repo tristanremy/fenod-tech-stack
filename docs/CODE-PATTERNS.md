@@ -1172,8 +1172,8 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
 ### Chat API Route
 
 ```ts
-import { streamText } from "ai";
-import { openai } from "@ai-sdk/openai";
+import { chat, toServerSentEventsResponse } from "@tanstack/ai";
+import { openaiText } from "@tanstack/ai-openai";
 
 export const Route = createFileRoute("/api/chat")({
   server: {
@@ -1181,13 +1181,13 @@ export const Route = createFileRoute("/api/chat")({
       POST: async ({ request }) => {
         const { messages } = await request.json();
 
-        const result = streamText({
-          model: openai("gpt-4o-mini"),
+        const stream = chat({
+          adapter: openaiText("gpt-4o-mini"),
           system: "You are a helpful assistant.",
           messages,
         });
 
-        return result.toDataStreamResponse();
+        return toServerSentEventsResponse(stream);
       },
     },
   },
@@ -1197,12 +1197,21 @@ export const Route = createFileRoute("/api/chat")({
 ### Chat Component
 
 ```tsx
-import { useChat } from "@ai-sdk/react";
+import { fetchServerSentEvents, useChat } from "@tanstack/ai-react";
+import { useState } from "react";
 
 export function Chat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: "/api/chat",
+  const [input, setInput] = useState("");
+  const { messages, sendMessage, isLoading } = useChat({
+    connection: fetchServerSentEvents("/api/chat"),
   });
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!input.trim() || isLoading) return;
+    sendMessage(input);
+    setInput("");
+  };
 
   return (
     <div className="flex h-[600px] flex-col">
@@ -1223,7 +1232,9 @@ export function Chat() {
                   : "bg-muted"
               )}
             >
-              {message.content}
+              {message.parts.map((part, index) =>
+                part.type === "text" ? <span key={index}>{part.content}</span> : null
+              )}
             </div>
           </div>
         ))}
@@ -1232,7 +1243,7 @@ export function Chat() {
       <form onSubmit={handleSubmit} className="flex gap-2 border-t p-4">
         <Input
           value={input}
-          onChange={handleInputChange}
+          onChange={(event) => setInput(event.target.value)}
           placeholder="Type a message..."
           disabled={isLoading}
         />

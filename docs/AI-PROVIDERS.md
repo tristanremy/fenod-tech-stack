@@ -2,15 +2,15 @@
 
 [Disponible en francais](./fr/AI-PROVIDERS.md)
 
-Run AI models from Workers using the right provider for the task. Cloudflare-native inference is the default; route to external providers when you need specific models, fallbacks, or centralized observability.
+Run AI models from Workers using the right provider for the task. Cloudflare-native inference is the default; use TanStack AI for application-level chat, streaming, tools, and agent state, then route to external providers when you need specific models, fallbacks, or centralized observability.
 
 ## Provider Overview
 
 | Provider | Use when |
 |----------|----------|
-| **Workers AI** (`workers-ai-provider`) | Default for Cloudflare edge inference. No latency from routing outside CF network. |
-| **Cloudflare AI Gateway** (`ai-gateway-provider`) | You need caching, retries, fallback between providers, or unified observability. |
-| **Replicate** (`@ai-sdk/replicate` or via AI Gateway) | Image generation models not available on Workers AI. |
+| **Workers AI** (`@cloudflare/tanstack-ai`) | Default for Cloudflare edge inference. No latency from routing outside CF network. |
+| **Cloudflare AI Gateway** (`@cloudflare/tanstack-ai`) | You need caching, retries, fallback between providers, or unified observability. |
+| **Replicate** (TanStack AI adapter or via AI Gateway) | Image generation models not available on Workers AI. |
 
 ## Workers AI
 
@@ -19,7 +19,7 @@ Serverless GPU inference on Cloudflare's network. Available directly from Worker
 ### Setup
 
 ```bash
-pnpm add workers-ai-provider
+pnpm add @tanstack/ai @cloudflare/tanstack-ai
 ```
 
 ```jsonc
@@ -30,21 +30,19 @@ pnpm add workers-ai-provider
 ```
 
 ```ts
-import { createWorkersAI } from "workers-ai-provider";
-import { generateText, streamText } from "ai";
+import { chat, streamToText } from "@tanstack/ai";
+import { createWorkersAiChat } from "@cloudflare/tanstack-ai";
 
 type Env = { AI: Ai };
 
 export default {
   async fetch(_: Request, env: Env) {
-    const workersai = createWorkersAI({ binding: env.AI });
-
-    const result = await generateText({
-      model: workersai("@cf/meta/llama-3.1-8b-instruct"),
-      prompt: "Explain edge computing in one sentence.",
+    const stream = chat({
+      adapter: createWorkersAiChat("@cf/meta/llama-3.1-8b-instruct", { binding: env.AI }),
+      messages: [{ role: "user", content: "Explain edge computing in one sentence." }],
     });
 
-    return new Response(result.text);
+    return new Response(await streamToText(stream));
   },
 };
 ```
@@ -52,43 +50,37 @@ export default {
 ### Structured Output
 
 ```ts
-import { createWorkersAI } from "workers-ai-provider";
-import { generateText, Output } from "ai";
+import { chat, streamToText } from "@tanstack/ai";
+import { createWorkersAiChat } from "@cloudflare/tanstack-ai";
 import { z } from "zod";
 
-const workersai = createWorkersAI({ binding: env.AI });
-
-const result = await generateText({
-  model: workersai("@cf/meta/llama-3.1-8b-instruct"),
-  prompt: "Generate a lasagna recipe",
-  output: Output.object({
-    schema: z.object({
-      recipe: z.object({
-        ingredients: z.array(z.string()),
-        description: z.string(),
-      }),
-    }),
+const RecipeSchema = z.object({
+  recipe: z.object({
+    ingredients: z.array(z.string()),
+    description: z.string(),
   }),
 });
 
-return Response.json(result.output);
+const stream = chat({
+  adapter: createWorkersAiChat("@cf/meta/llama-3.1-8b-instruct", { binding: env.AI }),
+  messages: [{ role: "user", content: "Generate a lasagna recipe as JSON." }],
+});
+
+return Response.json(RecipeSchema.parse(JSON.parse(await streamToText(stream))));
 ```
 
 ### Streaming Response
 
 ```ts
-const result = streamText({
-  model: workersai("@cf/meta/llama-3.1-8b-instruct"),
-  prompt: "Write a haiku about cloud computing.",
+import { chat, toServerSentEventsResponse } from "@tanstack/ai";
+import { createWorkersAiChat } from "@cloudflare/tanstack-ai";
+
+const stream = chat({
+  adapter: createWorkersAiChat("@cf/meta/llama-3.1-8b-instruct", { binding: env.AI }),
+  messages: [{ role: "user", content: "Write a haiku about cloud computing." }],
 });
 
-return result.toTextStreamResponse({
-  headers: {
-    "Content-Type": "text/x-unknown",
-    "content-encoding": "identity",
-    "transfer-encoding": "chunked",
-  },
-});
+return toServerSentEventsResponse(stream);
 ```
 
 ## Cloudflare AI Gateway
@@ -98,44 +90,41 @@ Route requests to multiple providers through a single gateway. Get caching, retr
 ### Setup
 
 ```bash
-pnpm add ai-gateway-provider
+pnpm add @tanstack/ai @cloudflare/tanstack-ai
 ```
 
 ```ts
-import { createAiGateway } from "ai-gateway-provider";
-import { createAnthropic } from "@ai-sdk/anthropic";
-import { createOpenAI } from "@ai-sdk/openai";
+import { createAnthropicChat, createOpenAiChat } from "@cloudflare/tanstack-ai";
 
-const aigateway = createAiGateway({
-  accountId: env.CLOUDFLARE_ACCOUNT_ID,
-  gateway: "my-gateway",
-  apiKey: env.CLOUDFLARE_API_KEY,
+const claude = createAnthropicChat("claude-haiku-4-5", {
+  binding: env.AI.gateway("my-gateway"),
+  apiKey: env.ANTHROPIC_API_KEY,
 });
 
-const anthropic = createAnthropic({ apiKey: env.ANTHROPIC_API_KEY });
-const openai = createOpenAI({ apiKey: env.OPENAI_API_KEY });
+const gpt = createOpenAiChat("gpt-4o-mini", {
+  binding: env.AI.gateway("my-gateway"),
+  apiKey: env.OPENAI_API_KEY,
+});
 
-// Fallback: try Claude first, then GPT-4o-mini
-const model = aigateway([
-  anthropic("claude-haiku-4-5"),
-  openai("gpt-4o-mini"),
-]);
+// Keep fallback selection in application code so behavior is explicit.
+const adapters = [claude, gpt];
 ```
 
 ### Request Options
 
 ```ts
-const result = await generateText({
-  model,
-  prompt: "Classify this email as urgent or not.",
-  providerOptions: {
-    aigateway: {
+import { chat } from "@tanstack/ai";
+import { createWorkersAiChat } from "@cloudflare/tanstack-ai";
+
+const stream = chat({
+  adapter: createWorkersAiChat("@cf/meta/llama-3.1-8b-instruct", {
+    binding: env.AI.gateway("my-gateway"),
+    gateway: {
       cacheTtl: 3600,
       skipCache: false,
-      retries: { maxAttempts: 3, backoff: "exponential" },
-      metadata: { userId: "user-123" },
     },
-  },
+  }),
+  messages: [{ role: "user", content: "Classify this email as urgent or not." }],
 });
 ```
 
@@ -155,63 +144,40 @@ const result = await generateText({
 
 ## Replicate
 
-Best for image generation models not on Workers AI. Use directly via `@ai-sdk/replicate` for image-focused workflows, or route through AI Gateway for caching and fallback.
-
-### Direct Setup
-
-```bash
-pnpm add @ai-sdk/replicate
-```
-
-```ts
-import { replicate } from "@ai-sdk/replicate";
-import { generateImage } from "ai";
-
-const { image } = await generateImage({
-  model: replicate.image("black-forest-labs/flux-schnell"),
-  prompt: "A golden retriever getting a manicure in a futuristic salon",
-  aspectRatio: "16:9",
-});
-
-await writeFile("image.webp", image.uint8Array);
-```
+Best for image generation models not on Workers AI. Prefer routing Replicate through Cloudflare AI Gateway for caching, fallback, and centralized observability. If a direct TanStack AI adapter is not available for the exact image workflow, call Replicate from a narrow server-side service instead of adding a second AI toolkit just for images.
 
 ### Via AI Gateway
 
 ```ts
-import { createAiGateway } from "ai-gateway-provider";
-import { createReplicate } from "@ai-sdk/replicate";
+import { createOpenAiChat } from "@cloudflare/tanstack-ai";
 
-const aigateway = createAiGateway({
-  accountId: env.CLOUDFLARE_ACCOUNT_ID,
-  gateway: "my-gateway",
-  apiKey: env.CLOUDFLARE_API_KEY,
+// For OpenAI-compatible image providers routed through AI Gateway, keep the
+// gateway configuration in one server-side adapter module.
+const imageAdapter = createOpenAiChat("recraft-ai/recraft-v3", {
+  binding: env.AI.gateway("my-gateway"),
+  apiKey: env.REPLICATE_API_TOKEN,
 });
-
-const replicate = createReplicate({ apiKey: env.REPLICATE_API_TOKEN });
-
-const model = aigateway([replicate.image("recraft-ai/recraft-v3")]);
 ```
 
-### Image Editing
+### Direct Service Fallback
 
 ```ts
-const inputImage = readFileSync("./input.png");
-const mask = readFileSync("./mask.png"); // white = inpaint zone
-
-const { images } = await generateImage({
-  model: replicate.image("black-forest-labs/flux-fill-pro"),
-  prompt: {
-    text: "Replace the background with a sunset over mountains",
-    images: [inputImage],
-    mask: mask,
+const response = await fetch("https://api.replicate.com/v1/predictions", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${env.REPLICATE_API_TOKEN}`,
+    "Content-Type": "application/json",
   },
-  providerOptions: {
-    replicate: {
+  body: JSON.stringify({
+    version: "black-forest-labs/flux-fill-pro",
+    input: {
+      prompt: "Replace the background with a sunset over mountains",
+      image: inputImageUrl,
+      mask: maskImageUrl,
       guidance_scale: 7.5,
       num_inference_steps: 30,
     },
-  },
+  }),
 });
 ```
 
@@ -317,5 +283,6 @@ const { images } = await generateImage({
 - [MCP Guide](./MCP-GUIDE.md)
 - [Workers AI Models](https://developers.cloudflare.com/workers-ai/models/)
 - [AI Gateway Docs](https://developers.cloudflare.com/ai-gateway/)
-- [Replicate Provider](https://ai-sdk.dev/providers/ai-sdk-providers/replicate)
-- [Cloudflare Workers AI Provider](https://ai-sdk.dev/providers/community-providers/cloudflare-workers-ai)
+- [TanStack AI](https://tanstack.com/ai)
+- [TanStack AI Cloudflare adapter](https://tanstack.com/ai/latest/docs/community-adapters/cloudflare)
+- [Cloudflare AI package](https://github.com/cloudflare/ai)
