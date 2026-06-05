@@ -9,17 +9,19 @@ Use this folder as the working map of the Fenod stack. The root `README.md` expl
 ### Starting a new project
 
 1. [Stack Overview](./STACK-OVERVIEW.md)
-2. [Migration Guide](./MIGRATION.md)
-3. [Development Strategy](./DEVELOPMENT-STRATEGY.md)
-4. [Code Patterns](./CODE-PATTERNS.md)
-5. [React Best Practices](./REACT-BEST-PRACTICES.md)
+2. [Tooling](./TOOLING.md)
+3. [Migration Guide](./MIGRATION.md)
+4. [Development Strategy](./DEVELOPMENT-STRATEGY.md)
+5. [Code Patterns](./CODE-PATTERNS.md)
+6. [React Best Practices](./REACT-BEST-PRACTICES.md)
 
 ### Building with AI
 
 1. [AI Development Workflow](./AI-DEVELOPMENT-WORKFLOW.md)
-2. [Agent Platform Plan](./AGENT-PLATFORM-PLAN.md)
-3. [MCP Guide](./MCP-GUIDE.md)
-4. [TDD with AI](./TDD-WITH-AI.md)
+2. [Security Model](./SECURITY-MODEL.md)
+3. [Agent Platform Plan](./AGENT-PLATFORM-PLAN.md)
+4. [MCP Guide](./MCP-GUIDE.md)
+5. [TDD with AI](./TDD-WITH-AI.md)
 5. [Testing Guide](./TESTING.md)
 6. [Debugging](./DEBUGGING.md)
 
@@ -28,7 +30,9 @@ Use this folder as the working map of the Fenod stack. The root `README.md` expl
 1. [Deployment Guide](./DEPLOYMENT.md)
 2. [Environment and Secrets](./ENVIRONMENT-SECRETS.md)
 3. [Cloudflare API Tokens](./CLOUDFLARE-API-TOKENS.md)
-4. [App Improvement Guide](./APP-IMPROVEMENT-GUIDE.md)
+4. [Security Model](./SECURITY-MODEL.md)
+5. [Email](./EMAIL.md)
+6. [App Improvement Guide](./APP-IMPROVEMENT-GUIDE.md)
 5. [Debugging](./DEBUGGING.md)
 6. [Local Toolchain Snapshot](./LOCAL-TOOLCHAIN.md)
 
@@ -45,6 +49,7 @@ Use this folder as the working map of the Fenod stack. The root `README.md` expl
 | Guide | Use it for |
 |-------|------------|
 | [Stack Overview](./STACK-OVERVIEW.md) | Choosing the primary defaults and avoiding stack sprawl |
+| [Tooling](./TOOLING.md) | VoidZero, Vite, Vitest, Ultracite, tsgo, Rolldown, and tsdown defaults |
 | [Migration Guide](./MIGRATION.md) | Going from scaffold to production-ready project |
 | [Development Strategy](./DEVELOPMENT-STRATEGY.md) | Phased delivery and UI-first execution |
 | [Code Patterns](./CODE-PATTERNS.md) | Reusable implementation patterns across the stack |
@@ -55,6 +60,7 @@ Use this folder as the working map of the Fenod stack. The root `README.md` expl
 | Guide | Use it for |
 |-------|------------|
 | [AI Development Workflow](./AI-DEVELOPMENT-WORKFLOW.md) | Daily collaboration model with Cursor, Claude Code, MCP, and verification |
+| [Security Model](./SECURITY-MODEL.md) | Secrets, agents, Cloudflare authority, prompt injection, data, and production gates |
 | [Agent Platform Plan](./AGENT-PLATFORM-PLAN.md) | Project-scoped agent runtime, brokered Cloudflare changes, backups, and local DX |
 | [AI Providers](./AI-PROVIDERS.md) | Workers AI, AI Gateway, Replicate — model guide and provider comparison |
 | [MCP Guide](./MCP-GUIDE.md) | Dynamic tool loading, browser inspection, and Cloudflare tooling |
@@ -69,6 +75,8 @@ Use this folder as the working map of the Fenod stack. The root `README.md` expl
 | [Deployment Guide](./DEPLOYMENT.md) | Cloudflare deployment, CI/CD, and runtime bindings |
 | [Environment and Secrets](./ENVIRONMENT-SECRETS.md) | Infisical, Cloudflare secrets, and safe deploy-time environment handling |
 | [Cloudflare API Tokens](./CLOUDFLARE-API-TOKENS.md) | Least-privilege API tokens, AI-agent guardrails, and secure Wrangler usage |
+| [Security Model](./SECURITY-MODEL.md) | Cross-cutting security model for secrets, agents, data, and production changes |
+| [Email](./EMAIL.md) | Cloudflare inbound email, transactional outbound, deliverability, and agent-safe workflows |
 | [App Improvement Guide](./APP-IMPROVEMENT-GUIDE.md) | Performance, resilience, and operational hardening |
 | [Local Toolchain Snapshot](./LOCAL-TOOLCHAIN.md) | Auditing what is installed locally and what should stay primary |
 | [Cloudflare Compute](./CLOUDFLARE-COMPUTE.md) | Worker vs Dynamic Worker vs Container: when to use each |

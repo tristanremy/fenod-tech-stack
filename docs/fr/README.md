@@ -7,7 +7,8 @@ Utilisez ce dossier comme carte de travail de la stack Fenod. Le `README.md` rac
 ### Demarrer un nouveau projet
 
 1. [Vue d'ensemble de la Stack](./STACK-OVERVIEW.md)
-2. [Guide de Migration](./MIGRATION.md)
+2. [Tooling](./TOOLING.md)
+3. [Guide de Migration](./MIGRATION.md)
 3. [Strategie de Developpement](./DEVELOPMENT-STRATEGY.md)
 4. [Patterns de Code](./CODE-PATTERNS.md)
 5. [Bonnes pratiques React](./REACT-BEST-PRACTICES.md)
@@ -15,7 +16,8 @@ Utilisez ce dossier comme carte de travail de la stack Fenod. Le `README.md` rac
 ### Construire avec l'IA
 
 1. [Workflow de Developpement avec l'IA](./AI-DEVELOPMENT-WORKFLOW.md)
-2. [MCP avec Claude Code](./MCP-GUIDE.md)
+2. [Modele de securite](./SECURITY-MODEL.md)
+3. [MCP avec Claude Code](./MCP-GUIDE.md)
 3. [TDD avec l'IA](./TDD-WITH-AI.md)
 4. [Guide de Tests](./TESTING.md)
 5. [Debugging](./DEBUGGING.md)
@@ -25,7 +27,9 @@ Utilisez ce dossier comme carte de travail de la stack Fenod. Le `README.md` rac
 1. [Guide de Deploiement](./DEPLOYMENT.md)
 2. [Environnements et secrets](./ENVIRONMENT-SECRETS.md)
 3. [Tokens API Cloudflare](./CLOUDFLARE-API-TOKENS.md)
-4. [Guide d'Amelioration d'App](./APP-IMPROVEMENT-GUIDE.md)
+4. [Modele de securite](./SECURITY-MODEL.md)
+5. [Email](./EMAIL.md)
+6. [Guide d'Amelioration d'App](./APP-IMPROVEMENT-GUIDE.md)
 5. [Debugging](./DEBUGGING.md)
 6. [Etat de l'Outillage Local](./LOCAL-TOOLCHAIN.md)
 
@@ -42,6 +46,7 @@ Utilisez ce dossier comme carte de travail de la stack Fenod. Le `README.md` rac
 | Guide | Utilisez-le pour |
 |-------|------------------|
 | [Vue d'ensemble de la Stack](./STACK-OVERVIEW.md) | Choisir les defaults principaux et eviter la dispersion de la stack |
+| [Tooling](./TOOLING.md) | Defaults VoidZero, Vite, Vitest, Ultracite, tsgo, Rolldown et tsdown |
 | [Guide de Migration](./MIGRATION.md) | Passer du scaffold a un projet pret pour la production |
 | [Strategie de Developpement](./DEVELOPMENT-STRATEGY.md) | Executer un delivery par phases avec une approche UI-first |
 | [Patterns de Code](./CODE-PATTERNS.md) | Reutiliser des patterns d'implementation a travers la stack |
@@ -52,6 +57,7 @@ Utilisez ce dossier comme carte de travail de la stack Fenod. Le `README.md` rac
 | Guide | Utilisez-le pour |
 |-------|------------------|
 | [Workflow de Developpement avec l'IA](./AI-DEVELOPMENT-WORKFLOW.md) | Definir le modele de travail quotidien avec Cursor, Claude Code, MCP et la verification |
+| [Modele de securite](./SECURITY-MODEL.md) | Secrets, agents, autorite Cloudflare, prompt injection, donnees et gates production |
 | [AI Providers](./AI-PROVIDERS.md) | Workers AI, AI Gateway, Replicate — guide des modeles et comparatif providers |
 | [MCP avec Claude Code](./MCP-GUIDE.md) | Charger les outils dynamiquement, inspecter le navigateur et piloter Cloudflare |
 | [TDD avec l'IA](./TDD-WITH-AI.md) | Rendre la sortie de l'IA plus sure avec des boucles red/green/refactor |
@@ -65,6 +71,8 @@ Utilisez ce dossier comme carte de travail de la stack Fenod. Le `README.md` rac
 | [Guide de Deploiement](./DEPLOYMENT.md) | Deployer sur Cloudflare, configurer le CI/CD et les bindings |
 | [Environnements et secrets](./ENVIRONMENT-SECRETS.md) | Infisical, secrets Cloudflare et env de deploy securisee |
 | [Tokens API Cloudflare](./CLOUDFLARE-API-TOKENS.md) | Tokens a privilege minimal, garde-fous IA et usage Wrangler securise |
+| [Modele de securite](./SECURITY-MODEL.md) | Modele transversal pour secrets, agents, donnees et changements production |
+| [Email](./EMAIL.md) | Email inbound Cloudflare, outbound transactionnel, deliverability et workflows agents |
 | [Guide d'Amelioration d'App](./APP-IMPROVEMENT-GUIDE.md) | Renforcer la performance, la resilience et l'operabilite |
 | [Etat de l'Outillage Local](./LOCAL-TOOLCHAIN.md) | Auditer ce qui est installe localement et ce qui doit rester principal |
 | [Les Primitives de Calcul Cloudflare](./CLOUDFLARE-COMPUTE.md) | Worker vs Dynamic Worker vs Container: quand utiliser chacun |

@@ -236,6 +236,8 @@ Cloudflare is the default deployment target. Use OAuth for local Wrangler work, 
 |-------|-------------|
 | [Documentation Hub](docs/README.md) | Reading paths and categorized documentation map |
 | [Stack Overview](docs/STACK-OVERVIEW.md) | Recommended defaults, tradeoffs, and operating mode |
+| [Tooling](docs/TOOLING.md) | VoidZero, Vite, Vitest, Ultracite, tsgo, Rolldown, and tsdown defaults |
+| [Security Model](docs/SECURITY-MODEL.md) | Secrets, agents, Cloudflare authority, prompt injection, data, and production gates |
 | [AI Development Workflow](docs/AI-DEVELOPMENT-WORKFLOW.md) | How Cursor, Claude Code, MCP, and verification fit together |
 | [Agent Platform Plan](docs/AGENT-PLATFORM-PLAN.md) | Project-scoped agent runtime, brokered Cloudflare changes, backups, and local DX |
 | [TDD with AI](docs/TDD-WITH-AI.md) | Red/green/refactor adapted to AI-assisted delivery |
@@ -243,6 +245,7 @@ Cloudflare is the default deployment target. Use OAuth for local Wrangler work, 
 | [Cloudflare Compute](docs/CLOUDFLARE-COMPUTE.md) | Worker vs Dynamic Worker vs Container: when to use each |
 | [Cloudflare API Tokens](docs/CLOUDFLARE-API-TOKENS.md) | Least-privilege tokens, secure Wrangler usage, and AI-agent guardrails |
 | [AI Providers](docs/AI-PROVIDERS.md) | Workers AI, AI Gateway, Replicate — model guide and provider comparison |
+| [Email](docs/EMAIL.md) | Cloudflare inbound email, transactional outbound, deliverability, and agent-safe workflows |
 | [Code Patterns](docs/CODE-PATTERNS.md) | API, auth, forms, UI, Workflows, Queues, Vectorize, Agents |
 | [Development Strategy](docs/DEVELOPMENT-STRATEGY.md) | UI-first workflow, phased development |
 | [Migration Guide](docs/MIGRATION.md) | From TanStack CLI scaffold to production |

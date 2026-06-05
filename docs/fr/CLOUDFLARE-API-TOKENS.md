@@ -1,26 +1,27 @@
-# Tokens API Cloudflare pour le travail assisté par IA
+# Cloudflare API Tokens for AI-Assisted Work
 
 [Available in English](../CLOUDFLARE-API-TOKENS.md)
 
-Utilise ce guide pour créer des identifiants Cloudflare pour le développement local, la CI, les déploiements, les serveurs MCP ou les agents IA. Objectif : permettre aux agents d'être utiles sans leur donner un contrôle large du compte ni des secrets longue durée inutiles.
+Use this guide when creating Cloudflare credentials for local development, CI, deploys, MCP servers, or AI coding agents. The goal is simple: agents can do useful Cloudflare work without receiving broad account control or long-lived secrets they do not need.
 
-## Règles d'or
+## Golden Rules
 
-1. **Préférer OAuth pour Wrangler en local.** Ne pas exporter `CLOUDFLARE_API_TOKEN` globalement : cette variable remplace OAuth et cause souvent des erreurs de permissions confuses.
-2. **Créer des tokens étroits et dédiés.** Un token par surface d'automatisation : déploiement CI, preview, migrations D1, upload R2, lecture analytics, etc.
-3. **Ne jamais coller de token dans un prompt, une issue, une PR, des logs ou de la doc.** Utiliser Bitwarden Secrets Manager, Infisical, les secrets Cloudflare ou les secrets CI.
-4. **Ne pas donner d'accès édition compte entier aux agents IA par défaut.** Passer par des scripts, des outils MCP contrôlés ou des jobs CI avec scopes limités.
-5. **Révoquer vite après expérimentation.** Tout token utilisé pendant du travail exploratoire avec IA doit être court-terme ou supprimé après la session.
+1. **Prefer OAuth for local Wrangler commands.** Do not export `CLOUDFLARE_API_TOKEN` globally; it overrides Wrangler OAuth and often causes confusing permission failures.
+2. **Use narrow, task-specific tokens.** Create one token per automation surface: CI deploy, preview deploy, D1 migrations, R2 upload, analytics read, etc.
+3. **Use resource-scoped permissions whenever Cloudflare supports them.** A deploy token should target one Worker, one Pages project, one D1 database, one R2 bucket, or one zone instead of the whole account.
+4. **Never paste tokens into prompts, issues, PRs, logs, or markdown docs.** Store secrets in Bitwarden Secrets Manager, Infisical, Cloudflare secrets, or CI secret storage.
+5. **Do not give AI agents account-wide edit access by default.** Broker sensitive operations through scripts, MCP tools, or CI jobs with limited scopes.
+6. **Rotate aggressively after experiments.** Any token used during exploratory AI work should be short-lived or deleted after the session.
 
-## Wrangler en local
+## Local Wrangler Usage
 
-Pour le développement humain quotidien :
+For day-to-day human development, use Wrangler OAuth:
 
 ```bash
 wrangler login
 ```
 
-Quand une machine peut avoir un token exporté, le retirer explicitement :
+When running local commands on a machine that might have a token exported, explicitly unset it:
 
 ```bash
 env -u CLOUDFLARE_API_TOKEN wrangler whoami
@@ -28,17 +29,19 @@ env -u CLOUDFLARE_API_TOKEN wrangler pages deploy dist --project-name my-project
 env -u CLOUDFLARE_API_TOKEN wrangler d1 migrations apply my-db --local
 ```
 
-Ne définir `CLOUDFLARE_API_TOKEN` que dans un processus étroit, un job CI ou une commande injectée par un gestionnaire de secrets.
+Only set `CLOUDFLARE_API_TOKEN` inside a narrow process, CI job, or secret-injected command that truly needs API-token auth.
 
-## Profils de tokens
+## Token Profiles
 
-Créer des tokens séparés pour des tâches séparées. Format conseillé :
+Create separate Cloudflare API tokens for separate jobs. Names should include the project, environment, purpose, and owner.
+
+Recommended naming format:
 
 ```text
 fenod:<project>:<env>:<purpose>:<owner>
 ```
 
-Exemples :
+Examples:
 
 ```text
 fenod:client-app:prod:workers-deploy:github-actions
@@ -47,67 +50,140 @@ fenod:client-app:prod:d1-migrations:ci
 fenod:client-app:dev:r2-upload:agent-broker
 ```
 
-## Carte des permissions minimales
+## Least-Privilege Resource Map
 
-| Tâche | Permissions typiques | Portée | Notes |
-|------|----------------------|--------|-------|
-| Déploiement Workers | Workers Scripts: Edit, Account Settings: Read si Wrangler l'exige | Un compte, idéalement un script/projet | Pour CI seulement ; éviter pour agents ad hoc. |
-| Déploiement Pages | Cloudflare Pages: Edit | Un compte, projet Pages précis si possible | Préférer `wrangler pages deploy` depuis CI. |
-| Migrations D1 | D1: Edit | Base précise si possible | Séparer des tokens de déploiement app. |
-| Upload R2 | R2: Edit | Bucket précis si possible | Éviter l'admin R2 global. |
-| Écritures KV | Workers KV Storage: Edit | Namespace précis si possible | KV peut contenir de la config sensible. |
-| Queues | Queues: Edit | Queue précise si possible | Séparer bindings runtime et tokens admin. |
-| Analytics / logs | Analytics: Read, Logs: Read si besoin | Lecture seule | Adapté aux agents de debug. |
-| DNS | Zone DNS: Edit | Une zone seulement | Très risqué ; ne jamais mélanger avec déploiement. |
-| Gestion compte/utilisateurs | Account Settings/User details: Read/Edit | Compte | À éviter pour agents sauf approbation explicite. |
+Use Cloudflare's token templates as a starting point, then reduce account/resource access to the smallest possible scope. For old tokens, reissue them with the newest Cloudflare token format and resource-scoped policies so leaked tokens are easier to detect and the blast radius is smaller.
 
-Si un token a besoin de permissions sans rapport, le découper ou déplacer l'opération derrière une CI avec validation humaine.
+| Job | Typical permissions | Resource scope | Notes |
+|-----|---------------------|----------------|-------|
+| Workers deploy | Workers Scripts: Edit, Account Settings: Read if required by Wrangler | One account, ideally one script/project | Use for CI deploy only; avoid giving this to ad hoc agents. |
+| Pages deploy | Cloudflare Pages: Edit | One account, specific Pages project if available | Prefer `wrangler pages deploy` from CI. |
+| D1 migrations | D1: Edit | Specific account/database where possible | Keep separate from app deploy tokens. Migrations can destroy data. |
+| R2 object upload | R2: Edit | Specific bucket where possible | For app assets/backups; avoid account-wide R2 admin. |
+| KV writes | Workers KV Storage: Edit | Specific namespace where possible | KV often stores config; treat writes as sensitive. |
+| Queues management | Queues: Edit | Specific queue where possible | Separate runtime producer/consumer bindings from admin tokens. |
+| Analytics/read-only inspection | Analytics: Read, Logs: Read if needed | Account/project read-only | Safe for dashboards and debugging agents. |
+| DNS automation | Zone DNS: Edit | One zone only | High risk: can hijack traffic. Never bundle with deploy tokens. |
+| Account/user management | Account Settings/User details: Read/Edit | Account | Avoid for agents unless building admin automation with explicit approval. |
 
-## Pattern de sécurité pour agents IA
+If a token needs many unrelated permissions, split it into multiple tokens or move the operation behind a human-approved CI workflow.
 
-Hiérarchie recommandée :
+## Platform Tokens vs Provider Keys
 
-1. **Contexte lecture seule :** docs, `wrangler.jsonc`, types générés, sortie de commandes assainie.
-2. **Commandes OAuth locales :** Wrangler authentifié humainement avec `env -u CLOUDFLARE_API_TOKEN`.
-3. **Scripts broker :** scripts versionnés comme `deploy-preview`, `apply-local-migrations`, `tail-logs`.
-4. **CI :** déploiements prod et migrations via GitHub Actions avec secrets scopés.
-5. **Break-glass :** token temporaire, limité, révoqué après la tâche.
+Do not mix these two credential classes:
 
-Bonne commande exposée à un agent :
+| Layer | Credential | Owns | Preferred boundary |
+|-------|------------|------|--------------------|
+| Cloudflare platform | `CLOUDFLARE_API_TOKEN` | Deploying Workers, editing DNS, creating D1/R2/KV/Queues | Resource-scoped token, CI/broker controlled |
+| AI provider access | OpenAI/Anthropic/Gemini/Replicate keys | Model inference spend and data access | Cloudflare AI Gateway BYOK or provider secret store |
+| Agent runtime budget | Model context/output tokens | Cost and context pressure while agents work | Code Mode, tool search, summaries, budget caps |
+
+A Worker deploy token should not also be the way the app calls LLM providers. Likewise, an LLM provider key should not be available to an infrastructure-management agent unless the task explicitly requires it.
+
+## AI Gateway BYOK for Provider Keys
+
+For deployed AI apps, prefer Cloudflare AI Gateway with BYOK / stored provider keys over raw provider keys in Worker secrets.
+
+Recommended production pattern:
+
+1. Security/admin owner stores provider keys in Cloudflare AI Gateway or a secret manager integrated with it.
+2. Application code references the stored key or gateway route, not the plaintext provider key.
+3. Developers and agents can deploy code that references approved keys, but cannot read the key value.
+4. AI Gateway enforces budgets, rate limits, caching, fallback, and audit logging.
+5. Dynamic routes or gateway policies cap runaway loops before they become billing incidents.
+
+Use direct Worker secrets for provider keys only when AI Gateway does not support the provider/workflow yet, or during short-lived local development. Document the exception and migrate it back behind Gateway when possible.
+
+Provider caveat: some SDKs/providers still require direct API-key signing or are not fully OpenAI-compatible. Treat those as explicit exceptions with narrower secrets and tighter budgets.
+
+## AI Agent Safety Pattern
+
+AI agents should not directly hold broad Cloudflare tokens. Prefer this hierarchy:
+
+1. **Read-only context:** docs, `wrangler.jsonc`, generated types, and sanitized command output.
+2. **Local OAuth commands:** human-authenticated Wrangler with `env -u CLOUDFLARE_API_TOKEN`.
+3. **Broker scripts:** checked-in scripts expose safe operations like `deploy-preview`, `apply-local-migrations`, or `tail-logs`.
+4. **CI workflows:** production deploys and migrations run from GitHub Actions with scoped secrets.
+5. **Break-glass token:** temporary, time-boxed, manually revoked after the task.
+
+Good agent-facing command:
 
 ```bash
 pnpm cf:deploy-preview
 ```
 
-Commande risquée :
+Risky agent-facing command:
 
 ```bash
 CLOUDFLARE_API_TOKEN=... wrangler deploy --env production
 ```
 
-## Stockage des secrets
+## Repository Scripts to Prefer
 
-| Contexte | Stocker dans | Éviter |
-|----------|--------------|--------|
-| Machine locale | Bitwarden Secrets Manager ou Infisical | Exports shell globaux, `.env`, notes |
-| Runtime local | Secrets Cloudflare ou injection par gestionnaire de secrets | `.dev.vars` commité avec vraies valeurs |
-| CI/CD | GitHub Actions secrets/environments, Infisical, Bitwarden | Valeurs en clair dans YAML |
-| Worker runtime | Secrets/bindings Cloudflare | Variables frontend bundlées |
-| IA/MCP | Commandes broker ou tokens courts et étroits | Token compte général partagé |
+Add project scripts so agents do not invent privileged commands:
 
-## Checklist agent
+```json
+{
+  "scripts": {
+    "cf:whoami": "env -u CLOUDFLARE_API_TOKEN wrangler whoami",
+    "cf:types": "env -u CLOUDFLARE_API_TOKEN wrangler types",
+    "cf:d1:local": "env -u CLOUDFLARE_API_TOKEN wrangler d1 migrations apply DB --local",
+    "cf:deploy:preview": "pnpm build && env -u CLOUDFLARE_API_TOKEN wrangler pages deploy dist --project-name PROJECT"
+  }
+}
+```
 
-- [ ] La commande utilise OAuth en local ou un secret CI scopé.
-- [ ] `CLOUDFLARE_API_TOKEN` n'est pas exporté globalement.
-- [ ] Le token ne peut pas modifier le DNS sauf tâche DNS explicite.
-- [ ] Le token ne peut pas modifier D1/R2/KV hors projet cible.
-- [ ] L'opération est scriptée et relisible.
-- [ ] Les déploiements/migrations prod demandent une validation humaine.
-- [ ] Tout token temporaire a un propriétaire et une date de suppression.
+For CI-only scripts, document that they require injected secrets and should not be run locally by agents.
 
-## Guides liés
+## Secret Storage
 
-- [Deployment Guide](../DEPLOYMENT.md)
-- [Environment and Secrets](../ENVIRONMENT-SECRETS.md)
-- [Cloudflare Compute](../CLOUDFLARE-COMPUTE.md)
-- [MCP Guide](../MCP-GUIDE.md)
+| Context | Store tokens in | Avoid |
+|---------|-----------------|-------|
+| Local human machine | Bitwarden Secrets Manager or Infisical | Shell profile exports, `.env`, notes apps |
+| Local app runtime | Cloudflare `wrangler secret put` or local secret manager injection | Committed `.dev.vars` with real values |
+| CI/CD | GitHub Actions secrets/environments, Infisical, Bitwarden Secrets Manager | Plain workflow YAML values |
+| Worker runtime | Cloudflare secrets/bindings | Bundled frontend env vars |
+| AI/MCP tooling | Brokered commands or short-lived narrow tokens | Shared all-purpose account token |
+
+Never commit real Cloudflare credentials. `.env.example` may list variable names only.
+
+## Production Gates
+
+For production-affecting operations, require at least one gate:
+
+- protected GitHub environment approval
+- manual `workflow_dispatch` approval
+- branch protection + reviewed PR
+- a broker service that validates allowed resource IDs
+- Cloudflare token with only the target resource and permission
+
+Production D1 migrations, DNS edits, Worker route changes, and account-level settings should never be silent side effects of an AI coding session.
+
+## Incident Response
+
+If a token may have leaked:
+
+1. Revoke the token in Cloudflare immediately.
+2. Search repo, PRs, logs, CI output, issue comments, and agent transcripts for the value or prefix.
+3. Rotate any downstream credentials the token could access or overwrite.
+4. Review Cloudflare audit logs for deploys, DNS edits, data writes, and new tokens.
+5. Add a narrower replacement token only after the incident is understood.
+
+## Agent Checklist
+
+Before asking an AI agent to run Cloudflare commands, confirm:
+
+- [ ] The command uses OAuth locally or a scoped CI secret.
+- [ ] `CLOUDFLARE_API_TOKEN` is not globally exported.
+- [ ] The token cannot edit DNS unless the task is explicitly DNS-related.
+- [ ] The token cannot edit D1/R2/KV resources outside the target project.
+- [ ] The operation is scripted and reviewable.
+- [ ] Production deploys/migrations require human approval.
+- [ ] Any temporary token has an owner and deletion date.
+
+## Related Guides
+
+- [Deployment Guide](./DEPLOYMENT.md)
+- [Environment and Secrets](./ENVIRONMENT-SECRETS.md)
+- [Cloudflare Compute](./CLOUDFLARE-COMPUTE.md)
+- [MCP Guide](./MCP-GUIDE.md)

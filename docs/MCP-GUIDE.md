@@ -36,19 +36,22 @@ The agent discovers and loads only what it needs per session.
 
 ### Code Mode
 
-Agents write JavaScript tools that chain MCP calls:
+Agents write JavaScript tools that chain MCP calls. Use this by default when an agent needs to orchestrate a large API surface such as Cloudflare, GitHub, Linear, Stripe, or internal admin APIs.
 
 ```
 Without code mode:
-- 50 tool definitions in context
+- Many endpoint/tool definitions live in context
 - Each call returns full results to context
-- Context fills after ~20 calls
+- Context fills quickly and agent cost rises with API size
 
 With code mode:
-- Agent writes custom tool using only needed MCP tools
+- Agent gets a small search/execute surface
+- Agent writes custom tool using only needed API calls
 - Results saved to volume, not context
 - Only summaries/answers returned to model
 ```
+
+This is especially important for Cloudflare automation. Do not expose every Cloudflare operation as independent always-loaded tools when the agent only needs to deploy one Worker or inspect one D1 database. Keep broad API catalogs behind search/execute, broker scripts, or Code Mode.
 
 Example: Search GitHub → Save to Notion
 ```
@@ -114,6 +117,8 @@ Claude can:
 - Verify DOM state
 
 ## Cloudflare MCP Servers
+
+Cloudflare MCP access should follow the same boundary as deploy tokens: resource-scoped where possible, read-only unless mutation is explicitly needed, and routed through a broker or CI for production changes.
 
 ### Available Servers
 
@@ -191,7 +196,9 @@ For Fenod Stack projects:
 ## Tips
 
 - Use Docker gateway for dynamic tool loading (saves tokens)
+- Prefer Code Mode/search/execute for large APIs instead of loading every endpoint as a tool
 - Chrome MCP for frontend debugging
-- Cloudflare MCP for infrastructure management
+- Cloudflare MCP for infrastructure management, with resource-scoped tokens only
 - Chain tools with code mode for complex workflows
 - Results to files/databases, not context
+- Add budget/rate limits before letting agents run autonomous Cloudflare or AI Gateway workflows

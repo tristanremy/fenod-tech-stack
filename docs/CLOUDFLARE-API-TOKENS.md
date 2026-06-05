@@ -8,9 +8,10 @@ Use this guide when creating Cloudflare credentials for local development, CI, d
 
 1. **Prefer OAuth for local Wrangler commands.** Do not export `CLOUDFLARE_API_TOKEN` globally; it overrides Wrangler OAuth and often causes confusing permission failures.
 2. **Use narrow, task-specific tokens.** Create one token per automation surface: CI deploy, preview deploy, D1 migrations, R2 upload, analytics read, etc.
-3. **Never paste tokens into prompts, issues, PRs, logs, or markdown docs.** Store secrets in Bitwarden Secrets Manager, Infisical, Cloudflare secrets, or CI secret storage.
-4. **Do not give AI agents account-wide edit access by default.** Broker sensitive operations through scripts, MCP tools, or CI jobs with limited scopes.
-5. **Rotate aggressively after experiments.** Any token used during exploratory AI work should be short-lived or deleted after the session.
+3. **Use resource-scoped permissions whenever Cloudflare supports them.** A deploy token should target one Worker, one Pages project, one D1 database, one R2 bucket, or one zone instead of the whole account.
+4. **Never paste tokens into prompts, issues, PRs, logs, or markdown docs.** Store secrets in Bitwarden Secrets Manager, Infisical, Cloudflare secrets, or CI secret storage.
+5. **Do not give AI agents account-wide edit access by default.** Broker sensitive operations through scripts, MCP tools, or CI jobs with limited scopes.
+6. **Rotate aggressively after experiments.** Any token used during exploratory AI work should be short-lived or deleted after the session.
 
 ## Local Wrangler Usage
 
@@ -51,7 +52,7 @@ fenod:client-app:dev:r2-upload:agent-broker
 
 ## Least-Privilege Resource Map
 
-Use Cloudflare's token templates as a starting point, then reduce account/resource access to the smallest possible scope.
+Use Cloudflare's token templates as a starting point, then reduce account/resource access to the smallest possible scope. For old tokens, reissue them with the newest Cloudflare token format and resource-scoped policies so leaked tokens are easier to detect and the blast radius is smaller.
 
 | Job | Typical permissions | Resource scope | Notes |
 |-----|---------------------|----------------|-------|
@@ -66,6 +67,34 @@ Use Cloudflare's token templates as a starting point, then reduce account/resour
 | Account/user management | Account Settings/User details: Read/Edit | Account | Avoid for agents unless building admin automation with explicit approval. |
 
 If a token needs many unrelated permissions, split it into multiple tokens or move the operation behind a human-approved CI workflow.
+
+## Platform Tokens vs Provider Keys
+
+Do not mix these two credential classes:
+
+| Layer | Credential | Owns | Preferred boundary |
+|-------|------------|------|--------------------|
+| Cloudflare platform | `CLOUDFLARE_API_TOKEN` | Deploying Workers, editing DNS, creating D1/R2/KV/Queues | Resource-scoped token, CI/broker controlled |
+| AI provider access | OpenAI/Anthropic/Gemini/Replicate keys | Model inference spend and data access | Cloudflare AI Gateway BYOK or provider secret store |
+| Agent runtime budget | Model context/output tokens | Cost and context pressure while agents work | Code Mode, tool search, summaries, budget caps |
+
+A Worker deploy token should not also be the way the app calls LLM providers. Likewise, an LLM provider key should not be available to an infrastructure-management agent unless the task explicitly requires it.
+
+## AI Gateway BYOK for Provider Keys
+
+For deployed AI apps, prefer Cloudflare AI Gateway with BYOK / stored provider keys over raw provider keys in Worker secrets.
+
+Recommended production pattern:
+
+1. Security/admin owner stores provider keys in Cloudflare AI Gateway or a secret manager integrated with it.
+2. Application code references the stored key or gateway route, not the plaintext provider key.
+3. Developers and agents can deploy code that references approved keys, but cannot read the key value.
+4. AI Gateway enforces budgets, rate limits, caching, fallback, and audit logging.
+5. Dynamic routes or gateway policies cap runaway loops before they become billing incidents.
+
+Use direct Worker secrets for provider keys only when AI Gateway does not support the provider/workflow yet, or during short-lived local development. Document the exception and migrate it back behind Gateway when possible.
+
+Provider caveat: some SDKs/providers still require direct API-key signing or are not fully OpenAI-compatible. Treat those as explicit exceptions with narrower secrets and tighter budgets.
 
 ## AI Agent Safety Pattern
 

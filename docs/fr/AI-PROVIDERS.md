@@ -85,7 +85,7 @@ return toServerSentEventsResponse(stream);
 
 ## Cloudflare AI Gateway
 
-Route requests to multiple providers through a single gateway. Get caching, retries, rate limiting, and fallback without changing call sites.
+Route requests to multiple providers through a single gateway. Get caching, retries, rate limiting, spend controls, and fallback without changing call sites. For production, prefer AI Gateway BYOK / stored provider keys so Workers and AI agents reference approved keys without reading plaintext values.
 
 ### Setup
 
@@ -93,11 +93,20 @@ Route requests to multiple providers through a single gateway. Get caching, retr
 pnpm add @tanstack/ai @cloudflare/tanstack-ai
 ```
 
+Recommended ownership split:
+
+- Security/admins create and rotate stored provider keys.
+- Developers reference gateway routes or stored-key names in code.
+- Agents can edit routing/config code, but should not receive raw provider keys.
+- Gateway budgets and rate limits are mandatory for autonomous agent loops.
+
 ```ts
 import { createAnthropicChat, createOpenAiChat } from "@cloudflare/tanstack-ai";
 
 const claude = createAnthropicChat("claude-haiku-4-5", {
   binding: env.AI.gateway("my-gateway"),
+  // Prefer a stored provider key / gateway route in production.
+  // Use env keys only for dev or providers that still require direct signing.
   apiKey: env.ANTHROPIC_API_KEY,
 });
 
@@ -260,6 +269,8 @@ const response = await fetch("https://api.replicate.com/v1/predictions", {
 - Serverless, pay-per-request, no GPU management.
 
 ### Add AI Gateway when you need:
+- BYOK / stored provider keys that developers and agents cannot read.
+- Budgets and rate limits for autonomous agent loops.
 - Caching to reduce cost on repeated prompts.
 - Retry logic with exponential backoff.
 - Automatic fallback between models or providers.
