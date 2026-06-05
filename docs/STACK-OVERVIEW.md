@@ -24,7 +24,9 @@ This is the operating view of the Fenod stack: what should be primary, what is o
 | Database layer | Drizzle + D1 | Simple SQL model aligned with Cloudflare deployment |
 | Auth | Better Auth | Good TypeScript ergonomics and D1-friendly setup |
 | Styling | Tailwind v4 + shadcn/ui | Fast product work with a maintainable base component layer |
-| Deploy | Wrangler + Cloudflare | Default hosting target for apps, APIs, and edge services |
+| Quality gates | VoidZero tooling + Ultracite + tsgo + Vitest/Playwright + React Doctor | Fast linting, formatting, testing, type safety, behavior, and React-specific security/best-practice checks |
+| Deploy | Wrangler + Cloudflare + Alchemy | Default hosting target and IaC path for apps, APIs, and edge services |
+| Secrets | Infisical + Cloudflare Worker secrets | Safe storage, local injection, CI fetch, and runtime bindings |
 | Editor | Cursor or VS Code | Mature editor workflow with strong extension support |
 | Terminal AI | Claude Code | Good fit for repo-wide changes, terminal tasks, and documentation work |
 
@@ -38,6 +40,26 @@ This machine has more than one runtime and more than one coding surface installe
 - `Cursor`, `VS Code`, and `Claude Code` can coexist if each has a clear role.
 
 For the machine-specific version snapshot, see [Local Toolchain Snapshot](./LOCAL-TOOLCHAIN.md).
+
+## VoidZero Tooling Direction
+
+VoidZero is the preferred direction for JavaScript tooling because it aligns with the stack's goals: fast feedback, one coherent toolchain, and fewer bespoke configs.
+
+| Tool | Role in the stack | Adoption posture |
+|------|-------------------|------------------|
+| Vite | Dev server and framework foundation for TanStack Start and Astro | Default |
+| Vitest | Unit and integration tests that understand Vite config | Default |
+| Oxlint / Oxfmt | High-performance linting and formatting foundations | Default through Ultracite where possible |
+| Rolldown / `rolldown-vite` | Faster bundling and future Vite build path | Try on larger apps or slow builds |
+| `tsdown` | Library/package build tool | Default for internal packages that need published artifacts |
+| Vite+ | Unified web toolchain entry point | Experimental for new prototypes until stable enough for client work |
+
+Adoption should be staged:
+
+1. **Stable default:** Vite, Vitest, Ultracite, tsgo, and Playwright.
+2. **Performance upgrade:** try `rolldown-vite` when build time is a real bottleneck.
+3. **Package build default:** use `tsdown` instead of custom Rollup/tsup configs for libraries.
+4. **Experimental lane:** evaluate Vite+ on prototypes before standardizing it for production apps.
 
 ## Recommended Operating Mode
 
@@ -61,8 +83,9 @@ For the machine-specific version snapshot, see [Local Toolchain Snapshot](./LOCA
 - Strict TypeScript gives AI sharper constraints and reduces ambiguous edits.
 - Slice-based architecture keeps changes local instead of scattering them across layers.
 - Cloudflare tooling is scriptable and works well with terminal-oriented agents.
+- Infisical keeps agents from needing plaintext `.env` files while still enabling deploy/test commands.
 - Good documentation narrows prompts and keeps AI output aligned with team standards.
-- Tests and typechecks provide the fast feedback loop AI needs to be trustworthy.
+- Tests, typechecks, and React Doctor provide the fast feedback loop AI needs to be trustworthy before pushing or merging.
 
 ## Improvement Priorities
 

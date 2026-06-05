@@ -1,1 +1,17 @@
 .claude/
+
+# Local secrets and generated environment files
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+
+# Local/editor state
+.obsidian/
+
+# Backups and exports can contain production data
+backups/
+*.sql
+*.sqlite
+*.db

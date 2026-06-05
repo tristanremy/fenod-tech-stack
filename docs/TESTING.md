@@ -11,6 +11,7 @@
 | **Vitest** | Unit & integration tests |
 | **Playwright** | E2E browser tests |
 | **MSW** | API mocking for frontend tests |
+| **React Doctor** | React best-practice, security, accessibility, performance, and architecture checks |
 
 ---
 
@@ -22,6 +23,7 @@
 pnpm add -D vitest @vitest/coverage-v8 @testing-library/react @testing-library/dom jsdom
 pnpm add -D playwright @playwright/test
 pnpm add -D msw
+pnpm add -D react-doctor
 ```
 
 ### Vitest Configuration
@@ -70,10 +72,84 @@ afterAll(() => server.close())
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "doctor:react": "react-doctor .",
+    "doctor:react:diff": "react-doctor . --diff main",
+    "doctor:react:staged": "react-doctor . --staged"
   }
 }
 ```
+
+---
+
+## React Doctor Quality Gate
+
+Use React Doctor before pushing UI work and as a required PR check before merging to `main`. It scans React code for correctness, security, accessibility, performance, bundle-size, and architecture issues, then returns a 0-100 health score with actionable findings. See [React Best Practices](./REACT-BEST-PRACTICES.md) for the lightweight rules agents should follow while coding.
+
+### Local workflow
+
+```bash
+# Full scan
+pnpm doctor:react
+
+# Feature branch scan against main
+pnpm doctor:react:diff
+
+# Pre-commit/pre-push scan for staged React changes
+pnpm doctor:react:staged
+```
+
+Recommended threshold:
+
+| Score | Meaning | Action |
+|-------|---------|--------|
+| `75+` | Healthy | OK to push/merge if tests pass |
+| `50-74` | Needs work | Fix high-signal findings before merge |
+| `<50` | Critical | Block merge except for explicitly approved emergencies |
+
+### CI gate for pull requests and `main`
+
+```yaml
+# .github/workflows/react-doctor.yml
+name: React Doctor
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  react-doctor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: millionco/react-doctor@latest
+        with:
+          diff: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+Make this workflow a required status check in branch protection for `main`. Keep `fmt`, `lint`, `typecheck`, tests, and React Doctor together as the minimum merge gate.
+
+### Agent workflow
+
+When an AI agent touches React components, routes, hooks, forms, or client state:
+
+1. run `pnpm doctor:react:diff` before handing off;
+2. fix security/correctness/accessibility findings before polish findings;
+3. mention any ignored or deferred findings in the PR description.
 
 ---
 

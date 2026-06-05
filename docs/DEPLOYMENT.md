@@ -10,6 +10,7 @@
 |------|---------|
 | **Alchemy** | Infrastructure-as-code for Cloudflare |
 | **Wrangler** | Cloudflare CLI for dev/debug |
+| **Infisical** | Secret storage, local env injection, and CI/runtime secret delivery |
 | **D1** | SQLite database at the edge |
 | **R2** | Object storage |
 | **KV** | Key-value store |
@@ -17,6 +18,15 @@
 ---
 
 ## Environment Configuration
+
+Use [Environment and Secrets](./ENVIRONMENT-SECRETS.md) as the source guide for Infisical, Cloudflare Worker secrets, and deploy-time environment handling. Short version:
+
+- commit `infisical.json`, never commit `.env`, `.env.local`, or `.dev.vars`;
+- run local commands with `infisical run --env=dev -- pnpm dev`;
+- deploy with `infisical run --env=staging -- pnpm deploy:staging` or from CI after fetching Infisical secrets;
+- sync only runtime secrets to Cloudflare Workers, and keep non-secret config in Alchemy/Wrangler `vars`;
+- validate both Node-side deploy env and Worker `env` bindings with Zod.
+
 
 ### Env Validation with Zod
 
@@ -178,15 +188,38 @@ wrangler secret put BETTER_AUTH_SECRET --env development
 
 ### Deploy Commands
 
+Prefer a CAPM-style stage variable for new projects:
+
 ```bash
-# Deploy to development
-ALCHEMY_PHASE=development pnpm alchemy deploy
+# Deploy to development with local Infisical secrets
+infisical run --env=dev --command "STAGE=dev pnpm exec alchemy deploy"
+
+# Deploy to staging
+infisical run --env=staging --command "STAGE=staging pnpm exec alchemy deploy"
 
 # Deploy to production
-ALCHEMY_PHASE=production pnpm alchemy deploy
+infisical run --env=prod --command "STAGE=prod pnpm exec alchemy deploy"
+```
 
-# Destroy resources (careful!)
-ALCHEMY_PHASE=development pnpm alchemy destroy
+Recommended package scripts:
+
+```json
+{
+  "scripts": {
+    "predeploy": "pnpm fmt && pnpm lint && pnpm typecheck && pnpm doctor:react:diff",
+    "deploy": "pnpm predeploy && pnpm exec alchemy deploy",
+    "deploy:staging": "STAGE=staging pnpm deploy",
+    "deploy:prod": "STAGE=prod pnpm deploy",
+    "deploy:staging:secrets": "infisical run --env=staging -- pnpm deploy:staging",
+    "deploy:prod:secrets": "infisical run --env=prod -- pnpm deploy:prod"
+  }
+}
+```
+
+Destroy resources only from an explicitly approved session:
+
+```bash
+STAGE=dev pnpm exec alchemy destroy
 ```
 
 ---
@@ -624,8 +657,10 @@ jobs:
 ### Pre-Deploy
 
 - [ ] All tests passing
+- [ ] React Doctor passes for the branch diff
 - [ ] Environment variables validated with Zod
-- [ ] Secrets set in Cloudflare dashboard
+- [ ] Infisical environment selected (`dev`, `staging`, or `prod`)
+- [ ] Runtime secrets synced to Cloudflare Workers or injected during Alchemy deploy
 - [ ] Database migrations applied
 - [ ] Build succeeds locally
 
@@ -672,7 +707,9 @@ wrangler rollback --version <version-id>
 - Check database exists: `wrangler d1 list`
 
 **"Secret not set"**
-- Set via: `wrangler secret put SECRET_NAME`
+- Preferred: sync the secret from Infisical to the target Cloudflare Worker/environment
+- Deploy-time fallback: `infisical run --env=staging -- pnpm deploy:staging`
+- Manual fallback: `wrangler secret put SECRET_NAME`
 - Verify: `wrangler secret list`
 
 **"Migration failed"**

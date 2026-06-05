@@ -14,6 +14,7 @@
 - [TanStack Form](#tanstack-form)
 - [Database (Drizzle)](#database-drizzle)
 - [Styling (Tailwind v4)](#styling-tailwind-v4)
+- [React Best Practices](#react-best-practices)
 - [UI Patterns](#ui-patterns)
 - [AI Integration](#ai-integration)
 - [File Upload](#file-upload)
@@ -1023,6 +1024,20 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 export const useTheme = () => useContext(ThemeContext);
 ```
+
+---
+
+## React Best Practices
+
+Keep React simple by default:
+
+- server data lives in TanStack Query or route loaders;
+- derived values stay in render, not `useEffect` + duplicated state;
+- static arrays like table columns live outside components;
+- icon-only buttons have `aria-label`;
+- unsafe HTML and client-side secrets are not allowed.
+
+Use [React Best Practices](./REACT-BEST-PRACTICES.md) for the full lightweight checklist and React Doctor config template.
 
 ---
 

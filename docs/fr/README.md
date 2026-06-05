@@ -10,6 +10,7 @@ Utilisez ce dossier comme carte de travail de la stack Fenod. Le `README.md` rac
 2. [Guide de Migration](./MIGRATION.md)
 3. [Strategie de Developpement](./DEVELOPMENT-STRATEGY.md)
 4. [Patterns de Code](./CODE-PATTERNS.md)
+5. [Bonnes pratiques React](./REACT-BEST-PRACTICES.md)
 
 ### Construire avec l'IA
 
@@ -22,9 +23,11 @@ Utilisez ce dossier comme carte de travail de la stack Fenod. Le `README.md` rac
 ### Aller en production
 
 1. [Guide de Deploiement](./DEPLOYMENT.md)
-2. [Guide d'Amelioration d'App](./APP-IMPROVEMENT-GUIDE.md)
-3. [Debugging](./DEBUGGING.md)
-4. [Etat de l'Outillage Local](./LOCAL-TOOLCHAIN.md)
+2. [Environnements et secrets](./ENVIRONMENT-SECRETS.md)
+3. [Tokens API Cloudflare](./CLOUDFLARE-API-TOKENS.md)
+4. [Guide d'Amelioration d'App](./APP-IMPROVEMENT-GUIDE.md)
+5. [Debugging](./DEBUGGING.md)
+6. [Etat de l'Outillage Local](./LOCAL-TOOLCHAIN.md)
 
 ### Surfaces produit et contenu
 
@@ -42,6 +45,7 @@ Utilisez ce dossier comme carte de travail de la stack Fenod. Le `README.md` rac
 | [Guide de Migration](./MIGRATION.md) | Passer du scaffold a un projet pret pour la production |
 | [Strategie de Developpement](./DEVELOPMENT-STRATEGY.md) | Executer un delivery par phases avec une approche UI-first |
 | [Patterns de Code](./CODE-PATTERNS.md) | Reutiliser des patterns d'implementation a travers la stack |
+| [Bonnes pratiques React](./REACT-BEST-PRACTICES.md) | Regles simples React pour agents, PRs, securite, accessibilite et React Doctor |
 
 ### IA et Workflow
 
@@ -51,7 +55,7 @@ Utilisez ce dossier comme carte de travail de la stack Fenod. Le `README.md` rac
 | [AI Providers](./AI-PROVIDERS.md) | Workers AI, AI Gateway, Replicate — guide des modeles et comparatif providers |
 | [MCP avec Claude Code](./MCP-GUIDE.md) | Charger les outils dynamiquement, inspecter le navigateur et piloter Cloudflare |
 | [TDD avec l'IA](./TDD-WITH-AI.md) | Rendre la sortie de l'IA plus sure avec des boucles red/green/refactor |
-| [Guide de Tests](./TESTING.md) | Structurer Vitest, Playwright, MSW et l'organisation des tests |
+| [Guide de Tests](./TESTING.md) | Structurer Vitest, Playwright, MSW, React Doctor et l'organisation des tests |
 | [Debugging](./DEBUGGING.md) | Deboguer le navigateur, les logs et l'edge runtime |
 
 ### Livraison et Durcissement
@@ -59,6 +63,8 @@ Utilisez ce dossier comme carte de travail de la stack Fenod. Le `README.md` rac
 | Guide | Utilisez-le pour |
 |-------|------------------|
 | [Guide de Deploiement](./DEPLOYMENT.md) | Deployer sur Cloudflare, configurer le CI/CD et les bindings |
+| [Environnements et secrets](./ENVIRONMENT-SECRETS.md) | Infisical, secrets Cloudflare et env de deploy securisee |
+| [Tokens API Cloudflare](./CLOUDFLARE-API-TOKENS.md) | Tokens a privilege minimal, garde-fous IA et usage Wrangler securise |
 | [Guide d'Amelioration d'App](./APP-IMPROVEMENT-GUIDE.md) | Renforcer la performance, la resilience et l'operabilite |
 | [Etat de l'Outillage Local](./LOCAL-TOOLCHAIN.md) | Auditer ce qui est installe localement et ce qui doit rester principal |
 | [Les Primitives de Calcul Cloudflare](./CLOUDFLARE-COMPUTE.md) | Worker vs Dynamic Worker vs Container: quand utiliser chacun |

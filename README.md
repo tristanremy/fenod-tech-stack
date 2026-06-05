@@ -135,7 +135,21 @@ my-app/
 | [Drizzle](https://orm.drizzle.team) | TypeScript ORM |
 | [Better Auth](https://better-auth.com) | Authentication |
 
+### Tooling
+
+VoidZero is the stack direction for fast JavaScript tooling: Vite/Vitest as defaults, Oxlint/Oxfmt through Ultracite where useful, Rolldown for faster builds, `tsdown` for packages, and Vite+ as an experimental new-project lane.
+
+| Tool | Purpose |
+|------|---------|
+| [Vite](https://vite.dev) | Dev server and framework foundation |
+| [Vitest](https://vitest.dev) | Unit and integration tests |
+| [Oxlint](https://oxc.rs/docs/guide/usage/linter.html) / Oxfmt | Fast linting and formatting foundation |
+| [Rolldown](https://rolldown.rs) | Future-facing bundler path for faster builds |
+| [tsdown](https://tsdown.dev) | ESM-first package/library builds |
+
 ### Infrastructure (Cloudflare)
+
+Cloudflare is the default deployment target. Use OAuth for local Wrangler work, scoped API tokens for CI/automation, and never hand broad account tokens to AI agents. See [Cloudflare API Tokens](docs/CLOUDFLARE-API-TOKENS.md).
 
 | Service | Purpose |
 |---------|---------|
@@ -223,16 +237,20 @@ my-app/
 | [Documentation Hub](docs/README.md) | Reading paths and categorized documentation map |
 | [Stack Overview](docs/STACK-OVERVIEW.md) | Recommended defaults, tradeoffs, and operating mode |
 | [AI Development Workflow](docs/AI-DEVELOPMENT-WORKFLOW.md) | How Cursor, Claude Code, MCP, and verification fit together |
+| [Agent Platform Plan](docs/AGENT-PLATFORM-PLAN.md) | Project-scoped agent runtime, brokered Cloudflare changes, backups, and local DX |
 | [TDD with AI](docs/TDD-WITH-AI.md) | Red/green/refactor adapted to AI-assisted delivery |
 | [Local Toolchain Snapshot](docs/LOCAL-TOOLCHAIN.md) | Machine audit and recommendations for this setup |
 | [Cloudflare Compute](docs/CLOUDFLARE-COMPUTE.md) | Worker vs Dynamic Worker vs Container: when to use each |
+| [Cloudflare API Tokens](docs/CLOUDFLARE-API-TOKENS.md) | Least-privilege tokens, secure Wrangler usage, and AI-agent guardrails |
 | [AI Providers](docs/AI-PROVIDERS.md) | Workers AI, AI Gateway, Replicate — model guide and provider comparison |
 | [Code Patterns](docs/CODE-PATTERNS.md) | API, auth, forms, UI, Workflows, Queues, Vectorize, Agents |
 | [Development Strategy](docs/DEVELOPMENT-STRATEGY.md) | UI-first workflow, phased development |
 | [Migration Guide](docs/MIGRATION.md) | From TanStack CLI scaffold to production |
 | [App Improvement Guide](docs/APP-IMPROVEMENT-GUIDE.md) | Performance, security, error handling |
-| [Testing Guide](docs/TESTING.md) | Vitest, Playwright, slice testing |
+| [Testing Guide](docs/TESTING.md) | Vitest, Playwright, slice testing, React Doctor quality gates |
+| [React Best Practices](docs/REACT-BEST-PRACTICES.md) | Simple React rules for agents, PRs, security, and accessibility |
 | [Deployment Guide](docs/DEPLOYMENT.md) | Alchemy, Wrangler (jsonc), CI/CD |
+| [Environment and Secrets](docs/ENVIRONMENT-SECRETS.md) | Infisical, Cloudflare secrets, safe deploy env |
 | [Data Fetching](docs/TANSTACK-DATA-FETCHING.md) | Query vs Router loaders |
 | [Debugging](docs/DEBUGGING.md) | Wrangler tail, DevTools, logging |
 | [MCP Guide](docs/MCP-GUIDE.md) | MCP server integration |
@@ -267,7 +285,9 @@ my-app/
 | [Better Upload](https://better-upload.dev) | File uploads to R2 |
 | [Polar.sh](https://polar.sh) | Payments |
 | [AI SDK](https://sdk.vercel.ai) | LLM integration |
+| [React Doctor](https://www.react.doctor/) | React best-practice, security, performance, and architecture checks before PR merge |
 | [Alchemy](https://alchemy.run) | Cloudflare IaC |
+| [Infisical](https://infisical.com) | Secret storage and environment injection |
 | [Husky](https://typicode.github.io/husky/) + [lint-staged](https://github.com/lint-staged/lint-staged) | Git hooks (pre-commit, pre-push) |
 
 ---
@@ -276,6 +296,6 @@ my-app/
 
 **Core:** [TanStack Start](https://tanstack.com/start) | [Astro](https://astro.build) | [Hono](https://hono.dev) | [ORPC](https://orpc.unnoq.com) | [Drizzle](https://orm.drizzle.team) | [Better Auth](https://better-auth.com)
 
-**Infra:** [Cloudflare](https://developers.cloudflare.com) | [Alchemy](https://alchemy.run) | [Turborepo](https://turbo.build)
+**Infra:** [Cloudflare](https://developers.cloudflare.com) | [Alchemy](https://alchemy.run) | [Infisical](https://infisical.com) | [Turborepo](https://turbo.build)
 
 **UI:** [shadcn/ui](https://ui.shadcn.com) | [Tailwind](https://tailwindcss.com) | [AI SDK Elements](https://ai-sdk.dev/elements)
