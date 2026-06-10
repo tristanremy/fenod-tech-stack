@@ -1,6 +1,7 @@
 {
   "name": "fenod-tech-stack",
   "private": true,
+  "packageManager": "pnpm@10.24.0",
   "type": "module",
   "scripts": {
     "dev": "pnpm diagrams:build && astro dev",
