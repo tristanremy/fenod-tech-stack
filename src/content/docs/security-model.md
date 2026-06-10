@@ -61,6 +61,18 @@ Rules:
 
 See [Cloudflare API Tokens](/cloudflare-api-tokens/).
 
+## Dependency Security
+
+Every product repo should use automated dependency monitoring plus an audit gate. Prefer Renovate with security-sensitive labels for auth/RPC/ORM packages, and run `pnpm audit --audit-level high` in CI.
+
+Security-sensitive packages require explicit review before major upgrades:
+
+- `better-auth` and `@better-auth/*`: stay on the latest stable 1.6.x line or newer security-patched stable line.
+- `@orpc/*`: keep patched for serializer/deserializer advisories.
+- `drizzle-orm` / `drizzle-kit`: stay on patched 0.44.x for client work until the v1 stable migration plan is written.
+
+Patch and minor security updates should be reviewed quickly. Major version bumps to auth, RPC, ORM, or deployment tooling are never drive-by cleanups.
+
 ## AI Provider Keys
 
 Provider keys control spend and model/data access. They should be treated separately from deploy tokens.

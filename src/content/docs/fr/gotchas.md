@@ -80,3 +80,11 @@ Utiliser les primitives Cloudflare-native: KV pour le cache, le binding Workers 
 ## tsgo ne Remplace pas le Package typescript
 
 tsgo utilise la toolchain native TypeScript 7/Corsa pour des type checks rapides. Garder `typescript` installe side-by-side pour les outils qui consomment l'API programmatique legacy Strada jusqu'a stabilisation de l'API Corsa.
+
+## Drizzle v1 n'est pas encore le Default Client
+
+Drizzle v1 est en RC et inclut des breaking changes comme RQBv2 et les changements d'API casing. Le travail client reste sur 0.44.x patche jusqu'a stabilisation de v1 et ecriture du plan de migration. Ne pas laisser un agent upgrader Drizzle en cleanup opportuniste.
+
+## Les Updates Securite Auth/RPC/ORM ne sont pas Optionnelles
+
+Better Auth, ORPC et Drizzle ont tous eu des advisories securite significatives en 2026. Les repos produit ont besoin d'une veille dependances automatisee plus `pnpm audit --audit-level high`; les major bumps auth/RPC/ORM demandent une revue explicite.

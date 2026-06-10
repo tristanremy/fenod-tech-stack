@@ -13,7 +13,7 @@ Cloudflare is the default and only deployment target unless a project documents 
 - **Default deploy path:** `wrangler.jsonc` + `wrangler deploy`.
 - **Alchemy v2 only when triggered:** 4+ Cloudflare resources with shared lifecycle, 3+ stages beyond Wrangler envs, infra-level tests/OTel as code, or multiple Cloudflare accounts.
 - **Never use Alchemy v1 examples.** Package is `alchemy`, not `the legacy Alchemy framework package`; v2 uses `Alchemy.Stack(...)` and `Cloudflare.Worker(...)`.
-- **Every deployed Worker ships with observability:** `observability.enabled = true` and an error alert. Product apps add Sentry. See `/observability/`.
+- **Every deployed Worker ships with observability:** `observability.enabled = true` and an error alert. Product apps add Sentry. Better Auth and ORPC spans should flow to the app's chosen OTel collector/exporter. See `/observability/`.
 - **Rate limiting uses Cloudflare-native primitives:** Workers rate limiting binding, or Durable Objects for custom semantics. Never add external Redis for default rate limiting.
 - **Never commit secrets.** Commit `infisical.json`; never `.env`, `.env.local`, `.dev.vars`. If a tool insists on dotenv, generate `.env.local` temporarily and delete it.
 - **Local commands run through Infisical:** `infisical run --env=dev -- pnpm dev`. Deploys: `infisical run --env=staging -- wrangler deploy --env staging`, or CI fetches secrets at runtime.

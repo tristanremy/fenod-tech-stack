@@ -13,7 +13,7 @@ This guide defines the JavaScript/TypeScript tooling direction for Fenod project
 
 | Layer | Default | Notes |
 |-------|---------|-------|
-| Runtime | Node 22 | Baseline for app and CI commands |
+| Runtime | Node 24 | Baseline for app and CI commands |
 | Package manager | pnpm | Default for workspaces and scripts |
 | Dev/build foundation | Vite | Via TanStack Start, Astro, or direct Vite apps |
 | Test runner | Vitest | Unit/integration tests with Vite-aware config |
@@ -25,12 +25,12 @@ This guide defines the JavaScript/TypeScript tooling direction for Fenod project
 
 ## VoidZero Direction
 
-VoidZero tooling is the direction for the JS toolchain:
+VoidZero tooling is now part of Cloudflare's platform strategy after Cloudflare acquired VoidZero in June 2026. This validates the Fenod default of Cloudflare-first runtime plus Vite/Vitest/Oxc/Rolldown tooling, but it also creates a deliberate concentration risk: the stack leans heavily on one vendor ecosystem.
 
-- **Vite** for dev/build foundation
+- **Vite 8** for dev/build foundation in new projects
 - **Vitest** for tests
 - **Oxlint/Oxfmt** for fast lint/format foundations
-- **Rolldown** for faster bundled builds as it matures
+- **Rolldown** as the Vite 8 default bundler
 - **tsdown** for package/library builds
 - **Vite+** as an experimental unified entry point for prototypes
 
@@ -38,10 +38,10 @@ Adoption posture:
 
 | Tool | Use now | Try when | Avoid when |
 |------|---------|----------|------------|
-| Vite | yes | default | framework hides it completely and no config needed |
+| Vite 8 | yes for new projects | default | existing Vite 7 app needs a lower-risk two-step migration |
+| `rolldown-vite` | migration bridge | existing Vite 7 app wants to isolate bundler issues before Vite 8 | new projects; use Vite 8 directly |
 | Vitest | yes | default | true browser-only behavior is required; use Playwright |
 | Ultracite | yes | default lint/format gate | repo has a strong existing standard to preserve |
-| Rolldown / `rolldown-vite` | selectively | build time is painful or app is large | client work cannot tolerate bundler edge cases |
 | tsdown | yes for packages | replacing tsup/Rollup configs | app builds handled by framework |
 | Vite+ | experimental | prototypes and internal tests | production client baseline until stable enough |
 

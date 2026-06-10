@@ -16,13 +16,13 @@ Cette page est le contrat. Si une autre page est plus detaillee, utilise cette p
 
 ## Utiliser
 
-- Node 22
+- Node 24 pour les nouveaux projets; Node 22 seulement pour l'existant jusqu'a migration
 - pnpm
 - TanStack Start pour les apps full-stack
 - Astro/Starlight pour les docs et sites riches en contenu
 - Hono + ORPC pour les APIs
-- Drizzle + D1 pour les donnees relationnelles
-- Better Auth pour l'authentification
+- Drizzle 0.44.x stable + D1 pour les donnees relationnelles; ne pas upgrader le travail client vers Drizzle v1 RC pour l'instant
+- Better Auth latest 1.6.x pour l'authentification
 - Tailwind v4 + shadcn/ui pour les fondations UI
 - TanStack Query/Router/Form/Table quand pertinent
 - TanStack AI pour chat, tools, streaming et etat agent
@@ -36,6 +36,7 @@ Cette page est le contrat. Si une autre page est plus detaillee, utilise cette p
 - Durable Objects pour la coordination stateful
 - Wrangler pour les deploiements par defaut; Alchemy v2 seulement pour les projets multi-ressources/multi-stages (voir [Deployment](/fr/deployment/))
 - Infisical ou Bitwarden Secrets Manager pour les secrets
+- Vite 8 + Rolldown pour les nouveaux projets; `rolldown-vite` seulement comme pont de migration Vite 7
 - Ultracite + tsgo + Vitest + Playwright pour les quality gates
 - tsdown pour les packages internes
 
@@ -52,6 +53,8 @@ Cette page est le contrat. Si une autre page est plus detaillee, utilise cette p
 - tokens de deploiement larges au niveau compte
 - fichiers `.env` plaintext dans Git
 - cles fournisseur dans le code client
+- upgrades majeurs non relus des packages auth/RPC/ORM
+- Drizzle v1 RC sur projets clients avant un plan de migration stable
 - Vercel AI SDK pour nouveau code app sauf workflow non supporte
 
 ## Regle Architecture

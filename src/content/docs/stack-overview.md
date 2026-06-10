@@ -21,7 +21,7 @@ This is the operating view of the Fenod stack: what should be primary, what is o
 
 | Layer | Default | Why |
 |-------|---------|-----|
-| Runtime | Node 22 | Stable baseline for the ecosystem and team docs |
+| Runtime | Node 24 | Stable baseline for the ecosystem and team docs |
 | Package manager | pnpm | Fast workspaces, predictable installs, strong monorepo fit |
 | App framework | TanStack Start | Typed full-stack React with strong router/query story |
 | Content framework | Astro | Better fit for content, SEO, and marketing surfaces |
@@ -48,21 +48,23 @@ For the machine-specific version snapshot, see [Local Toolchain Snapshot](/local
 
 ## VoidZero Tooling Direction
 
-VoidZero is the preferred direction for JavaScript tooling because it aligns with the stack's goals: fast feedback, one coherent toolchain, and fewer bespoke configs.
+VoidZero is the preferred direction for JavaScript tooling because it aligns with the stack's goals: fast feedback, one coherent toolchain, and fewer bespoke configs. Since Cloudflare acquired VoidZero in June 2026, this direction is now tightly aligned with Cloudflare's runtime strategy.
+
+That is a strength and a concentration risk. Fenod accepts the vendor concentration because the integration benefits are large for a small team, but major new projects should still keep standards-based boundaries: SQL, HTTP, OpenAPI, portable TypeScript, and explicit export paths.
 
 | Tool | Role in the stack | Adoption posture |
 |------|-------------------|------------------|
-| Vite | Dev server and framework foundation for TanStack Start and Astro | Default |
+| Vite 8 | Dev server and framework foundation for TanStack Start and Astro | Default for new projects |
+| `rolldown-vite` | Vite 7 compatibility bridge with Rolldown | Migration bridge for existing Vite 7 apps |
 | Vitest | Unit and integration tests that understand Vite config | Default |
 | Oxlint / Oxfmt | High-performance linting and formatting foundations | Default through Ultracite where possible |
-| Rolldown / `rolldown-vite` | Faster bundling and future Vite build path | Try on larger apps or slow builds |
 | `tsdown` | Library/package build tool | Default for internal packages that need published artifacts |
 | Vite+ | Unified web toolchain entry point | Experimental for new prototypes until stable enough for client work |
 
 Adoption should be staged:
 
-1. **Stable default:** Vite, Vitest, Ultracite, tsgo, and Playwright.
-2. **Performance upgrade:** try `rolldown-vite` when build time is a real bottleneck.
+1. **Stable default:** Vite 8, Vitest, Ultracite, tsgo, and Playwright for new projects.
+2. **Migration bridge:** use `rolldown-vite` first when upgrading an existing Vite 7 app, so bundler issues are isolated before the Vite 8 jump.
 3. **Package build default:** use `tsdown` instead of custom Rollup/tsup configs for libraries.
 4. **Experimental lane:** evaluate Vite+ on prototypes before standardizing it for production apps.
 
@@ -71,7 +73,7 @@ Adoption should be staged:
 ### Use one default path for delivery
 
 - Document commands with `pnpm`.
-- Assume Node 22 for local development and CI unless a project says otherwise.
+- Assume Node 24 for local development and CI unless a project says otherwise.
 - Build product apps with TanStack Start unless Astro is clearly the better fit.
 - Keep backend work thin with Hono, ORPC, Drizzle, and Better Auth.
 - Treat Cloudflare as the default deployment target, not an afterthought.
@@ -94,7 +96,7 @@ Adoption should be staged:
 
 ## Improvement Priorities
 
-1. Keep the stack opinionated: `pnpm`, Node 22, TanStack Start or Astro, Cloudflare by default.
+1. Keep the stack opinionated: `pnpm`, Node 24, TanStack Start or Astro, Cloudflare by default.
 2. Make the AI workflow explicit instead of relying on ad hoc prompting.
 3. Add TDD earlier so AI-generated code is guided by executable behavior.
 4. Track local toolchain drift so docs match reality.

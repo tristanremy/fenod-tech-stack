@@ -9,7 +9,8 @@
     "build": "pnpm diagrams:build && pnpm llms:build && astro check && astro build",
     "check:links": "tsx scripts/check-internal-links.ts",
     "check:public": "tsx scripts/check-public-safety.ts",
-    "check": "pnpm build && pnpm check:links && pnpm check:public",
+    "audit:deps": "pnpm audit --audit-level high",
+    "check": "pnpm build && pnpm check:links && pnpm check:public && pnpm audit:deps",
     "preview": "astro preview"
   },
   "dependencies": {

@@ -47,6 +47,12 @@ Le SDK Cloudflare de Sentry necessite `AsyncLocalStorage`, donc ajouter un flag 
 
 Stocker `SENTRY_DSN` dans Infisical et le synchroniser comme Worker secret. Ne pas mettre le DSN dans des `vars` publiques.
 
+## Traces Auth et RPC
+
+Better Auth 1.6 emet des spans OpenTelemetry pour les appels API auth, le cycle de vie des hooks, le travail des plugins, et les operations DB quand un tracer provider est enregistre. ORPC traite aussi OpenTelemetry comme un chemin d'integration first-class. Le default Fenod est de garder ces spans disponibles et de choisir un collecteur/exporter au niveau app plutot que de desactiver l'instrumentation dans les libraries.
+
+Workers Observability donne la base logs/traces. Les apps produit qui ont besoin de traces cross-service doivent brancher un collecteur/exporter OTel dans la meme decision observabilite que Sentry.
+
 ## Gotchas
 
 - Le sampling peut cacher les erreurs rares. Utiliser le sampling complet jusqu'a preuve par le trafic.

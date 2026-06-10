@@ -1,0 +1,20 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommits"],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": false
+    },
+    {
+      "matchPackageNames": ["better-auth", "/^@better-auth\\//", "@orpc/client", "@orpc/server", "drizzle-orm", "drizzle-kit"],
+      "labels": ["dependencies", "security-sensitive"],
+      "automerge": false
+    },
+    {
+      "matchPackageNames": ["drizzle-orm", "drizzle-kit"],
+      "allowedVersions": "<1.0.0"
+    }
+  ]
+}

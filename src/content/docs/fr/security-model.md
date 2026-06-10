@@ -61,6 +61,18 @@ Règles :
 
 Voir [Cloudflare API Tokens](/fr/cloudflare-api-tokens/).
 
+## Securite des Dependances
+
+Chaque repo produit doit utiliser une veille dependances automatisee plus une gate d'audit. Preferer Renovate avec labels security-sensitive pour les packages auth/RPC/ORM, et lancer `pnpm audit --audit-level high` en CI.
+
+Les packages sensibles necessitent une revue explicite avant les upgrades majeurs:
+
+- `better-auth` et `@better-auth/*`: rester sur la derniere ligne stable 1.6.x ou une ligne stable plus recente patchee securite.
+- `@orpc/*`: garder patche pour les advisories serializer/deserializer.
+- `drizzle-orm` / `drizzle-kit`: rester sur 0.44.x patche pour le travail client tant que le plan migration v1 stable n'est pas ecrit.
+
+Les patchs et minors securite doivent etre relus rapidement. Les major bumps auth, RPC, ORM, ou tooling deploy ne sont jamais des cleanups opportunistes.
+
 ## Clés fournisseurs IA
 
 Les clés fournisseur contrôlent les dépenses et l’accès aux modèles/données. Elles doivent être traitées séparément des tokens de déploiement.

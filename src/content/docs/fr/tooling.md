@@ -13,7 +13,7 @@ Ce guide définit l’orientation de l’outillage JavaScript/TypeScript pour le
 
 | Couche | Défaut | Notes |
 |-------|---------|-------|
-| Runtime | Node 22 | Base pour les commandes applicatives et CI |
+| Runtime | Node 24 | Base pour les commandes applicatives et CI |
 | Gestionnaire de paquets | pnpm | Défaut pour les workspaces et scripts |
 | Base dev/build | Vite | Via TanStack Start, Astro ou des apps Vite directes |
 | Lanceur de tests | Vitest | Tests unitaires/intégration avec config compatible Vite |
@@ -25,12 +25,12 @@ Ce guide définit l’orientation de l’outillage JavaScript/TypeScript pour le
 
 ## Orientation VoidZero
 
-L’outillage VoidZero est la direction pour la toolchain JS :
+L’outillage VoidZero fait maintenant partie de la strategie plateforme Cloudflare apres l'acquisition de VoidZero par Cloudflare en juin 2026. Cela valide le default Fenod runtime Cloudflare-first plus tooling Vite/Vitest/Oxc/Rolldown, mais cree aussi un risque de concentration assume: la stack s'appuie fortement sur un meme ecosysteme vendor.
 
-- **Vite** comme base dev/build
+- **Vite 8** comme base dev/build pour les nouveaux projets
 - **Vitest** pour les tests
 - **Oxlint/Oxfmt** comme bases rapides de lint/format
-- **Rolldown** pour des builds bundlés plus rapides à mesure qu’il mûrit
+- **Rolldown** comme bundler default de Vite 8
 - **tsdown** pour les builds de paquets/bibliothèques
 - **Vite+** comme point d’entrée unifié expérimental pour les prototypes
 
@@ -38,10 +38,10 @@ Posture d’adoption :
 
 | Outil | À utiliser maintenant | À essayer quand | À éviter quand |
 |------|---------|----------|------------|
-| Vite | oui | par défaut | le framework le masque complètement et aucune config n’est nécessaire |
+| Vite 8 | oui pour les nouveaux projets | default | une app Vite 7 existante a besoin d'une migration en deux etapes moins risquee |
+| `rolldown-vite` | pont de migration | une app Vite 7 veut isoler les problemes bundler avant Vite 8 | nouveaux projets; utiliser Vite 8 directement |
 | Vitest | oui | par défaut | un comportement purement navigateur est requis ; utiliser Playwright |
 | Ultracite | oui | gate lint/format par défaut | le repo a un standard existant fort à préserver |
-| Rolldown / `rolldown-vite` | sélectivement | le temps de build est douloureux ou l’app est grande | le travail client ne peut pas tolérer les cas limites du bundler |
 | tsdown | oui pour les paquets | remplacement de configs tsup/Rollup | les builds d’app sont gérés par le framework |
 | Vite+ | expérimental | prototypes et tests internes | baseline client de production avant stabilité suffisante |
 

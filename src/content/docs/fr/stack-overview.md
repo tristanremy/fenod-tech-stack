@@ -21,7 +21,7 @@ This is the operating view of the Fenod stack: what should be primary, what is o
 
 | Couche | Défaut | Pourquoi |
 |-------|---------|-----|
-| Runtime | Node 22 | Base stable pour l’écosystème et la documentation d’équipe |
+| Runtime | Node 24 | Base stable pour l’écosystème et la documentation d’équipe |
 | Package manager | pnpm | Workspaces rapides, installations prévisibles, excellent choix monorepo |
 | App framework | TanStack Start | React full-stack typé avec un solide modèle router/query |
 | Content framework | Astro | Meilleur choix pour le contenu, le SEO et les surfaces marketing |
@@ -48,30 +48,32 @@ For the machine-specific version snapshot, see [État de l'outillage local](/fr/
 
 ## Direction outillage VoidZero
 
-VoidZero is the preferred direction for JavaScript tooling because it aligns with the stack's goals: fast feedback, one coherent toolchain, and fewer bespoke configs.
+VoidZero est la direction preferee pour l'outillage JavaScript parce qu'elle colle aux objectifs de la stack: feedback rapide, toolchain coherente, et moins de configs custom. Depuis l'acquisition de VoidZero par Cloudflare en juin 2026, cette direction est fortement alignee avec la strategie runtime Cloudflare.
+
+C'est une force et un risque de concentration. Fenod accepte cette concentration vendor car les benefices d'integration sont importants pour une petite equipe, mais les nouveaux grands projets doivent garder des frontieres standard: SQL, HTTP, OpenAPI, TypeScript portable, et exports explicites.
 
 | Tool | Role in the stack | Adoption posture |
 |------|-------------------|------------------|
-| Vite | Dev server and framework foundation for TanStack Start and Astro | Default |
-| Vitest | Unit and integration tests that understand Vite config | Default |
-| Oxlint / Oxfmt | High-performance linting and formatting foundations | Default through Ultracite where possible |
-| Rolldown / `rolldown-vite` | Faster bundling and future Vite build path | Try on larger apps or slow builds |
-| `tsdown` | Library/package build tool | Default for internal packages that need published artifacts |
-| Vite+ | Unified web toolchain entry point | Experimental for new prototypes until stable enough for client work |
+| Vite 8 | Dev server et base framework pour TanStack Start et Astro | Default pour nouveaux projets |
+| `rolldown-vite` | Pont compatibilite Vite 7 avec Rolldown | Pont de migration pour apps Vite 7 existantes |
+| Vitest | Tests unitaires et integration compatibles config Vite | Default |
+| Oxlint / Oxfmt | Bases linting/formatting haute performance | Default via Ultracite quand possible |
+| `tsdown` | Build tool libraries/packages | Default pour packages internes publiables |
+| Vite+ | Point d'entree toolchain web unifie | Experimental pour prototypes avant production client |
 
 Adoption should be staged:
 
-1. **Stable default:** Vite, Vitest, Ultracite, tsgo, and Playwright.
-2. **Performance upgrade:** try `rolldown-vite` when build time is a real bottleneck.
-3. **Package build default:** use `tsdown` instead of custom Rollup/tsup configs for libraries.
-4. **Experimental lane:** evaluate Vite+ on prototypes before standardizing it for production apps.
+1. **Stable default:** Vite 8, Vitest, Ultracite, tsgo et Playwright pour nouveaux projets.
+2. **Pont de migration:** utiliser `rolldown-vite` d'abord pour upgrader une app Vite 7 existante, afin d'isoler les problemes bundler avant le saut Vite 8.
+3. **Default build package:** utiliser `tsdown` au lieu de configs Rollup/tsup custom pour les libraries.
+4. **Lane experimental:** evaluer Vite+ sur prototypes avant standardisation production.
 
 ## Mode de fonctionnement recommandé
 
 ### Utilisez one default path for delivery
 
 - Document commands with `pnpm`.
-- Assume Node 22 for local development and CI unless a project says otherwise.
+- Assume Node 24 for local development and CI unless a project says otherwise.
 - Build product apps with TanStack Start unless Astro is clearly the better fit.
 - Keep backend work thin with Hono, ORPC, Drizzle, and Better Auth.
 - Treat Cloudflare as the default deployment target, not an afterthought.
@@ -94,7 +96,7 @@ Adoption should be staged:
 
 ## Priorités d'amélioration
 
-1. Keep the stack opinionated: `pnpm`, Node 22, TanStack Start or Astro, Cloudflare by default.
+1. Keep the stack opinionated: `pnpm`, Node 24, TanStack Start or Astro, Cloudflare by default.
 2. Make the AI workflow explicit instead of relying on ad hoc prompting.
 3. Add TDD earlier so AI-generated code is guided by executable behavior.
 4. Track local toolchain drift so docs match reality.

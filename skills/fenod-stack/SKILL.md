@@ -31,7 +31,9 @@ Hono must be added manually after scaffolding if needed as the HTTP layer. The s
 
 ## Non-negotiable defaults
 
-- Runtime **Node 22**, package manager **pnpm**. Never switch package managers. Never make Bun/Deno required for normal commands.
+- Runtime **Node 24** for new projects; Node 22 only for existing projects until migration. Package manager **pnpm**. Never switch package managers. Never make Bun/Deno required for normal commands.
+- New Vite-based projects use **Vite 8 with Rolldown**. Existing Vite 7 apps may use `rolldown-vite` as a migration bridge before Vite 8.
+- Client work stays on patched **Drizzle 0.44.x** until Drizzle v1 is stable and a migration plan exists. Do not upgrade auth/RPC/ORM majors as cleanup.
 - **TypeScript strict mode** plus `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noPropertyAccessFromIndexSignature`. Full tsconfig in the `src/content/docs/stack-overview.md` of the stack repo.
 - Validate every environment with **Zod** at startup; never trust raw `process.env` or Worker `env`.
 - Styling: **Tailwind v4 + shadcn/ui** base. Production polish: Intent UI, RE UI. Marketing blocks: Tailark, shadcnblocks.

@@ -95,13 +95,13 @@ This page is the contract. If another page is more detailed, use this page to re
 
 ## Use
 
-- Node 22
+- Node 24 for new projects; Node 22 only for existing projects until migration
 - pnpm
 - TanStack Start for full-stack apps
 - Astro/Starlight for docs and content-heavy sites
 - Hono + ORPC for APIs
-- Drizzle + D1 for relational data
-- Better Auth for authentication
+- Drizzle 0.44.x stable + D1 for relational data; do not upgrade client work to Drizzle v1 RC yet
+- Better Auth latest 1.6.x for authentication
 - Tailwind v4 + shadcn/ui for UI foundations
 - TanStack Query/Router/Form/Table where relevant
 - TanStack AI for app-level chat, tools, streaming, and agent state
@@ -115,6 +115,7 @@ This page is the contract. If another page is more detailed, use this page to re
 - Durable Objects for stateful coordination
 - Wrangler for deploys by default; Alchemy v2 only for multi-resource/multi-stage projects (see [Deployment](/deployment/))
 - Infisical or Bitwarden Secrets Manager for secrets
+- Vite 8 + Rolldown for new projects; `rolldown-vite` only as a Vite 7 migration bridge
 - Ultracite + tsgo + Vitest + Playwright for quality gates
 - tsdown for internal package builds
 
@@ -131,6 +132,8 @@ This page is the contract. If another page is more detailed, use this page to re
 - broad account-scoped deploy tokens
 - plaintext `.env` files in Git
 - provider keys in client-side code
+- unreviewed major upgrades of auth/RPC/ORM packages
+- Drizzle v1 RC on client projects before the stable migration plan is written
 - Vercel AI SDK for new app code unless an unsupported workflow requires it
 
 ## Architecture Rule
@@ -328,6 +331,14 @@ Use Cloudflare-native primitives: KV for cache, the Workers rate limiting bindin
 
 tsgo uses the native TypeScript 7/Corsa toolchain for fast type checks. Keep `typescript` installed side-by-side for tools that consume the legacy Strada programmatic API until the Corsa API stabilizes.
 
+## Drizzle v1 Is Not the Client Default Yet
+
+Drizzle v1 is in RC and includes breaking changes such as RQBv2 and casing API changes. Client work stays on patched 0.44.x until v1 is stable and the migration plan is written. Do not let agents upgrade Drizzle as a drive-by cleanup.
+
+## Auth/RPC/ORM Security Updates Are Not Optional
+
+Better Auth, ORPC, and Drizzle all had meaningful security advisories in 2026. Product repos need automated dependency monitoring plus `pnpm audit --audit-level high`; auth/RPC/ORM major bumps require explicit review.
+
 
 ---
 
@@ -501,6 +512,18 @@ Rules:
 - prefer GitHub Actions or a deploy broker for production mutations
 
 See [Cloudflare API Tokens](/cloudflare-api-tokens/).
+
+## Dependency Security
+
+Every product repo should use automated dependency monitoring plus an audit gate. Prefer Renovate with security-sensitive labels for auth/RPC/ORM packages, and run `pnpm audit --audit-level high` in CI.
+
+Security-sensitive packages require explicit review before major upgrades:
+
+- `better-auth` and `@better-auth/*`: stay on the latest stable 1.6.x line or newer security-patched stable line.
+- `@orpc/*`: keep patched for serializer/deserializer advisories.
+- `drizzle-orm` / `drizzle-kit`: stay on patched 0.44.x for client work until the v1 stable migration plan is written.
+
+Patch and minor security updates should be reviewed quickly. Major version bumps to auth, RPC, ORM, or deployment tooling are never drive-by cleanups.
 
 ## AI Provider Keys
 
@@ -1129,7 +1152,7 @@ This guide defines the JavaScript/TypeScript tooling direction for Fenod project
 
 | Layer | Default | Notes |
 |-------|---------|-------|
-| Runtime | Node 22 | Baseline for app and CI commands |
+| Runtime | Node 24 | Baseline for app and CI commands |
 | Package manager | pnpm | Default for workspaces and scripts |
 | Dev/build foundation | Vite | Via TanStack Start, Astro, or direct Vite apps |
 | Test runner | Vitest | Unit/integration tests with Vite-aware config |
@@ -1141,12 +1164,12 @@ This guide defines the JavaScript/TypeScript tooling direction for Fenod project
 
 ## VoidZero Direction
 
-VoidZero tooling is the direction for the JS toolchain:
+VoidZero tooling is now part of Cloudflare's platform strategy after Cloudflare acquired VoidZero in June 2026. This validates the Fenod default of Cloudflare-first runtime plus Vite/Vitest/Oxc/Rolldown tooling, but it also creates a deliberate concentration risk: the stack leans heavily on one vendor ecosystem.
 
-- **Vite** for dev/build foundation
+- **Vite 8** for dev/build foundation in new projects
 - **Vitest** for tests
 - **Oxlint/Oxfmt** for fast lint/format foundations
-- **Rolldown** for faster bundled builds as it matures
+- **Rolldown** as the Vite 8 default bundler
 - **tsdown** for package/library builds
 - **Vite+** as an experimental unified entry point for prototypes
 
@@ -1154,10 +1177,10 @@ Adoption posture:
 
 | Tool | Use now | Try when | Avoid when |
 |------|---------|----------|------------|
-| Vite | yes | default | framework hides it completely and no config needed |
+| Vite 8 | yes for new projects | default | existing Vite 7 app needs a lower-risk two-step migration |
+| `rolldown-vite` | migration bridge | existing Vite 7 app wants to isolate bundler issues before Vite 8 | new projects; use Vite 8 directly |
 | Vitest | yes | default | true browser-only behavior is required; use Playwright |
 | Ultracite | yes | default lint/format gate | repo has a strong existing standard to preserve |
-| Rolldown / `rolldown-vite` | selectively | build time is painful or app is large | client work cannot tolerate bundler edge cases |
 | tsdown | yes for packages | replacing tsup/Rollup configs | app builds handled by framework |
 | Vite+ | experimental | prototypes and internal tests | production client baseline until stable enough |
 

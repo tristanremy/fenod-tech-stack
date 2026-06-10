@@ -56,10 +56,14 @@ Husky + lint-staged: pre-commit runs lint/format on staged files; the `prepare` 
 
 | Tool | Status |
 |------|--------|
-| Vite, Vitest, Ultracite, tsgo, Playwright | Stable default |
-| `rolldown-vite` | Try only when build time genuinely hurts; document results |
+| Vite 8, Vitest, Ultracite, tsgo, Playwright | Stable default for new projects |
+| `rolldown-vite` | Vite 7 migration bridge before Vite 8, not the new-project default |
 | `tsdown` | Default for internal package builds (ESM-first, typed exports, explicit `exports` map) |
 | Vite+ | Prototypes only, not client production |
+
+## Dependency security
+
+Product repos use Renovate or Dependabot plus `pnpm audit --audit-level high` in CI. Better Auth, ORPC, and Drizzle are security-sensitive: review quickly, keep patched, and never merge auth/RPC/ORM major upgrades as drive-by cleanup.
 
 ## Deep references
 
