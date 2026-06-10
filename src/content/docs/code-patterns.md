@@ -562,7 +562,7 @@ curl -X POST http://localhost:3000/api/auth/seed-admin
 
 ### Default Path
 
-Use the Cloudflare Workers rate limiting binding. Do not add Redis for default rate limiting.
+Use the Cloudflare Workers rate limiting binding with Wrangler 4.36.0 or newer. Do not add Redis for default rate limiting.
 
 ```jsonc
 {
@@ -614,6 +614,7 @@ app.use('/api/auth/*', rateLimitAuth)
 ### Gotchas
 
 - `namespace_id` is a string containing a positive integer unique within the Cloudflare account.
+- Use a unique `namespace_id` per client/project. Two bindings with the same `namespace_id` in the same Cloudflare account share counters for matching keys, even across different Workers.
 - `simple.period` must be `10` or `60` seconds.
 - Limits are local to the Cloudflare location and eventually consistent; do not use this API for exact billing counters.
 - Use a Durable Object when fixed-window semantics are not enough, such as per-tenant quotas, sliding windows, or custom burst rules.

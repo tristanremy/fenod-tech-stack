@@ -599,6 +599,39 @@ curl -X POST http://localhost:3000/api/auth/seed-admin
 
 ---
 
+## Rate Limiting
+
+### Default Path
+
+Utiliser le binding Cloudflare Workers rate limiting avec Wrangler 4.36.0 ou plus recent. Ne pas ajouter Redis pour le rate limiting par defaut.
+
+```jsonc
+{
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 100,
+        "period": 60
+      }
+    }
+  ]
+}
+```
+
+Le binding expose `env.RATE_LIMITER.limit({ key })`. La `key` peut etre n'importe quelle chaine stable; preferer IDs utilisateur authentifies, tenant IDs, API keys, ou cles par route plutot que l'IP brute quand possible.
+
+### Gotchas
+
+- `namespace_id` est une chaine contenant un entier positif unique dans le compte Cloudflare.
+- Utiliser un `namespace_id` unique par client/projet. Deux bindings avec le meme `namespace_id` dans le meme compte Cloudflare partagent les compteurs pour les cles identiques, meme entre Workers differents.
+- `simple.period` doit etre `10` ou `60` secondes.
+- Les limites sont locales au datacenter Cloudflare et eventually consistent; ne pas utiliser cette API pour des compteurs de facturation exacts.
+- Utiliser un Durable Object quand le fixed-window ne suffit pas: quotas par tenant, sliding windows, ou regles de burst custom.
+
+---
+
 ## Routeur TanStack
 
 ### Route racine avec shellComponent

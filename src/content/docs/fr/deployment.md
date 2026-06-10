@@ -161,7 +161,7 @@ Tout le reste (site/app PME typique: un Worker, un D1, peut-etre un R2): Wrangle
 
 ## Setup Alchemy v2
 
-Alchemy v2 est une reecriture basee sur Effect. Ne pas utiliser les anciens exemples de package legacy ou d'initializer v1 phase/run pour les nouveaux projets. Installer le package courant:
+Alchemy v2 est une reecriture basee sur Effect et est actuellement en beta. Pour un projet client, valider la version courante d'Alchemy et les docs au moment de l'adoption. Ne pas utiliser les anciens exemples de package legacy ou d'initializer v1 phase/run pour les nouveaux projets. Installer le package courant:
 
 ```bash
 pnpm add -D alchemy effect
@@ -207,6 +207,8 @@ export default Cloudflare.Worker(
   }),
 )
 ```
+
+Pour les credentials Alchemy locaux, utiliser `alchemy login`; Alchemy stocke les profils dans `~/.alchemy/profiles.json`. Ne pas exporter `CLOUDFLARE_API_TOKEN` pour le travail Alchemy local.
 
 Deployer seulement apres la quality gate normale:
 

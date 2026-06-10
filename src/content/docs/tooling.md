@@ -104,7 +104,6 @@ pnpm doctor:react:diff
 - Do not add new lint/format/test tools without removing or integrating the old path.
 - Do not switch package managers.
 - Do not make Bun/Deno required for normal app commands unless the project explicitly chooses them.
-- If build performance is a problem, try Rolldown as an experiment and document results before standardizing it.
 - Do not remove the `typescript` package when tsgo is present; keep both side-by-side until the Corsa API stabilizes and the project confirms dependent tools have migrated.
 - If a package build needs custom config, explain the concrete limitation that tsdown cannot cover.
 
