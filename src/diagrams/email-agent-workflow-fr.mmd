@@ -1,0 +1,16 @@
+sequenceDiagram
+  participant Sender as Expediteur entrant
+  participant EmailWorker as Email Worker Cloudflare
+  participant R2 as Archive brute R2
+  participant Queue as Evenement Queue / D1
+  participant Agent as App ou agent
+  participant Approval as Politique d'approbation
+  participant Provider as Resend / Postmark
+  Sender->>EmailWorker: Envoie un email
+  EmailWorker->>EmailWorker: Valide expediteur, taille, pieces jointes
+  EmailWorker->>R2: Stocke la copie brute si necessaire
+  EmailWorker->>Queue: Ecrit un evenement normalise
+  Queue->>Agent: Traite la tache structuree
+  Agent->>Approval: Propose une reponse sortante
+  Approval-->>Agent: Autorise, refuse ou demande revue humaine
+  Agent->>Provider: Envoie l'email transactionnel approuve

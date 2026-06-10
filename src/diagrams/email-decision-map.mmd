@@ -1,0 +1,11 @@
+flowchart TD
+  Need[Email need] --> Inbound{Inbound?}
+  Inbound -->|Yes| Routing[Cloudflare Email Routing]
+  Routing --> Workflow{Needs processing?}
+  Workflow -->|Yes| Worker[Email Worker to Queue / D1 / R2]
+  Workflow -->|No| Forward[Forward to human inbox]
+  Inbound -->|No| Outbound{Outbound type?}
+  Outbound -->|Transactional| Transactional[Resend or Postmark]
+  Outbound -->|Marketing| Marketing[Loops / Customer.io]
+  Outbound -->|Agent draft| Approval[App policy and human approval]
+  Approval --> Transactional

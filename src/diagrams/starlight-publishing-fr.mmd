@@ -1,0 +1,8 @@
+flowchart LR
+  Repo[Depot fenod-tech-stack] --> Main[GitHub main]
+  Main --> Pages[Build Cloudflare Pages]
+  Pages --> Dist[Sortie statique dist]
+  Dist --> Domain[stack.fenod.fr]
+  Repo --> Content[Contenu Starlight]
+  Content --> Search[Index de recherche Pagefind]
+  Search --> Domain

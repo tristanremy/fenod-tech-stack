@@ -1,0 +1,11 @@
+flowchart LR
+  UI[User action] --> Local[Local state]
+  Local --> IDB[(IndexedDB)]
+  IDB --> Queue[Outbox queue]
+  Queue --> Sync[Background sync]
+  Sync --> API[Server API]
+  API --> Resolve{Conflict?}
+  Resolve -->|No| Commit[Commit server state]
+  Resolve -->|Yes| Reconcile[Reconcile and notify]
+  Commit --> Cache[TanStack Query cache]
+  Reconcile --> Cache

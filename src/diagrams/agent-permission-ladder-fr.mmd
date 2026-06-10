@@ -1,0 +1,8 @@
+flowchart TB
+  A[Lire docs et config] --> B[Modifier les fichiers du depot]
+  B --> C[Lancer build et tests locaux]
+  C --> D[Lancer scripts broker surs]
+  D --> E[Declencher CI protegee]
+  E --> F[Gate approbation production]
+  F --> G[Mutation Cloudflare scope ressource]
+  G --> H[Identifiant temporaire break-glass]

@@ -1,0 +1,10 @@
+flowchart TD
+  Change[Code or docs change] --> PR[Reviewable PR or protected main]
+  PR --> CI[GitHub Actions]
+  CI --> Check[Build, tests, secret scan]
+  Check --> Risk{Production impact?}
+  Risk -->|No| Deploy[Deploy preview or staging]
+  Risk -->|Yes| Approval[Protected environment approval]
+  Approval --> Backup[Snapshot or backup]
+  Backup --> DeployProd[Production deploy]
+  DeployProd --> Audit[Audit logs and rollback notes]

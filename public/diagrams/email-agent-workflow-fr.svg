@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1333.484 470" width="1333.484" height="470" style="--bg:#ffffff;--fg:#0f172a;--line:#50d170;--accent:#6480ff;--surface:#f8fafc;--border:#6480ff">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="seq-arrow" markerWidth="8" markerHeight="5" refX="8" refY="2.5" orient="auto-start-reverse">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" />
+  </marker>
+  <marker id="seq-arrow-open" markerWidth="8" markerHeight="5" refX="8" refY="2.5" orient="auto-start-reverse">
+    <polyline points="0 0, 8 2.5, 0 5" fill="none" stroke="var(--_arrow)" stroke-width="1" />
+  </marker>
+</defs>
+<line class="lifeline" data-actor="Sender" x1="101.4385" y1="70" x2="101.4385" y2="440" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="EmailWorker" x1="300.6175" y1="70" x2="300.6175" y2="440" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="R2" x1="494.98" y1="70" x2="494.98" y2="440" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="Queue" x1="681.562" y1="70" x2="681.562" y2="440" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="Agent" x1="856.288" y1="70" x2="856.288" y2="440" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="Approval" x1="1035.0895" y1="70" x2="1035.0895" y2="440" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="Provider" x1="1231.3045" y1="70" x2="1231.3045" y2="440" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<g class="message" data-from="Sender" data-to="EmailWorker" data-label="Envoie un email" data-line-style="solid" data-arrow-head="filled" data-self="false">
+  <line x1="101.4385" y1="90" x2="300.6175" y2="90" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <text x="201.02800000000002" y="80" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Envoie un email</text>
+</g>
+<g class="message" data-from="EmailWorker" data-to="EmailWorker" data-label="Valide expediteur, taille, pieces jointes" data-line-style="solid" data-arrow-head="filled" data-self="true">
+  <polyline points="300.6175,130 330.6175,130 330.6175,150 300.6175,150" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <text x="338.6175" y="140" font-size="11" text-anchor="start" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Valide expediteur, taille, pieces jointes</text>
+</g>
+<g class="message" data-from="EmailWorker" data-to="R2" data-label="Stocke la copie brute si necessaire" data-line-style="solid" data-arrow-head="filled" data-self="false">
+  <line x1="300.6175" y1="200" x2="494.98" y2="200" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <text x="397.79875000000004" y="190" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Stocke la copie brute si necessaire</text>
+</g>
+<g class="message" data-from="EmailWorker" data-to="Queue" data-label="Ecrit un evenement normalise" data-line-style="solid" data-arrow-head="filled" data-self="false">
+  <line x1="300.6175" y1="240" x2="681.562" y2="240" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <text x="491.08975" y="230" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Ecrit un evenement normalise</text>
+</g>
+<g class="message" data-from="Queue" data-to="Agent" data-label="Traite la tache structuree" data-line-style="solid" data-arrow-head="filled" data-self="false">
+  <line x1="681.562" y1="280" x2="856.288" y2="280" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <text x="768.925" y="270" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Traite la tache structuree</text>
+</g>
+<g class="message" data-from="Agent" data-to="Approval" data-label="Propose une reponse sortante" data-line-style="solid" data-arrow-head="filled" data-self="false">
+  <line x1="856.288" y1="320" x2="1035.0895" y2="320" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <text x="945.68875" y="310" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Propose une reponse sortante</text>
+</g>
+<g class="message" data-from="Approval" data-to="Agent" data-label="Autorise, refuse ou demande revue humaine" data-line-style="dashed" data-arrow-head="filled" data-self="false">
+  <line x1="1035.0895" y1="360" x2="856.288" y2="360" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <text x="945.68875" y="350" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Autorise, refuse ou demande revue humaine</text>
+</g>
+<g class="message" data-from="Agent" data-to="Provider" data-label="Envoie l'email transactionnel approuve" data-line-style="solid" data-arrow-head="filled" data-self="false">
+  <line x1="856.288" y1="400" x2="1231.3045" y2="400" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <text x="1043.7962499999999" y="390" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Envoie l&#39;email transactionnel approuve</text>
+</g>
+<g class="actor" data-id="Sender" data-label="Expediteur entrant" data-type="participant">
+  <rect x="30" y="30" width="142.877" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="101.4385" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">Expediteur entrant</text>
+</g>
+<g class="actor" data-id="EmailWorker" data-label="Email Worker Cloudflare" data-type="participant">
+  <rect x="212.877" y="30" width="175.481" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="300.6175" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">Email Worker Cloudflare</text>
+</g>
+<g class="actor" data-id="R2" data-label="Archive brute R2" data-type="participant">
+  <rect x="428.358" y="30" width="133.244" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="494.98" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">Archive brute R2</text>
+</g>
+<g class="actor" data-id="Queue" data-label="Evenement Queue / D1" data-type="participant">
+  <rect x="601.602" y="30" width="159.92" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="681.562" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">Evenement Queue / D1</text>
+</g>
+<g class="actor" data-id="Agent" data-label="App ou agent" data-type="participant">
+  <rect x="801.522" y="30" width="109.53200000000001" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="856.288" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">App ou agent</text>
+</g>
+<g class="actor" data-id="Approval" data-label="Politique d'approbation" data-type="participant">
+  <rect x="951.0540000000001" y="30" width="168.07099999999997" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1035.0895" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">Politique d&#39;approbation</text>
+</g>
+<g class="actor" data-id="Provider" data-label="Resend / Postmark" data-type="participant">
+  <rect x="1159.125" y="30" width="144.359" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1231.3045" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">Resend / Postmark</text>
+</g>
+</svg>

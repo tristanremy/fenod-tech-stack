@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860.1120000000001 354.55" width="860.1120000000001" height="354.55" style="--bg:#ffffff;--fg:#0f172a;--line:#50d170;--accent:#6480ff;--surface:#f8fafc;--border:#6480ff">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<polyline class="edge" data-from="Browser" data-to="App" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="207.179,101.4 241.10000000000005,101.4" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="App" data-to="Data" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="401.61000000000007,101.4 433.9462500000001,101.4 433.9462500000001,65.45 466.2825,65.45" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="App" data-to="Gateway" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="401.61000000000007,101.4 433.9462500000001,101.4 433.9462500000001,137.35000000000002 466.2825,137.35000000000002" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Gateway" data-to="Providers" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="635.6845,137.35000000000002 681.0910000000001,137.35000000000002" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Agent" data-to="Repo" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="179.0210000000001,198.75 210.06050000000008,198.75 210.06050000000008,166.3 339.6530000000002,166.3" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Agent" data-to="Broker" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="179.0210000000001,198.75 210.06050000000008,198.75 210.06050000000008,231.2 241.10000000000005,231.2" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Broker" data-to="Cloudflare" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="434.955,231.2 450.61875,231.2 450.61875,263.65000000000003 466.2825,263.65000000000003" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="CI" data-to="Cloudflare" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="420.876,296.1 450.61875,296.1 450.61875,263.65000000000003 466.2825,263.65000000000003" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="node" data-id="Browser" data-label="Navigateur utilisateur" data-shape="rectangle">
+  <rect x="40" y="82.95" width="167.179" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="123.5895" y="101.4" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Navigateur utilisateur</text>
+</g>
+<g class="node" data-id="App" data-label="Application / Worker" data-shape="rectangle">
+  <rect x="241.10000000000005" y="82.95" width="160.51000000000002" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="321.3550000000001" y="101.4" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Application / Worker</text>
+</g>
+<g class="node" data-id="Data" data-label="D1 / R2 / KV / Queues" data-shape="cylinder">
+  <rect x="466.2825" y="47" width="158.287" height="36.900000000000006" fill="var(--_node-fill)" stroke="none" />
+  <line x1="466.2825" y1="47" x2="466.2825" y2="83.9" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <line x1="624.5695000000001" y1="47" x2="624.5695000000001" y2="83.9" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="545.426" cy="83.9" rx="79.1435" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="545.426" cy="47" rx="79.1435" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="545.426" y="65.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">D1 / R2 / KV / Queues</text>
+</g>
+<g class="node" data-id="Gateway" data-label="Cloudflare AI Gateway" data-shape="rectangle">
+  <rect x="466.2825" y="118.9" width="169.402" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="550.9835" y="137.35000000000002" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Cloudflare AI Gateway</text>
+</g>
+<g class="node" data-id="Providers" data-label="Fournisseurs IA" data-shape="rectangle">
+  <rect x="681.0910000000001" y="118.9" width="139.02100000000002" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="750.6015000000001" y="137.35000000000002" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Fournisseurs IA</text>
+</g>
+<g class="node" data-id="Agent" data-label="Agent de code IA" data-shape="rectangle">
+  <rect x="40.000000000000114" y="180.3" width="139.021" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="109.5105000000001" y="198.75" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Agent de code IA</text>
+</g>
+<g class="node" data-id="Repo" data-label="Depot" data-shape="rectangle">
+  <rect x="339.6530000000002" y="147.85000000000002" width="76.036" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="377.67100000000016" y="166.3" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Depot</text>
+</g>
+<g class="node" data-id="Broker" data-label="Broker de deploiement / CI" data-shape="rectangle">
+  <rect x="241.10000000000005" y="212.75" width="193.85499999999993" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="338.02750000000003" y="231.2" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Broker de deploiement / CI</text>
+</g>
+<g class="node" data-id="Cloudflare" data-label="Plateforme Cloudflare" data-shape="rectangle">
+  <rect x="466.2825" y="245.20000000000005" width="167.179" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="549.8720000000001" y="263.65000000000003" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Plateforme Cloudflare</text>
+</g>
+<g class="node" data-id="CI" data-label="GitHub Actions" data-shape="rectangle">
+  <rect x="293.711" y="277.65000000000003" width="127.16499999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="357.2935" y="296.1" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">GitHub Actions</text>
+</g>
+</svg>

@@ -1,0 +1,22 @@
+# Fenod Stack
+
+> Cloudflare-first TypeScript stack handbook for humans and AI agents.
+
+Docs: https://stack.fenod.fr
+
+## Read first
+
+- [AI Index](https://stack.fenod.fr/ai-index/)
+- [Stack Contract](https://stack.fenod.fr/stack-contract/)
+- [Agent Operating Contract](https://stack.fenod.fr/agent-operating-contract/)
+- [Gotchas](https://stack.fenod.fr/gotchas/)
+- [Recipes](https://stack.fenod.fr/recipes/)
+- [Security Model](https://stack.fenod.fr/security-model/)
+- [Cloudflare API Tokens](https://stack.fenod.fr/cloudflare-api-tokens/)
+- [AI Providers](https://stack.fenod.fr/ai-providers/)
+- [Tooling](https://stack.fenod.fr/tooling/)
+- [Email](https://stack.fenod.fr/email/)
+
+## Core defaults
+
+Node 22, pnpm, TanStack Start, Hono, ORPC, Drizzle, D1, Better Auth, Tailwind v4, shadcn/ui, TanStack AI, Cloudflare Workers/Pages, Alchemy, Infisical, Ultracite, tsgo, Vitest, Playwright.

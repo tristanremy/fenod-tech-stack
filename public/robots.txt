@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://stack.fenod.fr/sitemap-index.xml
+
+# AI documentation entry points:
+# https://stack.fenod.fr/llms.txt
+# https://stack.fenod.fr/llms-full.txt

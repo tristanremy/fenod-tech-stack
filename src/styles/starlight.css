@@ -1,0 +1,71 @@
+:root {
+  --sl-color-accent-low: #082f49;
+  --sl-color-accent: #0284c7;
+  --sl-color-accent-high: #bae6fd;
+  --spi-sidebar-icon-size: 1.1rem;
+  --spi-sidebar-icon-gap: 0.45rem;
+}
+
+img[src^='/diagrams/'] {
+  cursor: zoom-in;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.75rem;
+  background: white;
+  padding: 0.75rem;
+}
+
+[data-diagram-lightbox] {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: color-mix(in srgb, #020617 88%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.diagram-lightbox__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  padding: 0.75rem;
+}
+
+.diagram-lightbox__toolbar button,
+.diagram-lightbox__toolbar a {
+  border: 1px solid color-mix(in srgb, white 24%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, white 10%, transparent);
+  color: white;
+  padding: 0.45rem 0.75rem;
+  font: inherit;
+  text-decoration: none;
+}
+
+.diagram-lightbox__toolbar button {
+  cursor: pointer;
+}
+
+.diagram-lightbox__stage {
+  overflow: auto;
+  padding: 1rem;
+  display: grid;
+  place-items: center;
+}
+
+.diagram-lightbox__stage img {
+  max-width: min(1600px, 95vw);
+  max-height: none;
+  transform-origin: center top;
+  transition: transform 120ms ease;
+  border-radius: 0.75rem;
+  background: white;
+  padding: 1rem;
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #e0f2fe;
+  --sl-color-accent: #0369a1;
+  --sl-color-accent-high: #082f49;
+}

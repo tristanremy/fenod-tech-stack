@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1715.8119999999997 191.151" width="1715.8119999999997" height="191.151" style="--bg:#ffffff;--fg:#0f172a;--line:#50d170;--accent:#6480ff;--surface:#f8fafc;--border:#6480ff">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<polyline class="edge" data-from="UI" data-to="Local" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="179.02100000000002,95.5755 227.02100000000002,95.5755" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Local" data-to="IDB" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="321.582,95.5755 369.582,95.5755" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="IDB" data-to="Queue" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="476.74,95.5755 524.74,95.5755" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Queue" data-to="Sync" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="631.157,95.5755 679.157,95.5755" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Sync" data-to="API" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="843.372,95.5755 891.372,95.5755" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="API" data-to="Resolve" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1005.199,95.5755 1053.1989999999998,95.5755" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Resolve" data-to="Commit" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Non" points="1145.8248333333331,77.05033333333334 1200.35,77.05033333333334 1200.35,63.12550000000001 1287.5259999999998,63.12550000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Resolve" data-to="Reconcile" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Oui" points="1145.8248333333331,114.10066666666668 1200.9499999999998,114.10066666666668 1200.9499999999998,128.02550000000002 1287.5259999999998,128.02550000000002" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Commit" data-to="Cache" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1446.5539999999999,63.12550000000001 1472.7769999999998,63.12550000000001 1472.7769999999998,95.57550000000002 1496.0359999999998,95.57550000000002" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Reconcile" data-to="Cache" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1449.5179999999998,128.02550000000002 1472.7769999999998,128.02550000000002 1472.7769999999998,95.57550000000002 1496.0359999999998,95.57550000000002" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="edge-label" data-from="Resolve" data-to="Commit" data-label="Non">
+  <rect x="1208.35" y="47.12550000000001" width="36.658" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="1226.6789999999999" y="62.27550000000001" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Non</text>
+</g>
+<g class="edge-label" data-from="Resolve" data-to="Reconcile" data-label="Oui">
+  <rect x="1208.9499999999998" y="112.02550000000002" width="33.094" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="1225.4969999999998" y="127.17550000000003" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Oui</text>
+</g>
+<g class="node" data-id="UI" data-label="Action utilisateur" data-shape="rectangle">
+  <rect x="40" y="77.1255" width="139.02100000000002" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="109.51050000000001" y="95.5755" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Action utilisateur</text>
+</g>
+<g class="node" data-id="Local" data-label="Etat local" data-shape="rectangle">
+  <rect x="227.02100000000002" y="77.1255" width="94.561" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="274.30150000000003" y="95.5755" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Etat local</text>
+</g>
+<g class="node" data-id="IDB" data-label="IndexedDB" data-shape="cylinder">
+  <rect x="369.582" y="77.1255" width="107.158" height="36.900000000000006" fill="var(--_node-fill)" stroke="none" />
+  <line x1="369.582" y1="77.1255" x2="369.582" y2="114.02550000000001" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <line x1="476.74" y1="77.1255" x2="476.74" y2="114.02550000000001" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="423.161" cy="114.02550000000001" rx="53.579" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="423.161" cy="77.1255" rx="53.579" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="423.161" y="95.5755" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">IndexedDB</text>
+</g>
+<g class="node" data-id="Queue" data-label="File outbox" data-shape="rectangle">
+  <rect x="524.74" y="77.1255" width="106.41699999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="577.9485" y="95.5755" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">File outbox</text>
+</g>
+<g class="node" data-id="Sync" data-label="Sync en arriere-plan" data-shape="rectangle">
+  <rect x="679.157" y="77.1255" width="164.21499999999997" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="761.2645" y="95.5755" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Sync en arriere-plan</text>
+</g>
+<g class="node" data-id="API" data-label="API serveur" data-shape="rectangle">
+  <rect x="891.372" y="77.1255" width="113.827" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="948.2855" y="95.5755" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">API serveur</text>
+</g>
+<g class="node" data-id="Resolve" data-label="Conflit ?" data-shape="diamond">
+  <polygon points="1108.7744999999998,40 1164.3499999999997,95.5755 1108.7744999999998,151.151 1053.1989999999998,95.5755" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1108.7744999999998" y="95.5755" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Conflit ?</text>
+</g>
+<g class="node" data-id="Commit" data-label="Valider etat serveur" data-shape="rectangle">
+  <rect x="1287.5259999999998" y="44.67550000000001" width="159.02800000000002" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1367.04" y="63.12550000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Valider etat serveur</text>
+</g>
+<g class="node" data-id="Reconcile" data-label="Reconciler et notifier" data-shape="rectangle">
+  <rect x="1287.5259999999998" y="109.5755" width="161.99200000000002" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1368.522" y="128.02550000000002" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Reconciler et notifier</text>
+</g>
+<g class="node" data-id="Cache" data-label="Cache TanStack Query" data-shape="rectangle">
+  <rect x="1496.0359999999998" y="77.12550000000002" width="179.77599999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1585.9239999999998" y="95.57550000000002" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Cache TanStack Query</text>
+</g>
+</svg>

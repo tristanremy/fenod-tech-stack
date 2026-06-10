@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1388.8599999999997 214.25" width="1388.8599999999997" height="214.25" style="--bg:#ffffff;--fg:#0f172a;--line:#50d170;--accent:#6480ff;--surface:#f8fafc;--border:#6480ff">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<polyline class="edge" data-from="Browser" data-to="Start" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="133.82,90.9 181.82,90.9" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Start" data-to="Query" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="352.704,90.89999999999999 376.704,90.89999999999999 376.704,58.45 912.861,58.45" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Start" data-to="ORPC" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="352.704,90.89999999999999 376.704,90.89999999999999 376.704,123.35000000000001 400.704,123.35000000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="ORPC" data-to="Hono" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="511.567,123.35 559.567,123.35" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Hono" data-to="Router" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="688.955,123.35 736.955,123.35" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Router" data-to="Service" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="865.602,123.35 912.861,123.35" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Service" data-to="Drizzle" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1050.4,123.35000000000001 1074.7705,123.35000000000001 1074.7705,90.9 1099.141,90.9" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Drizzle" data-to="D1" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1184.069,90.9 1232.069,90.9" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Service" data-to="Bindings" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1050.4,123.35000000000001 1074.7705,123.35000000000001 1074.7705,155.8 1099.141,155.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="node" data-id="Browser" data-label="Browser" data-shape="rectangle">
+  <rect x="40" y="72.44999999999999" width="93.82" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="86.91" y="90.89999999999999" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Browser</text>
+</g>
+<g class="node" data-id="Start" data-label="TanStack Start routes" data-shape="rectangle">
+  <rect x="181.82" y="72.44999999999999" width="170.88400000000001" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="267.262" y="90.89999999999999" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">TanStack Start routes</text>
+</g>
+<g class="node" data-id="Query" data-label="TanStack Query" data-shape="rectangle">
+  <rect x="912.861" y="40" width="139.02100000000002" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="982.3715" y="58.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">TanStack Query</text>
+</g>
+<g class="node" data-id="ORPC" data-label="ORPC client" data-shape="rectangle">
+  <rect x="400.704" y="104.9" width="110.863" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="456.1355" y="123.35000000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">ORPC client</text>
+</g>
+<g class="node" data-id="Hono" data-label="Hono API layer" data-shape="rectangle">
+  <rect x="559.567" y="104.9" width="129.388" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="624.261" y="123.35000000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Hono API layer</text>
+</g>
+<g class="node" data-id="Router" data-label="Feature router" data-shape="rectangle">
+  <rect x="736.955" y="104.9" width="128.647" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="801.2785" y="123.35000000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Feature router</text>
+</g>
+<g class="node" data-id="Service" data-label="Feature service" data-shape="rectangle">
+  <rect x="912.861" y="104.9" width="137.539" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="981.6305" y="123.35000000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Feature service</text>
+</g>
+<g class="node" data-id="Drizzle" data-label="Drizzle" data-shape="rectangle">
+  <rect x="1099.141" y="72.45" width="84.928" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1141.605" y="90.9" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Drizzle</text>
+</g>
+<g class="node" data-id="D1" data-label="Cloudflare D1" data-shape="cylinder">
+  <rect x="1232.069" y="72.45" width="116.79099999999998" height="36.900000000000006" fill="var(--_node-fill)" stroke="none" />
+  <line x1="1232.069" y1="72.45" x2="1232.069" y2="109.35000000000001" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <line x1="1348.86" y1="72.45" x2="1348.86" y2="109.35000000000001" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="1290.4645" cy="109.35000000000001" rx="58.39549999999999" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="1290.4645" cy="72.45" rx="58.39549999999999" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1290.4645" y="90.9" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Cloudflare D1</text>
+</g>
+<g class="node" data-id="Bindings" data-label="R2 / KV / Queues / DO" data-shape="rectangle">
+  <rect x="1099.141" y="137.35000000000002" width="164.21499999999997" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1181.2485000000001" y="155.8" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">R2 / KV / Queues / DO</text>
+</g>
+</svg>

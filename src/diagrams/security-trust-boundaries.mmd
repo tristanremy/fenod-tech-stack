@@ -1,0 +1,19 @@
+flowchart LR
+  Browser[User browser] --> App[App / Worker]
+  App --> Data[(D1 / R2 / KV / Queues)]
+  App --> Gateway[Cloudflare AI Gateway]
+  Gateway --> Providers[AI providers]
+  Agent[AI coding agent] --> Repo[Repository]
+  Agent --> Broker[Deploy broker / CI]
+  Broker --> Cloudflare[Cloudflare platform]
+  CI[GitHub Actions] --> Cloudflare
+
+  classDef human fill:#eef2ff,stroke:#6480ff,color:#0f172a
+  classDef app fill:#f8fafc,stroke:#6480ff,color:#0f172a
+  classDef data fill:#ecfdf5,stroke:#50d170,color:#0f172a
+  classDef gate fill:#fff7ed,stroke:#f59e0b,color:#0f172a
+
+  class Browser,Agent human
+  class App,Repo app
+  class Data,Providers data
+  class Gateway,Broker,CI,Cloudflare gate

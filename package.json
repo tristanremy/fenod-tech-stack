@@ -1,0 +1,29 @@
+{
+  "name": "fenod-tech-stack",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm diagrams:build && astro dev",
+    "diagrams:build": "tsx scripts/render-diagrams.ts",
+    "llms:build": "tsx scripts/generate-llms.ts",
+    "build": "pnpm diagrams:build && pnpm llms:build && astro check && astro build",
+    "check:links": "tsx scripts/check-internal-links.ts",
+    "check:public": "tsx scripts/check-public-safety.ts",
+    "check": "pnpm build && pnpm check:links && pnpm check:public",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/check": "latest",
+    "@astrojs/starlight": "latest",
+    "@iconify-json/ph": "^1.2.2",
+    "astro": "latest",
+    "beautiful-mermaid": "^1.1.3",
+    "starlight-plugin-icons": "^1.1.6",
+    "typescript": "latest"
+  },
+  "devDependencies": {
+    "@unocss/astro": "^66.7.0",
+    "tsx": "^4.22.4",
+    "unocss": "^66.7.0"
+  }
+}

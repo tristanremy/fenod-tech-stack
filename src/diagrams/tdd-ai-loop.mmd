@@ -1,0 +1,9 @@
+flowchart LR
+  Spec[Behavior or bug] --> Red[Write failing test]
+  Red --> Agent[Agent implementation]
+  Agent --> Green[Tests pass]
+  Green --> Refactor[Refactor safely]
+  Refactor --> Regression[Regression suite]
+  Regression --> Review[Human or agent review]
+  Review --> Ship[Ship]
+  Regression -->|Fail| Agent
