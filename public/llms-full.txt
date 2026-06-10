@@ -113,7 +113,7 @@ This page is the contract. If another page is more detailed, use this page to re
 - KV for config/cache, not relational data
 - Queues/Workflows for async jobs
 - Durable Objects for stateful coordination
-- Alchemy for Cloudflare IaC
+- Wrangler for deploys by default; Alchemy v2 only for multi-resource/multi-stage projects (see [Deployment](/deployment/))
 - Infisical or Bitwarden Secrets Manager for secrets
 - Ultracite + tsgo + Vitest + Playwright for quality gates
 - tsdown for internal package builds
@@ -315,6 +315,18 @@ Mermaid source lives in `src/diagrams/*.mmd`. Generated SVGs live in `public/dia
 ```bash
 pnpm diagrams:build
 ```
+
+## Alchemy v1 vs v2
+
+The npm package is `alchemy`, not the legacy Alchemy framework package. Alchemy v2 is an Effect-based rewrite with `Alchemy.Stack(...)` and `Cloudflare.Worker(...)`; v1 examples from old docs or blog posts will not work against v2.
+
+## Redis Does Not Belong in the Default Stack
+
+Use Cloudflare-native primitives: KV for cache, the Workers rate limiting binding for simple limits, and Durable Objects for custom quota semantics. Do not add external Redis for default rate limiting.
+
+## tsgo Does Not Replace the typescript Package
+
+tsgo uses the native TypeScript 7/Corsa toolchain for fast type checks. Keep `typescript` installed side-by-side for tools that consume the legacy Strada programmatic API until the Corsa API stabilizes.
 
 
 ---
@@ -1149,6 +1161,14 @@ Adoption posture:
 | tsdown | yes for packages | replacing tsup/Rollup configs | app builds handled by framework |
 | Vite+ | experimental | prototypes and internal tests | production client baseline until stable enough |
 
+### tsgo and TypeScript 7
+
+tsgo is the native TypeScript 7 / Corsa toolchain and is the fast path for type-check scripts and CI gates. It does not fully replace the existing JavaScript TypeScript / Strada toolchain for every use case.
+
+Keep `typescript` installed side-by-side for tools that consume the TypeScript programmatic API, such as codemods, editor integrations, framework checkers, and some lint plugins. Removing `typescript` just because `tsgo` is present is not a cleanup until the Corsa API stabilizes and the relevant tools migrate.
+
+Current install posture: keep `typescript` for API consumers and use tsgo/native preview only through explicit scripts such as `pnpm typecheck`.
+
 ## Package Build Defaults
 
 For internal packages:
@@ -1201,6 +1221,7 @@ pnpm doctor:react:diff
 - Do not switch package managers.
 - Do not make Bun/Deno required for normal app commands unless the project explicitly chooses them.
 - If build performance is a problem, try Rolldown as an experiment and document results before standardizing it.
+- Do not remove the `typescript` package when tsgo is present; keep both side-by-side until the Corsa API stabilizes and the project confirms dependent tools have migrated.
 - If a package build needs custom config, explain the concrete limitation that tsdown cannot cover.
 
 ## Related Guides

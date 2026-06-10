@@ -89,6 +89,8 @@ afterAll(() => server.close())
 
 Use React Doctor before pushing UI work and as a required PR check before merging to `main`. It scans React code for correctness, security, accessibility, performance, bundle-size, and architecture issues, then returns a 0-100 health score with actionable findings. See [React Best Practices](/react-best-practices/) for the lightweight rules agents should follow while coding.
 
+React Doctor compatibility with the TypeScript 7/Corsa programmatic API is unverified. Keep `typescript` installed side-by-side with tsgo so React Doctor and other API-consuming tools can run against the stable Strada API if needed.
+
 ### Local workflow
 
 ```bash

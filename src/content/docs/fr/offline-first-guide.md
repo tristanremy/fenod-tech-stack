@@ -5,6 +5,8 @@ verified: 2026-06
 
 [Disponible en anglais](/fr/offline-first-guide/)
 
+> TanStack DB evalue 2026-06: Wait. La persistence/offline est prometteuse, mais la stack a besoin d'un vrai spike de sync avant de remplacer ce guide.
+
 > Retour au [README](.././)
 
 ## Quand implémenter l'offline-first

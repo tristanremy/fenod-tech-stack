@@ -5,6 +5,8 @@ verified: 2026-06
 
 [Disponible en français](/offline-first-guide/)
 
+> TanStack DB evaluated 2026-06: Wait. Persistence/offline support is promising, but the stack needs a real sync spike before replacing this guide.
+
 > Back to [README](./)
 
 ## When to Implement Offline-First

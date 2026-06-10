@@ -555,6 +555,75 @@ curl -X POST http://localhost:3000/api/auth/seed-admin
 | Admin plugin columns missing | `ALTER TABLE user ADD COLUMN role TEXT` (with `.catch(() => {})` for idempotency) |
 | Direct SQLite file writes invisible to miniflare | Always go through the running worker's D1 binding |
 
+
+---
+
+## Rate Limiting
+
+### Default Path
+
+Use the Cloudflare Workers rate limiting binding. Do not add Redis for default rate limiting.
+
+```jsonc
+{
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 100,
+        "period": 60
+      }
+    }
+  ]
+}
+```
+
+The binding exposes `env.RATE_LIMITER.limit({ key })`. The `key` can be any stable string; prefer authenticated user IDs, tenant IDs, API keys, or route-specific keys over raw IP addresses when possible.
+
+### Hono Middleware
+
+```ts
+type Env = {
+  Bindings: {
+    RATE_LIMITER: {
+      limit(input: { key: string }): Promise<{ success: boolean }>
+    }
+  }
+  Variables: {
+    user?: { id: string }
+  }
+}
+
+export const rateLimitAuth = async (c: Context<Env>, next: Next) => {
+  const user = c.get('user')
+  const actor = user?.id ?? c.req.header('CF-Connecting-IP') ?? 'anonymous'
+  const route = new URL(c.req.url).pathname
+  const { success } = await c.env.RATE_LIMITER.limit({ key: `${actor}:${route}` })
+
+  if (!success) {
+    return c.json({ error: 'Too many requests' }, 429)
+  }
+
+  return next()
+}
+
+app.use('/api/auth/*', rateLimitAuth)
+```
+
+### Gotchas
+
+- `namespace_id` is a string containing a positive integer unique within the Cloudflare account.
+- `simple.period` must be `10` or `60` seconds.
+- Limits are local to the Cloudflare location and eventually consistent; do not use this API for exact billing counters.
+- Use a Durable Object when fixed-window semantics are not enough, such as per-tenant quotas, sliding windows, or custom burst rules.
+
+### Verification
+
+```bash
+wrangler deploy --dry-run
+```
+
 ---
 
 ## TanStack Router

@@ -176,7 +176,7 @@ export default {
 
 - Enable `cookieCache` with JWE encryption
 - Set `freshAge` for sensitive operations (force re-auth)
-- Implement rate limiting on auth endpoints
+- Implement [Cloudflare-native rate limiting](/code-patterns/#rate-limiting) on auth endpoints
 - Use `cf-connecting-ip` header for real IP
 
 ```typescript

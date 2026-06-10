@@ -34,7 +34,7 @@ This page is the contract. If another page is more detailed, use this page to re
 - KV for config/cache, not relational data
 - Queues/Workflows for async jobs
 - Durable Objects for stateful coordination
-- Alchemy for Cloudflare IaC
+- Wrangler for deploys by default; Alchemy v2 only for multi-resource/multi-stage projects (see [Deployment](/deployment/))
 - Infisical or Bitwarden Secrets Manager for secrets
 - Ultracite + tsgo + Vitest + Playwright for quality gates
 - tsdown for internal package builds

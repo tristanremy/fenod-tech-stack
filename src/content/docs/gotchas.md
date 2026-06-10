@@ -68,3 +68,15 @@ Mermaid source lives in `src/diagrams/*.mmd`. Generated SVGs live in `public/dia
 ```bash
 pnpm diagrams:build
 ```
+
+## Alchemy v1 vs v2
+
+The npm package is `alchemy`, not the legacy Alchemy framework package. Alchemy v2 is an Effect-based rewrite with `Alchemy.Stack(...)` and `Cloudflare.Worker(...)`; v1 examples from old docs or blog posts will not work against v2.
+
+## Redis Does Not Belong in the Default Stack
+
+Use Cloudflare-native primitives: KV for cache, the Workers rate limiting binding for simple limits, and Durable Objects for custom quota semantics. Do not add external Redis for default rate limiting.
+
+## tsgo Does Not Replace the typescript Package
+
+tsgo uses the native TypeScript 7/Corsa toolchain for fast type checks. Keep `typescript` installed side-by-side for tools that consume the legacy Strada programmatic API until the Corsa API stabilizes.

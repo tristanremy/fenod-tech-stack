@@ -28,7 +28,7 @@ React-heavy changes add (when configured):
 pnpm doctor:react:diff   # React Doctor — security, perf, best-practice gate before merge
 ```
 
-Prefer repo scripts over ad hoc commands. Do not add a new lint/format/test tool without removing or integrating the old path.
+Prefer repo scripts over ad hoc commands. Do not add a new lint/format/test tool without removing or integrating the old path. Do not remove the `typescript` package when tsgo is present; keep both side-by-side until the TypeScript 7/Corsa programmatic API stabilizes and dependent tools migrate.
 
 ## TDD with AI — the loop
 
@@ -72,6 +72,6 @@ Resolve `src/content/docs/<slug>.md` in this order:
 |---------------|------|
 | Vitest/Playwright setup, slice testing, React Doctor gates | `TESTING.md` |
 | Red/green/refactor with AI, prompt ladder | `TDD-WITH-AI.md` |
-| Toolchain defaults and adoption rules | `TOOLING.md` |
+| Toolchain defaults and adoption rules | `tooling.md` |
 | Wrangler tail, DevTools, logging | `DEBUGGING.md` |
 | Perf, security, error handling on existing apps | `APP-IMPROVEMENT-GUIDE.md` |

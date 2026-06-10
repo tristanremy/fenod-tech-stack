@@ -68,3 +68,15 @@ La source Mermaid vit dans `src/diagrams/*.mmd`. Les SVG generes vivent dans `pu
 ```bash
 pnpm diagrams:build
 ```
+
+## Alchemy v1 vs v2
+
+Le package npm est `alchemy`, pas l'ancien package framework Alchemy. Alchemy v2 est une reecriture basee sur Effect avec `Alchemy.Stack(...)` et `Cloudflare.Worker(...)`; les exemples v1 venant d'anciennes docs ou de vieux articles ne fonctionnent pas avec v2.
+
+## Redis n'Appartient pas au Default Stack
+
+Utiliser les primitives Cloudflare-native: KV pour le cache, le binding Workers rate limiting pour les limites simples, et Durable Objects pour les quotas custom. Ne pas ajouter Redis externe pour le rate limiting par defaut.
+
+## tsgo ne Remplace pas le Package typescript
+
+tsgo utilise la toolchain native TypeScript 7/Corsa pour des type checks rapides. Garder `typescript` installe side-by-side pour les outils qui consomment l'API programmatique legacy Strada jusqu'a stabilisation de l'API Corsa.

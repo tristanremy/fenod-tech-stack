@@ -95,6 +95,8 @@ json
 
 Utilisez React Doctor avant de lancer le travail sur l'interface utilisateur et comme vérification des relations publiques obligatoire avant de fusionner avec `main`. Il analyse le code React pour vérifier l'exactitude, la sécurité, l'accessibilité, les performances, la taille du bundle et les problèmes d'architecture, puis renvoie un score de santé de 0 à 100 avec des résultats exploitables. Voir [React Best Practices](/fr/react-best-practices/) pour connaître les règles légères que les agents doivent suivre lors du codage.
 
+La compatibilite React Doctor avec l'API programmatique TypeScript 7/Corsa n'est pas verifiee. Garder `typescript` installe side-by-side avec tsgo pour que React Doctor et les autres outils consommateurs d'API puissent utiliser l'API stable Strada si besoin.
+
 ### Flux de travail local
 
 ```

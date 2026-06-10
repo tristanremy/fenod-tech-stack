@@ -66,6 +66,7 @@ export default defineConfig({
               { icon: 'i-ph:key-duotone', label: 'Cloudflare API Tokens', link: '/cloudflare-api-tokens/' },
               { icon: 'i-ph:vault-duotone', label: 'Environment & Secrets', link: '/environment-secrets/' },
               { icon: 'i-ph:chart-line-up-duotone', label: 'Rybbit Analytics', link: '/rybbit-analytics/' },
+              { icon: 'i-ph:heartbeat-duotone', label: 'Observability', link: '/observability/' },
             ],
           },
           {

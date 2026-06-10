@@ -105,137 +105,119 @@ For new Fenod projects, prefer **Cloudflare Workers** as the deployment surface,
 
 Use **Cloudflare Pages** when a docs/static project is already connected to GitHub and the Pages integration is the lowest-friction publishing path. This Fenod Stack Handbook can stay on Pages for that reason, but new app starters should target Workers first.
 
-## Alchemy Setup
+## Default Path: Wrangler
 
-Alchemy is IaC for Cloudflare. Define infrastructure in TypeScript.
+For a typical SME app or site, use `wrangler.jsonc` and `wrangler deploy`. A one-Worker project with D1, KV, R2, static assets, and secrets does not need an IaC framework.
 
-### Install
-
-```bash
-pnpm add -D alchemy-framework
+```jsonc
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "my-app",
+  "main": "./dist/worker.js",
+  "compatibility_date": "2026-06-01",
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/analytics/*"]
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "my-app-prod",
+      "database_id": "<database-id>"
+    }
+  ],
+  "vars": {
+    "APP_ENV": "production"
+  }
+}
 ```
 
-### Configuration
+Deploy with explicit environment context:
+
+```bash
+infisical run --env=staging -- wrangler deploy --env staging
+infisical run --env=prod -- wrangler deploy --env production
+```
+
+Use Wrangler environments for simple dev/staging/prod isolation. Keep secrets in Infisical, CI secret storage, or Worker secrets; keep only non-secret config in `vars`.
+
+## When to Use Alchemy
+
+A project uses Alchemy v2 instead of plain Wrangler when **any** of these hold:
+
+- 4+ Cloudflare resources whose lifecycle must be created/updated/deleted together;
+- 3+ isolated stages beyond what Wrangler environments handle cleanly;
+- infra-level tests or OTel wiring as code;
+- multiple Cloudflare accounts.
+
+Everything else (typical SME site/app: one Worker, one D1, maybe one R2): Wrangler only.
+
+## Alchemy v2 Setup
+
+Alchemy v2 is an Effect-based rewrite. Do not use old legacy-package examples or v1 phase/run initializer examples for new work. Install the current package:
+
+```bash
+pnpm add -D alchemy effect
+```
+
+Minimal shape from the Alchemy v2 docs:
 
 ```ts
 // alchemy.run.ts
-import alchemy from 'alchemy-framework'
+import * as Alchemy from 'alchemy'
+import * as Cloudflare from 'alchemy/Cloudflare'
+import * as Effect from 'effect/Effect'
+import Worker from './src/worker'
 
-export default alchemy({
-  name: 'my-app',
-  phase: process.env.ALCHEMY_PHASE ?? 'development',
-
-  async run({ phase }) {
-    const isProduction = phase === 'production'
-
-    // D1 Database
-    const database = await alchemy.D1Database('main-db', {
-      name: isProduction ? 'prod-db' : 'dev-db',
-    })
-
-    // KV Namespace
-    const kv = await alchemy.KVNamespace('cache', {
-      name: isProduction ? 'prod-cache' : 'dev-cache',
-    })
-
-    // R2 Bucket
-    const bucket = await alchemy.R2Bucket('uploads', {
-      name: isProduction ? 'prod-uploads' : 'dev-uploads',
-    })
-
-    // Worker
-    const worker = await alchemy.Worker('api', {
-      name: isProduction ? 'prod-api' : 'dev-api',
-      main: './dist/worker.js',
-      compatibilityDate: '2024-01-01',
-      bindings: {
-        DB: database,
-        KV: kv,
-        R2: bucket,
-        BETTER_AUTH_SECRET: alchemy.secret('BETTER_AUTH_SECRET'),
-        BETTER_AUTH_URL: isProduction
-          ? 'https://api.myapp.com'
-          : 'http://localhost:8787',
-      },
-    })
-
-    // Worker (frontend/API/static assets)
-    const web = await alchemy.Worker('web', {
-      name: isProduction ? 'prod-web' : 'dev-web',
-      main: './dist/worker.js',
-      compatibilityDate: '2026-06-01',
-      bindings: {
-        DB: database,
-        KV: kv,
-        R2: bucket,
-      },
-    })
-
-    return { database, kv, bucket, worker, web }
+export default Alchemy.Stack(
+  'MyApp',
+  {
+    providers: Cloudflare.providers(),
+    state: Cloudflare.state(),
   },
-})
+  Effect.gen(function* () {
+    const worker = yield* Worker
+    return { url: worker.url }
+  }),
+)
 ```
-
-### Secrets Management
 
 ```ts
-// Secrets are encrypted and stored in Cloudflare
-const worker = await alchemy.Worker('api', {
-  bindings: {
-    // Reference secrets by name - value comes from Cloudflare dashboard or CLI
-    BETTER_AUTH_SECRET: alchemy.secret('BETTER_AUTH_SECRET'),
-    GOOGLE_CLIENT_SECRET: alchemy.secret('GOOGLE_CLIENT_SECRET'),
-  },
-})
+// src/worker.ts
+import * as Cloudflare from 'alchemy/Cloudflare'
+import * as Effect from 'effect/Effect'
+import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse'
+
+export default Cloudflare.Worker(
+  'Worker',
+  { main: import.meta.filename },
+  Effect.gen(function* () {
+    return {
+      fetch: Effect.gen(function* () {
+        return HttpServerResponse.text('Hello, world!')
+      }),
+    }
+  }),
+)
 ```
 
-Set secrets via CLI:
+Deploy only after the normal quality gate:
 
 ```bash
-# Set secret for production
-wrangler secret put BETTER_AUTH_SECRET --env production
-
-# Set secret for development
-wrangler secret put BETTER_AUTH_SECRET --env development
-```
-
-### Deploy Commands
-
-Prefer a CAPM-style stage variable for new projects:
-
-```bash
-# Deploy to development with local Infisical secrets
-infisical run --env=dev --command "STAGE=dev pnpm exec alchemy deploy"
-
-# Deploy to staging
-infisical run --env=staging --command "STAGE=staging pnpm exec alchemy deploy"
-
-# Deploy to production
-infisical run --env=prod --command "STAGE=prod pnpm exec alchemy deploy"
-```
-
-Recommended package scripts:
-
-```json
-{
-  "scripts": {
-    "predeploy": "pnpm fmt && pnpm lint && pnpm typecheck && pnpm doctor:react:diff",
-    "deploy": "pnpm predeploy && pnpm exec alchemy deploy",
-    "deploy:staging": "STAGE=staging pnpm deploy",
-    "deploy:prod": "STAGE=prod pnpm deploy",
-    "deploy:staging:secrets": "infisical run --env=staging -- pnpm deploy:staging",
-    "deploy:prod:secrets": "infisical run --env=prod -- pnpm deploy:prod"
-  }
-}
+pnpm check
+pnpm exec alchemy deploy
 ```
 
 Destroy resources only from an explicitly approved session:
 
 ```bash
-STAGE=dev pnpm exec alchemy destroy
+pnpm exec alchemy destroy
 ```
-
----
 
 ## Wrangler Commands
 
@@ -676,6 +658,7 @@ jobs:
 - [ ] Environment variables validated with Zod
 - [ ] Infisical environment selected (`dev`, `staging`, or `prod`)
 - [ ] Runtime secrets synced to Cloudflare Workers or injected during Alchemy deploy
+- [ ] Observability enabled and error alert configured (see /observability/)
 - [ ] Database migrations applied
 - [ ] Build succeeds locally
 

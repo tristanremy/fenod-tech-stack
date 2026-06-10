@@ -45,6 +45,14 @@ Posture d’adoption :
 | tsdown | oui pour les paquets | remplacement de configs tsup/Rollup | les builds d’app sont gérés par le framework |
 | Vite+ | expérimental | prototypes et tests internes | baseline client de production avant stabilité suffisante |
 
+### tsgo et TypeScript 7
+
+tsgo est la toolchain native TypeScript 7 / Corsa et le chemin rapide pour les scripts de type-check et les gates CI. Il ne remplace pas complètement la toolchain TypeScript JavaScript / Strada pour tous les usages.
+
+Garder `typescript` installé side-by-side pour les outils qui consomment l'API programmatique TypeScript: codemods, intégrations éditeur, checkers framework, et certains plugins lint. Supprimer `typescript` parce que `tsgo` est présent n'est pas un cleanup tant que l'API Corsa n'est pas stabilisée et que les outils concernés n'ont pas migré.
+
+Posture actuelle: garder `typescript` pour les consommateurs d'API et utiliser tsgo/native preview seulement via des scripts explicites comme `pnpm typecheck`.
+
 ## Défauts de build de paquets
 
 Pour les paquets internes :
@@ -97,6 +105,7 @@ pnpm doctor:react:diff
 - Ne pas changer de gestionnaire de paquets.
 - Ne pas rendre Bun/Deno requis pour les commandes normales de l’app sauf si le projet les choisit explicitement.
 - Si la performance de build pose problème, essayer Rolldown comme expérience et documenter les résultats avant de le standardiser.
+- Ne pas supprimer le package `typescript` quand tsgo est présent; garder les deux side-by-side jusqu'à stabilisation de l'API Corsa et migration confirmée des outils dépendants.
 - Si un build de paquet nécessite une config personnalisée, expliquer la limitation concrète que tsdown ne peut pas couvrir.
 
 ## Guides liés
