@@ -27,7 +27,7 @@ Les agents peuvent aider à construire et exploiter des systèmes, mais ils ne d
 
 ## Secrets
 
-Les secrets vivent dans Infisical, Bitwarden Secrets Manager, les secrets Cloudflare Worker ou le stockage de secrets CI. Ils ne vivent pas dans les prompts, docs, issues, PRs, fichiers `.env` commités ni bundles navigateur.
+Les secrets vivent dans **Infisical** (defaut), les secrets Cloudflare Worker, et le stockage CI si besoin. Bitwarden SM seulement avec override projet explicite. Ils ne vivent pas dans les prompts, docs, issues, PRs, fichiers `.env` commités ni bundles navigateur.
 
 Autorisé dans Git :
 
@@ -69,7 +69,7 @@ Les packages sensibles necessitent une revue explicite avant les upgrades majeur
 
 - `better-auth` et `@better-auth/*`: rester sur la derniere ligne stable 1.6.x ou une ligne stable plus recente patchee securite.
 - `@orpc/*`: garder patche pour les advisories serializer/deserializer.
-- `drizzle-orm` / `drizzle-kit`: rester sur 0.44.x patche pour le travail client tant que le plan migration v1 stable n'est pas ecrit.
+- `drizzle-orm` / `drizzle-kit`: rester sur la derniere 0.4x stable patchee pour le travail client tant que le plan migration v1 stable n'est pas ecrit.
 
 Les patchs et minors securite doivent etre relus rapidement. Les major bumps auth, RPC, ORM, ou tooling deploy ne sont jamais des cleanups opportunistes.
 

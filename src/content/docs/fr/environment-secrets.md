@@ -5,19 +5,19 @@ verified: 2026-06
 
 [Disponible en anglais](/fr/environment-secrets/)
 
-> Utilisez Infisical comme source de vérité lisible par l’équipe, gardez les fichiers `.env` hors des dépôts et déployez sur Cloudflare sans exposer de secrets dans le code ou les logs CI.
+> **Infisical** est la source de vérité secrets par défaut. Pas de `.env` dans git. Cloudflare ne reçoit que les secrets runtime Worker. Loi: [Contrat de Stack](/fr/stack-contract/).
 
 ## Modèle recommandé
 
-| Layer | Source of truth | How apps receive values |
-|-------|-----------------|-------------------------|
-| Local development | Infisical project | `infisical run -- pnpm dev` injects env vars into the process |
-| Scripts and migrations | Infisical project | `infisical run -- pnpm db:migrate` or scoped command |
-| Cloudflare runtime secrets | Infisical synced to Cloudflare Workers secrets, or injected during deploy | Worker `env` bindings / `alchemy.secret(...)` |
-| Non-secret config | Git-tracked config or Cloudflare `vars` | Plain bindings, `vars`, or Alchemy string values |
-| CI deploy identity | GitHub OIDC or one short-lived machine identity | Infisical fetches deploy-time secrets, then runs Alchemy/Wrangler |
+| Couche | Source de vérité | Comment l'app reçoit les valeurs |
+|-------|-----------------|----------------------------------|
+| Dev local | Projet Infisical | `infisical run --env=dev -- pnpm dev` |
+| Scripts / migrations | Projet Infisical | `infisical run --env=dev -- pnpm db:migrate` |
+| Secrets runtime Cloudflare | Infisical → secrets Worker | Bindings Worker `env` |
+| Config non secrète | Git ou Cloudflare `vars` | Bindings / `vars` |
+| Identité CI deploy | OIDC GitHub ou identité machine courte | Fetch Infisical puis **Wrangler** |
 
-Infisical should store secrets. Cloudflare should receive only the secrets each deployed Worker needs. Application code should still validate everything at startup.
+Infisical stocke les secrets. Cloudflare ne reçoit que ce dont chaque Worker a besoin. Valider l'env au démarrage avec Zod. Bitwarden SM n'est pas le défaut Fenod.
 
 ## Classification des secrets
 

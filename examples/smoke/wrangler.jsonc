@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fenod-smoke",
+  "compatibility_date": "2026-06-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "@tanstack/react-start/server-entry",
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fenod-smoke",
+      // Replace with real id before remote deploy: wrangler d1 create fenod-smoke
+      "database_id": "00000000-0000-0000-0000-000000000001",
+      "migrations_dir": "drizzle",
+    },
+  ],
+  "vars": {
+    "APP_ENV": "development",
+  },
+}

@@ -1,0 +1,5 @@
+# Copy to .dev.vars (gitignored) for local Workers secrets.
+# Prefer: infisical run --env=dev -- pnpm dev
+
+BETTER_AUTH_SECRET=dev-only-replace-with-long-random-string-min-32-chars
+BETTER_AUTH_URL=http://localhost:3000

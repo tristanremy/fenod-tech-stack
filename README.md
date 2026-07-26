@@ -56,20 +56,21 @@ src/diagrams/           Mermaid diagram sources
 public/diagrams/        Generated SVG diagrams
 scripts/                Build-time generators
 docs/adr/               Lightweight architecture decision records
+examples/smoke/         Law reference app (one-package Start + Workers + D1)
 CONTEXT.md              Domain glossary for this handbook
 ```
 
 ## AI Entry Points
 
-Agents should start with:
+**Stack Contract is law.** Agents should start with:
 
-- [AI Index](https://stack.fenod.fr/ai-index/)
-- [Stack Contract](https://stack.fenod.fr/stack-contract/)
-- [Agent Operating Contract](https://stack.fenod.fr/agent-operating-contract/)
-- [Gotchas](https://stack.fenod.fr/gotchas/)
-- [Recipes](https://stack.fenod.fr/recipes/)
+1. [Stack Contract](https://stack.fenod.fr/stack-contract/)
+2. [AI Index](https://stack.fenod.fr/ai-index/)
+3. [Agent Operating Contract](https://stack.fenod.fr/agent-operating-contract/)
+4. [Gotchas](https://stack.fenod.fr/gotchas/)
+5. [Recipes](https://stack.fenod.fr/recipes/)
 
-Machine-readable entry points:
+Machine-readable entry points (generated from the contracts):
 
 - <https://stack.fenod.fr/llms.txt>
 - <https://stack.fenod.fr/llms-full.txt>
@@ -79,16 +80,22 @@ Machine-readable entry points:
 Before pushing to `main`:
 
 ```bash
-pnpm build
+pnpm check
+```
+
+Optional full gate (includes high-severity `pnpm audit`):
+
+```bash
+pnpm check:full
 ```
 
 Also check:
 
-- no real secrets or private infrastructure details;
+- no real secrets, personal paths, or private client names;
+- no `.env` / `.dev.vars` / `.env.local` on disk for publish (gitignored is not enough if tools bundle them);
 - public/internal boundary is respected;
-- English source page and French page stay aligned;
-- diagrams are regenerated when `.mmd` files change;
-- `llms.txt` and `llms-full.txt` are regenerated;
+- English source page and French page stay aligned (EN contracts win);
+- diagrams / `llms.txt` regenerated when sources change;
 - README stays a repository landing page, not a duplicate handbook.
 
 ## Decisions

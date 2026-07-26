@@ -3,6 +3,9 @@
   "private": true,
   "packageManager": "pnpm@10.24.0",
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "pnpm diagrams:build && astro dev",
     "diagrams:build": "tsx scripts/render-diagrams.ts",
@@ -10,22 +13,24 @@
     "build": "pnpm diagrams:build && pnpm llms:build && astro check && astro build",
     "check:links": "tsx scripts/check-internal-links.ts",
     "check:public": "tsx scripts/check-public-safety.ts",
+    "check:llms": "tsx scripts/check-llms-defaults.ts",
     "audit:deps": "pnpm audit --audit-level high",
-    "check": "pnpm build && pnpm check:links && pnpm check:public && pnpm audit:deps",
+    "check": "pnpm build && pnpm check:links && pnpm check:public && pnpm check:llms",
+    "check:full": "pnpm check && pnpm audit:deps",
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/check": "latest",
-    "@astrojs/starlight": "latest",
-    "@iconify-json/ph": "^1.2.2",
-    "astro": "latest",
-    "beautiful-mermaid": "^1.1.3",
-    "starlight-plugin-icons": "^1.1.6",
-    "typescript": "latest"
+    "@astrojs/check": "0.9.9",
+    "@astrojs/starlight": "0.39.3",
+    "@iconify-json/ph": "1.2.2",
+    "astro": "6.4.4",
+    "beautiful-mermaid": "1.1.3",
+    "starlight-plugin-icons": "1.1.6",
+    "typescript": "5.9.3"
   },
   "devDependencies": {
-    "@unocss/astro": "^66.7.0",
-    "tsx": "^4.22.4",
-    "unocss": "^66.7.0"
+    "@unocss/astro": "66.7.0",
+    "tsx": "4.22.4",
+    "unocss": "66.7.0"
   }
 }

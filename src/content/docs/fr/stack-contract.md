@@ -1,84 +1,95 @@
 ---
 title: "Contrat de Stack"
-description: "Defaults canoniques de la stack Fenod pour humains et agents IA."
+description: "Loi des defaults Fenod. Les autres pages expliquent; celle-ci tranche les conflits."
 verified: 2026-06
 ---
 
-Cette page est le contrat. Si une autre page est plus detaillee, utilise cette page pour resoudre les defaults.
+Cette page est la **loi**. Si une autre page est plus longue ou plus detaillee, celle-ci gagne sauf override explicite dans un `STACK.md` / AGENTS de projet.
 
-## Regles de Documentation
+> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt via Ultracite. Infisical + secrets Worker. Hono/ORPC seulement si une frontiere API le demande. Plus petite gate. Pas de secrets dans git, pas d'autorite prod pour les agents, pas de thrash de stack.
 
-- Le [Fenod Stack Handbook](./) est la surface de documentation canonique.
-- L'anglais est la Source Locale sauf indication contraire explicite.
-- Les guides majeurs doivent suivre la Guide Shape: Default Path, Gotchas, Agent Notes et Related Guides.
-- Les recettes doivent etre des Implementation Recipes: outils exacts, chemins de fichiers, commandes, pieges et verification.
-- Les diagrammes doivent etre des Decision Diagrams: utiles pour frontieres, flux, cycles de vie et cartes de decision.
+L'anglais est la Source Locale des contrats. Cette page FR est une commodite humaine, pas une seconde loi. En cas de derive: [Stack Contract EN](/stack-contract/).
 
-## Utiliser
+## Autorite
 
-- Node 24 pour les nouveaux projets; Node 22 seulement pour l'existant jusqu'a migration
-- pnpm
-- TanStack Start pour les apps full-stack
-- Astro/Starlight pour les docs et sites riches en contenu
-- Hono + ORPC pour les APIs
-- Drizzle 0.44.x stable + D1 pour les donnees relationnelles; ne pas upgrader le travail client vers Drizzle v1 RC pour l'instant
-- Better Auth latest 1.6.x pour l'authentification
-- Tailwind v4 + shadcn/ui pour les fondations UI
-- TanStack Query/Router/Form/Table quand pertinent
-- TanStack AI pour chat, tools, streaming et etat agent
-- Cloudflare AI Gateway pour routing fournisseurs, budgets et cles stockees
-- Cloudflare Workers comme runtime par defaut pour les nouvelles apps et sites dynamiques
-- Cloudflare Workers Static Assets pour les nouveaux sites statiques/docs/contenu quand on demarre de zero
-- Cloudflare Pages seulement pour les projets docs/statiques existants connectes a GitHub ou cette integration reste le chemin le plus simple
-- R2 pour les fichiers
-- KV pour config/cache, pas pour donnees relationnelles
-- Queues/Workflows pour les jobs async
-- Durable Objects pour la coordination stateful
-- Wrangler pour les deploiements par defaut; Alchemy v2 seulement pour les projets multi-ressources/multi-stages (voir [Deployment](/fr/deployment/))
-- Infisical ou Bitwarden Secrets Manager pour les secrets
-- Vite 8 + Rolldown pour les nouveaux projets; `rolldown-vite` seulement comme pont de migration Vite 7
-- Ultracite + tsgo + Vitest + Playwright pour les quality gates
-- tsdown pour les packages internes
+| Rang | Source | Gagne quand |
+|------|--------|-------------|
+| 1 | Ce contrat | toujours, sauf override projet |
+| 2 | `STACK.md` / AGENTS du repo | lignes specifiques projet |
+| 3 | Skills + recettes | le comment |
+| 4 | Guides longs | rationale seulement |
 
-## Ne Pas Utiliser par Defaut
+`ai-index`, `llms.txt` et les skills Fenod doivent matcher cette page.
 
-- npm/yarn au lieu de pnpm
-- Prisma au lieu de Drizzle
-- Postgres sauf demande explicite
-- Express quand Hono suffit
-- tRPC quand ORPC est le choix de stack
-- ceremonie Clean/hexagonal architecture pour petites apps
-- interfaces repository autour de Drizzle sans vraie douleur
-- Global API Key Cloudflare
-- tokens de deploiement larges au niveau compte
-- fichiers `.env` plaintext dans Git
-- cles fournisseur dans le code client
-- upgrades majeurs non relus des packages auth/RPC/ORM
-- Drizzle v1 RC sur projets clients avant un plan de migration stable
-- Vercel AI SDK pour nouveau code app sauf workflow non supporte
+## Defaults
 
-## Regle Architecture
+| Zone | Loi |
+|------|-----|
+| Langage | TypeScript strict |
+| Runtime local/CI | **Node 24** + **pnpm** |
+| App | **TanStack Start** sur **Cloudflare Workers** |
+| Contenu / docs | **Astro** (Starlight) sur Workers static assets |
+| API | Server functions Start d'abord. **Hono + ORPC** seulement si frontiere API / clients non-UI |
+| Donnees | **Drizzle** 0.4x patche + **D1** |
+| Auth | **Better Auth** (ligne stable patchee) |
+| UI | **Tailwind v4 + shadcn/ui** |
+| Data client | **TanStack Query + Router** |
+| Fichiers | **R2** + metadata D1 |
+| Cache / config | **KV** — pas une base |
+| Jobs | **Queues / Workflows** |
+| Coordination | **Durable Objects** si besoin |
+| AI | **TanStack AI** + **AI Gateway** |
+| Deploy | **`wrangler.jsonc` + `wrangler deploy`** |
+| Secrets | **Infisical** + secrets Worker |
+| Observability | Workers Observability; Sentry pour apps produit |
+| Rate limits | natif CF / DO — **pas de Redis** |
+| Lint | **Oxlint** |
+| Format | **Oxfmt** |
+| UX lint/format | **Ultracite** |
+| Types | **tsgo** (+ garder `typescript`) |
+| Tests | **Vitest**; **Playwright** pour flux UI |
+| Bundler | **Vite 8 + Rolldown** |
 
-Utiliser des feature slices:
+### Ne pas utiliser par defaut
+
+npm/yarn, Bun/Deno comme baseline, Prisma, Postgres (hors trigger), Express, tRPC, Vercel AI SDK par defaut, hexagonal, repos autour de Drizzle, Alchemy day-one, Pages pour le neuf, Redis, Global API Key, secrets en clair, Drizzle v1 RC client, majors auth/RPC/ORM non revues.
+
+## Forme
+
+Day-one = **un package**, pas un monorepo.
 
 ```txt
-packages/api/src/routers/{feature}/
-├── index.ts
-├── router.ts
-└── service.ts
+app/
+  src/
+  wrangler.jsonc
+  package.json
 ```
 
-Les routers valident et exposent les contrats. Les services contiennent la logique metier et appellent Drizzle directement.
+| Trigger | Alors |
+|---------|-------|
+| 2e deployable / libs partagees | monorepo |
+| API multi-consumers | slices Hono/ORPC |
+| 4+ ressources CF, 3+ stages, multi-compte | Alchemy v2 |
+| Reporting / mandat Postgres / plafond D1 | Postgres (+ Hyperdrive) |
+| Vrai offline terrain | design projet; Query persist sinon |
+| Site Pages deja connecte | garder Pages pour ce site |
 
-## Regle Verification
+## Verification
 
-Avant de dire que le travail est termine, lancer la plus petite echelle pertinente:
+Ship gate:
 
 ```bash
 pnpm lint
 pnpm typecheck
 pnpm test
-pnpm build
 ```
 
-Pour les changements UI, verifier dans un navigateur. Pour les changements production, exiger approbation explicite et auditabilite.
+Merge / risque: `pnpm build`, Playwright, verif navigateur si UI.
+
+## Voir aussi
+
+- [Index IA](/fr/ai-index/)
+- [Contrat agent](/fr/agent-operating-contract/)
+- [Pieges](/fr/gotchas/)
+- [Recettes](/fr/recipes/)
+- [Version anglaise (loi)](/stack-contract/)

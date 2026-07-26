@@ -5,9 +5,12 @@ verified: 2026-06
 
 [Disponible en français](/offline-first-guide/)
 
-> TanStack DB evaluated 2026-06: Wait. Persistence/offline support is promising, but the stack needs a real sync spike before replacing this guide.
-
-> Back to [README](./)
+> **Not stack law.** Default is TanStack Query cache/persist. Full offline-first is project-specific.
+>
+> TanStack DB evaluated 2026-06: **Wait.** This page is depth/reference, not a day-one scaffold.
+> Path prefixes like `apps/web/` are illustrative for multi-package layouts — day-one law is still one package.
+>
+> Law: [Stack Contract](/stack-contract/) · short path: [Recipes](/recipes/).
 
 ## When to Implement Offline-First
 

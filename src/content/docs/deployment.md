@@ -3,32 +3,34 @@ title: "Deployment Guide"
 verified: 2026-06
 ---
 
-[Disponible en français](/deployment/)
+[Disponible en français](/fr/deployment/)
 
-> Deploy to Cloudflare with Alchemy, manage environments, and validate configuration.
+> Deploy to Cloudflare with **Wrangler by default**. Alchemy v2 only on Stack Contract triggers. **[Stack Contract](/stack-contract/) is law.**
 
-## Stack
+## Default Path
 
-| Tool | Purpose |
-|------|---------|
-| **Alchemy** | Infrastructure-as-code for Cloudflare |
-| **Wrangler** | Cloudflare CLI for dev/debug |
-| **Infisical** | Secret storage, local env injection, and CI/runtime secret delivery |
-| **D1** | SQLite database at the edge |
-| **R2** | Object storage |
-| **KV** | Key-value store |
+| Tool | Role |
+|------|------|
+| **Wrangler** | Default deploy + local dev (`wrangler.jsonc` + `wrangler deploy`) |
+| **Workers** | Default runtime, including static assets |
+| **Infisical** | Human/CI secrets source of truth; Worker secrets at runtime |
+| **D1 / R2 / KV** | Default data/file/cache bindings |
+| **Alchemy v2** | Optional IaC when triggers match — not day-one |
 
----
+```bash
+pnpm lint && pnpm typecheck && pnpm test && pnpm build
+env -u CLOUDFLARE_API_TOKEN wrangler deploy
+```
 
 ## Environment Configuration
 
-Use [Environment and Secrets](/environment-secrets/) as the source guide for Infisical, Cloudflare Worker secrets, and deploy-time environment handling. Short version:
+Use [Environment and Secrets](/environment-secrets/) for the full secrets flow. Short version:
 
-- commit `infisical.json`, never commit `.env`, `.env.local`, or `.dev.vars`;
+- never commit `.env`, `.env.local`, or `.dev.vars` with real values;
 - run local commands with `infisical run --env=dev -- pnpm dev`;
-- deploy with `infisical run --env=staging -- pnpm deploy:staging` or from CI after fetching Infisical secrets;
-- sync only runtime secrets to Cloudflare Workers, and keep non-secret config in Alchemy/Wrangler `vars`;
-- validate both Node-side deploy env and Worker `env` bindings with Zod.
+- deploy with `infisical run --env=staging -- wrangler deploy --env staging` or CI after Infisical fetch;
+- sync only runtime secrets to Cloudflare Worker secrets; keep non-secret config in Wrangler `vars`;
+- validate Node-side deploy env and Worker `env` bindings with Zod.
 
 
 ### Env Validation with Zod
@@ -146,7 +148,9 @@ infisical run --env=prod -- wrangler deploy --env production
 
 Use Wrangler environments for simple dev/staging/prod isolation. Keep secrets in Infisical, CI secret storage, or Worker secrets; keep only non-secret config in `vars`.
 
-## When to Use Alchemy
+## When to Use Alchemy (exception path)
+
+Skip this section unless a trigger matches. App code should not become Effect-shaped just because Alchemy v2 uses Effect.
 
 A project uses Alchemy v2 instead of plain Wrangler when **any** of these hold:
 
@@ -571,15 +575,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 9
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm test:run
+      - run: pnpm test
       - run: pnpm build
 
   deploy:
@@ -587,23 +589,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 9
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: 'pnpm'
       - run: pnpm install
       - run: pnpm build
 
-      # Option A: Wrangler
       - name: Deploy with Wrangler
         run: wrangler deploy --env production
 
-      # Option B: Alchemy
-      - name: Deploy with Alchemy
-        run: ALCHEMY_PHASE=production pnpm alchemy deploy
+      # Only if the project met Alchemy triggers:
+      # - run: pnpm exec alchemy deploy
 ```
 
 ### Preview Deployments
@@ -621,19 +619,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: 'pnpm'
       - run: pnpm install
       - run: pnpm build
 
-      - name: Deploy Preview
+      - name: Deploy Preview Worker
         id: deploy
-        run: |
-          OUTPUT=$(wrangler pages deploy ./dist --project-name my-app --branch ${{ github.head_ref }})
-          echo "url=$(echo $OUTPUT | grep -oP 'https://[^\s]+')" >> $GITHUB_OUTPUT
+        run: wrangler deploy --env preview
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
@@ -659,7 +655,7 @@ jobs:
 - [ ] React Doctor passes for the branch diff
 - [ ] Environment variables validated with Zod
 - [ ] Infisical environment selected (`dev`, `staging`, or `prod`)
-- [ ] Runtime secrets synced to Cloudflare Workers or injected during Alchemy deploy
+- [ ] Runtime secrets synced to Cloudflare Worker secrets
 - [ ] Observability enabled and error alert configured (see /observability/)
 - [ ] Database migrations applied
 - [ ] Build succeeds locally

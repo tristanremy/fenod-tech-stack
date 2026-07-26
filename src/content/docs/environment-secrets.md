@@ -5,19 +5,19 @@ verified: 2026-06
 
 [Disponible en francais](/environment-secrets/)
 
-> Use Infisical as the human-facing source of truth, keep `.env` files out of repos, and deploy to Cloudflare without leaking secrets into code or CI logs.
+> **Infisical** is the default human/CI secrets source of truth. Keep `.env` files out of repos. Cloudflare gets only the Worker runtime secrets it needs. **[Stack Contract](/stack-contract/) is law.**
 
 ## Recommended Model
 
 | Layer | Source of truth | How apps receive values |
 |-------|-----------------|-------------------------|
-| Local development | Infisical project | `infisical run -- pnpm dev` injects env vars into the process |
-| Scripts and migrations | Infisical project | `infisical run -- pnpm db:migrate` or scoped command |
-| Cloudflare runtime secrets | Infisical synced to Cloudflare Workers secrets, or injected during deploy | Worker `env` bindings / `alchemy.secret(...)` |
-| Non-secret config | Git-tracked config or Cloudflare `vars` | Plain bindings, `vars`, or Alchemy string values |
-| CI deploy identity | GitHub OIDC or one short-lived machine identity | Infisical fetches deploy-time secrets, then runs Alchemy/Wrangler |
+| Local development | Infisical project | `infisical run --env=dev -- pnpm dev` |
+| Scripts and migrations | Infisical project | `infisical run --env=dev -- pnpm db:migrate` |
+| Cloudflare runtime secrets | Infisical → Worker secrets (sync or deploy-time inject) | Worker `env` bindings |
+| Non-secret config | Git-tracked config or Cloudflare `vars` | Plain bindings / `vars` |
+| CI deploy identity | GitHub OIDC or short-lived machine identity | Infisical fetch, then **Wrangler** (Alchemy only on triggers) |
 
-Infisical should store secrets. Cloudflare should receive only the secrets each deployed Worker needs. Application code should still validate everything at startup.
+Infisical stores secrets. Cloudflare receives only what each Worker needs. App code still validates env at startup with Zod. Bitwarden SM is not the Fenod default — only with an explicit project override.
 
 ## Secret Classification
 

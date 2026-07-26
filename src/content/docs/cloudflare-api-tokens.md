@@ -12,7 +12,7 @@ Use this guide when creating Cloudflare credentials for local development, CI, d
 1. **Prefer OAuth for local Wrangler commands.** Do not export `CLOUDFLARE_API_TOKEN` globally; it overrides Wrangler OAuth and often causes confusing permission failures.
 2. **Use narrow, task-specific tokens.** Create one token per automation surface: CI deploy, preview deploy, D1 migrations, R2 upload, analytics read, etc.
 3. **Use resource-scoped permissions whenever Cloudflare supports them.** A deploy token should target one Worker, one Pages project, one D1 database, one R2 bucket, or one zone instead of the whole account.
-4. **Never paste tokens into prompts, issues, PRs, logs, or markdown docs.** Store secrets in Bitwarden Secrets Manager, Infisical, Cloudflare secrets, or CI secret storage.
+4. **Never paste tokens into prompts, issues, PRs, logs, or markdown docs.** Store secrets in **Infisical**, Cloudflare secrets, or CI secret storage.
 5. **Do not give AI agents account-wide edit access by default.** Broker sensitive operations through scripts, MCP tools, or CI jobs with limited scopes.
 6. **Rotate aggressively after experiments.** Any token used during exploratory AI work should be short-lived or deleted after the session.
 
@@ -144,9 +144,9 @@ For CI-only scripts, document that they require injected secrets and should not 
 
 | Context | Store tokens in | Avoid |
 |---------|-----------------|-------|
-| Local human machine | Bitwarden Secrets Manager or Infisical | Shell profile exports, `.env`, notes apps |
-| Local app runtime | Cloudflare `wrangler secret put` or local secret manager injection | Committed `.dev.vars` with real values |
-| CI/CD | GitHub Actions secrets/environments, Infisical, Bitwarden Secrets Manager | Plain workflow YAML values |
+| Local human machine | Infisical | Shell profile exports, `.env`, notes apps |
+| Local app runtime | Cloudflare `wrangler secret put` or `infisical run` injection | Committed `.dev.vars` with real values |
+| CI/CD | Infisical and/or GitHub Actions secrets/environments | Plain workflow YAML values |
 | Worker runtime | Cloudflare secrets/bindings | Bundled frontend env vars |
 | AI/MCP tooling | Brokered commands or short-lived narrow tokens | Shared all-purpose account token |
 

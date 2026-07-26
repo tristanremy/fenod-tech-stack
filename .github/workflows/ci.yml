@@ -30,3 +30,29 @@ jobs:
 
       - name: Build and verify docs
         run: pnpm check
+
+  smoke:
+    name: Smoke app ship gate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/smoke
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: examples/smoke/pnpm-lock.yaml
+
+      - name: Install smoke dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Ship gate
+        run: pnpm ship

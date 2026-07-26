@@ -5,7 +5,11 @@ verified: 2026-06
 
 [Disponible en français](/development-strategy/)
 
-> **Philosophy**: Build and validate the entire user experience with dummy data before implementing backend logic. This approach allows for rapid iteration, early stakeholder feedback, and clear separation of concerns.
+> **Not stack law.** Optional delivery style for stakeholder-heavy UI work.
+>
+> Default delivery remains thin vertical slices with the ship gate (`lint` + `typecheck` + `test`). Prefer [TDD with AI](/tdd-with-ai/) for behavior-critical code.
+>
+> Law: [Stack Contract](/stack-contract/).
 
 ---
 
@@ -1629,14 +1633,14 @@ Use this checklist to track your progress:
 ## Deployment Checklist
 
 ### Pre-deployment
-- [ ] Environment variables configured in Alchemy
+- [ ] Environment variables configured via Infisical + Worker secrets
 - [ ] Database migrations applied to production
 - [ ] API keys and secrets secured
 - [ ] Error tracking configured (Sentry, etc.)
 - [ ] Analytics configured
 
 ### Deployment
-- [ ] Deploy to Cloudflare Workers via Alchemy
+- [ ] Deploy to Cloudflare Workers via Wrangler
 - [ ] Verify all routes work in production
 - [ ] Test authentication flows
 - [ ] Verify database connections

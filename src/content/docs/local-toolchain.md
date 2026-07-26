@@ -11,7 +11,7 @@ Snapshot captured on `2026-03-30` for the machine currently maintaining this rep
 
 | Tool | Version | Role |
 |------|---------|------|
-| `node` | `v22.22.2` | Default JavaScript runtime |
+| `node` | `v22.22.2` (snapshot) | **Law is Node 24** for new projects/CI; this machine snapshot may lag |
 | `npm` | `10.9.7` | Bundled package manager and fallback CLI |
 | `pnpm` | `10.33.0` | Recommended package manager for repo commands |
 | `bun` | `1.3.11` | Secondary runtime and utility CLI |
@@ -64,7 +64,7 @@ Snapshot captured on `2026-03-30` for the machine currently maintaining this rep
 
 ## What Should Stay Primary
 
-- `node` + `pnpm` for repo-level commands and examples
+- `node` **24** + `pnpm` for repo-level commands and examples (upgrade local snapshot when drift remains)
 - `wrangler` + `docker` for platform and local infrastructure workflows
 - `cursor` or `code` in the editor, with `claude` for terminal-oriented work
 

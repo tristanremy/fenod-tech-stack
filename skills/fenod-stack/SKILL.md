@@ -5,93 +5,88 @@ description: Fenod's opinionated stack for building web apps, sites, and APIs. U
 
 # Fenod Stack
 
-Opinionated defaults for every Fenod project. Follow these unless the project explicitly documents a deviation. When in doubt, the deep references below are authoritative.
+**Stack Contract is law.** This skill is the short operating copy. If anything here drifts, follow `src/content/docs/stack-contract.md` (or https://stack.fenod.fr/stack-contract/).
+
+## One-liner
+
+> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt via Ultracite. Infisical + Worker secrets. Hono/ORPC only when an API boundary needs it. Smallest gate. No secrets in git, no prod authority, no stack thrash.
 
 ## Decision matrix
 
 | Need | Stack | Deploy |
 |------|-------|--------|
-| Full-stack app | TanStack Start + Hono + ORPC + Drizzle + D1 + Better Auth | CF Workers |
-| Content + SEO site | Astro (+ TanStack Start islands if needed) | CF Workers (static assets) |
-| SPA (no SEO) | TanStack Start | CF Workers |
-| API only | Hono + ORPC + Drizzle | CF Workers |
-| Docs site | Starlight | CF Workers (static assets) |
-| Monorepo | Add Turborepo to any of the above | — |
+| Full-stack app | TanStack Start (+ Hono/ORPC when API boundary needs it) + Drizzle + D1 + Better Auth | CF Workers |
+| Content + SEO | Astro | CF Workers static assets |
+| SPA | TanStack Start | CF Workers |
+| API only | Hono + ORPC + Drizzle + D1 | CF Workers |
+| Docs | Starlight | CF Workers static assets |
+| Second deployable / shared libs | Add monorepo (+ Turborepo if needed) | — |
 
-Deploy static and content sites as **Workers with static assets**, not Cloudflare Pages. Cloudflare directs new projects to Workers; Pages is legacy-only for existing projects. Use `run_worker_first` for selective dynamic routing in front of static assets.
+Pages is legacy-only for already-connected static/docs sites. New work targets Workers.
 
 ## Scaffolding
 
 ```bash
-pnpm create @tanstack/start@latest my-app \
-  --add-ons oRPC,drizzle,better-auth,shadcn,tanstack-query,cloudflare
+pnpm dlx @tanstack/cli@latest create my-app \
+  --package-manager pnpm \
+  --deployment cloudflare \
+  --add-ons oRPC,drizzle,better-auth,shadcn,tanstack-query \
+  --yes --non-interactive --no-git --no-toolchain
 ```
 
-Hono must be added manually after scaffolding if needed as the HTTP layer. The scaffold is a starting point — read `src/content/docs/migration.md` to take it to production shape.
+**Day-one shape = one package.** Swap scaffold Postgres → **D1**. Reference implementation: `examples/smoke` (see `STACK.md`). Do not create `apps/web` + `apps/server` + four packages + Alchemy on day one.
 
-## Non-negotiable defaults
+## Non-negotiables
 
-- Runtime **Node 24** for new projects; Node 22 only for existing projects until migration. Package manager **pnpm**. Never switch package managers. Never make Bun/Deno required for normal commands.
-- New Vite-based projects use **Vite 8 with Rolldown**. Existing Vite 7 apps may use `rolldown-vite` as a migration bridge before Vite 8.
-- Client work stays on patched **Drizzle 0.44.x** until Drizzle v1 is stable and a migration plan exists. Do not upgrade auth/RPC/ORM majors as cleanup.
-- **TypeScript strict mode** plus `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noPropertyAccessFromIndexSignature`. Full tsconfig in the `src/content/docs/stack-overview.md` of the stack repo.
-- Validate every environment with **Zod** at startup; never trust raw `process.env` or Worker `env`.
-- Styling: **Tailwind v4 + shadcn/ui** base. Production polish: Intent UI, RE UI. Marketing blocks: Tailark, shadcnblocks.
-- Payments: Polar.sh. Uploads to R2: Better Upload. AI features: TanStack AI.
+- **Node 24** + **pnpm**. No npm/yarn. Bun/Deno not required baselines.
+- **Vite 8 + Rolldown** for new apps; `rolldown-vite` only as Vite 7 bridge.
+- **Drizzle 0.4x** until v1 stable + migration plan.
+- **Oxlint + Oxfmt** via Ultracite. No ESLint/Prettier by default.
+- **tsgo** for typecheck; keep `typescript` installed.
+- Validate env with **Zod**. Secrets via **Infisical**. Never commit real `.env` / `.dev.vars`.
+- UI: **Tailwind v4 + shadcn/ui**.
+- AI: **TanStack AI + AI Gateway**. Uploads: R2 (+ D1 metadata).
+- Deploy: **Wrangler**. Alchemy v2 only on contract triggers.
 
-## Slices architecture (not layers, not hexagonal)
+## Grow on triggers only
 
-Each feature owns its router, service, and types in one folder:
+| Trigger | Add |
+|---------|-----|
+| API boundary / non-UI clients | Hono + ORPC |
+| Thick feature API | slices: `router.ts` thin, `service.ts` + Drizzle direct |
+| Second deployable / shared package | monorepo |
+| 4+ CF resources shared lifecycle, 3+ stages, multi-account | Alchemy v2 |
+| Reporting / Postgres mandate / D1 ceiling | Postgres (+ Hyperdrive on CF) |
+| Real field offline | project design; Query persist first |
 
-```
-packages/api/src/routers/
-├── {feature}/
-│   ├── index.ts       # Public exports
-│   ├── router.ts      # ORPC endpoints — thin, delegates to service
-│   └── service.ts     # Business logic + Drizzle calls, directly
-└── index.ts           # Root router
-```
+No hexagonal. No repository interfaces around Drizzle without pain.
 
-Services import `drizzle-orm` directly — no repository interfaces, no ports/adapters. We are committed to D1/SQLite; abstraction layers are YAGNI here. Extract abstractions only when pain emerges. Rationale and trade-off table: `src/content/docs/stack-overview.md` ("Why Not Hexagonal").
+## Feature slices (when API module exists)
 
-## Monorepo layout
-
-```
-my-app/
-├── apps/
-│   ├── web/          # TanStack Start frontend
-│   └── server/       # Hono + ORPC backend
-├── packages/
-│   ├── api/          # ORPC routers (slices)
-│   ├── auth/         # Better Auth config
-│   ├── db/           # Drizzle schemas + migrations
-│   └── shared/       # Types, errors, env validation
-├── turbo.json
-└── alchemy.run.ts    # Cloudflare IaC
+```txt
+{api}/routers/{feature}/
+├── index.ts
+├── router.ts
+└── service.ts
 ```
 
-## Rules for agents working in a Fenod codebase
+## Agent rules
 
-- Match existing patterns in the repo before introducing new ones.
-- Keep routers thin; put logic in services. Changes stay inside the feature folder.
-- Data fetching: decide Query vs Router loaders per `src/content/docs/tanstack-data-fetching.md` — read it before wiring data flow.
-- React work follows `src/content/docs/react-best-practices.md` (security, accessibility, PR rules).
-- Concrete code examples for API, auth, forms, Workflows, Queues, Vectorize, Agents: `src/content/docs/code-patterns.md` — large file, search it by section rather than reading whole.
+- Match repo patterns; minimal diffs.
+- Do not swap stack pieces unless asked.
+- Data fetching: prefer existing repo patterns; see `tanstack-data-fetching.md` only if needed.
+- React: `react-best-practices.md` for a11y/security basics.
+- Long guides are depth, not law.
 
 ## Deep references
 
-Resolve `src/content/docs/<slug>.md` in this order:
-1. `../../src/content/docs/<slug>.md` relative to this skill (when working inside the `fenod-tech-stack` checkout);
-2. `~/dev/fenod-tech-stack/src/content/docs/<slug>.md` (local sibling checkout);
-3. `https://raw.githubusercontent.com/tristanremy/fenod-tech-stack/main/src/content/docs/<slug>.md` (fetch).
+Resolve `src/content/docs/<slug>.md` via this repo checkout or `https://raw.githubusercontent.com/tristanremy/fenod-tech-stack/main/src/content/docs/<slug>.md`.
 
-| When you need | Read |
-|---------------|------|
-| Defaults and trade-offs | `STACK-OVERVIEW.md` |
-| Scaffold → production | `MIGRATION.md` |
-| Code examples (API, auth, forms, CF primitives) | `CODE-PATTERNS.md` |
-| Query vs loaders | `TANSTACK-DATA-FETCHING.md` |
-| React rules | `REACT-BEST-PRACTICES.md` |
-| SEO on Astro | `ASTRO-SEO-GUIDE.md` |
-| PWA / offline | `OFFLINE-FIRST-GUIDE.md` |
-| UI-first phased delivery | `DEVELOPMENT-STRATEGY.md` |
+| Need | Read |
+|------|------|
+| Law | `stack-contract.md` |
+| Agent entry | `ai-index.md` |
+| Deploy | `deployment.md` |
+| Tooling | `tooling.md` |
+| Gotchas | `gotchas.md` |
+| Recipes | `recipes.md` |

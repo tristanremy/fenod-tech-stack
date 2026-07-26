@@ -24,6 +24,7 @@ The default primitive. Deploy JavaScript or TypeScript to Cloudflare's edge with
 - Durable Object stateful services
 - R2, D1, KV, Vectorize bindings
 - Workers AI inference
+- Workers Cache for public SSR and cacheable GET responses
 
 ```ts
 export default {
@@ -259,6 +260,7 @@ export default {
 - [AI Providers](/ai-providers/)
 - [Deployment Guide](/deployment/)
 - [Code Patterns](/code-patterns/)
+- [Cloudflare Enhancements Radar](/cloudflare-enhancements/)
 - [Workers AI](https://developers.cloudflare.com/workers-ai/)
 - [Dynamic Workers](https://developers.cloudflare.com/dynamic-workers/)
 - [Containers](https://developers.cloudflare.com/containers/)
