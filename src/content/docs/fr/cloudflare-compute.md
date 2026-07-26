@@ -22,6 +22,7 @@ La primitive par défaut. Déployez du JavaScript ou TypeScript sur le réseau e
 - Services stateful avec Durable Objects
 - Bindings R2, D1, KV, Vectorize
 - Inférence Workers AI
+- Workers Cache pour SSR public et réponses GET cacheables
 
 ```ts
 export default {
@@ -253,6 +254,7 @@ export default {
 - [Fournisseurs IA](/fr/ai-providers/)
 - [Guide de Déploiement](/fr/deployment/)
 - [Patterns de Code](/fr/code-patterns/)
+- [Radar des Ameliorations Cloudflare](/fr/cloudflare-enhancements/)
 - [Workers AI](https://developers.cloudflare.com/workers-ai/)
 - [Dynamic Workers](https://developers.cloudflare.com/dynamic-workers/)
 - [Containers](https://developers.cloudflare.com/containers/)

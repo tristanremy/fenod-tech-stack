@@ -12,7 +12,7 @@ Utilisez ce guide lors de la création d’identifiants Cloudflare pour le déve
 1. **Préférer OAuth pour les commandes Wrangler locales.** N’exportez pas `CLOUDFLARE_API_TOKEN` globalement ; il écrase l’OAuth Wrangler et provoque souvent des échecs de permissions confus.
 2. **Utiliser des tokens étroits et spécifiques à la tâche.** Créez un token par surface d’automatisation : déploiement CI, déploiement preview, migrations D1, upload R2, lecture analytics, etc.
 3. **Utiliser des permissions limitées aux ressources dès que Cloudflare les prend en charge.** Un token de déploiement doit cibler un Worker, un projet Pages, une base D1, un bucket R2 ou une zone plutôt que tout le compte.
-4. **Ne jamais coller de tokens dans les prompts, issues, PRs, logs ou docs markdown.** Stockez les secrets dans Bitwarden Secrets Manager, Infisical, les secrets Cloudflare ou le stockage de secrets CI.
+4. **Ne jamais coller de tokens dans les prompts, issues, PRs, logs ou docs markdown.** Stockez les secrets dans **Infisical**, les secrets Cloudflare ou le stockage de secrets CI.
 5. **Ne pas donner par défaut aux agents IA un accès edit sur tout le compte.** Brokerez les opérations sensibles via scripts, outils MCP ou jobs CI à scopes limités.
 6. **Faire tourner agressivement après les expériences.** Tout token utilisé pendant du travail exploratoire avec IA doit être court-vécu ou supprimé après la session.
 
@@ -144,9 +144,9 @@ Pour les scripts CI-only, documentez qu’ils nécessitent des secrets injectés
 
 | Contexte | Stocker les tokens dans | Éviter |
 |---------|-----------------|-------|
-| Machine humaine locale | Bitwarden Secrets Manager ou Infisical | Exports dans le profil shell, `.env`, apps de notes |
-| Runtime app local | Cloudflare `wrangler secret put` ou injection par secret manager local | `.dev.vars` commités avec vraies valeurs |
-| CI/CD | Secrets/environnements GitHub Actions, Infisical, Bitwarden Secrets Manager | Valeurs en clair dans YAML de workflow |
+| Machine humaine locale | Infisical | Exports dans le profil shell, `.env`, apps de notes |
+| Runtime app local | Cloudflare `wrangler secret put` ou `infisical run` | `.dev.vars` commités avec vraies valeurs |
+| CI/CD | Infisical et/ou secrets/environnements GitHub Actions | Valeurs en clair dans YAML de workflow |
 | Runtime Worker | Secrets/bindings Cloudflare | Variables env frontend bundlées |
 | Outillage IA/MCP | Commandes brokerées ou tokens étroits court-vécus | Token de compte partagé tout usage |
 

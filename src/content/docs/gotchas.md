@@ -4,11 +4,21 @@ description: "High-signal traps in the Fenod stack."
 verified: 2026-06
 ---
 
+## Stack Contract Wins
+
+If a long guide, skill, scaffold, or blog-shaped page disagrees with the [Stack Contract](/stack-contract/), follow the contract. Stale monorepo/Alchemy/Node 22 examples are fossils.
+
+## Day-One Is One Package
+
+Do not scaffold `apps/web` + `apps/server` + four packages + Turborepo + Alchemy for a single SME app. Start as one package on Workers. Grow on triggers in the Stack Contract.
+
+## Hono/ORPC Are Not Automatic
+
+TanStack Start server functions are enough until you need a real API boundary or non-UI clients. Adding Hono + ORPC on day one is optional cost, not law.
+
 ## Wrangler Token Override
 
 If `CLOUDFLARE_API_TOKEN` is exported locally, Wrangler may use it instead of OAuth and fail with confusing permission errors.
-
-Use:
 
 ```bash
 env -u CLOUDFLARE_API_TOKEN wrangler ...
@@ -16,75 +26,72 @@ env -u CLOUDFLARE_API_TOKEN wrangler ...
 
 ## Cloudflare Token Scope
 
-Never use the Global API Key. Prefer one resource-scoped token per job:
+Never use the Global API Key. Prefer one resource-scoped token per job: Worker deploy, Pages deploy, D1 migration, R2 upload, DNS edit, read-only logs/analytics.
 
-- Worker deploy
-- Pages deploy
-- D1 migration
-- R2 upload
-- DNS edit
-- read-only logs/analytics
+## Secrets: Infisical
+
+Default is **Infisical** + Worker secrets at runtime. Bitwarden SM only with an explicit project override. Do not invent a third store or commit real `.env` files.
 
 ## D1 Is SQLite
 
-D1 is SQLite-compatible. Do not assume Postgres features, extensions, or migration behavior.
+Do not assume Postgres features, extensions, or migration behavior. Escape to Postgres only on Stack Contract triggers.
 
 ## KV Is Not a Database
 
-KV is eventually consistent and best for config/cache. Do not use it for relational or transactional data.
+Eventually consistent config/cache only. Relational/transactional data stays in D1 (or Postgres when chosen).
 
 ## R2 Is Object Storage
 
-R2 is for files and blobs. Store metadata in D1 when you need querying, ownership, or lifecycle state.
+Files/blobs in R2. Metadata, ownership, lifecycle state in D1.
 
 ## Better Auth Secrets
 
-`BETTER_AUTH_SECRET` must be real, long, and server-only. Placeholder values are only acceptable in `.env.example`.
+`BETTER_AUTH_SECRET` must be real, long, and server-only. Placeholders only in `.env.example`.
 
 ## TanStack Start and Cloudflare
 
-Check runtime compatibility before adding Node-only packages. Cloudflare Workers do not provide a full Node server environment.
+Check Worker compatibility before adding Node-only packages. Workers are not a full Node server.
 
 ## AI Gateway Provider Keys
 
-For production AI apps, prefer AI Gateway stored keys/BYOK. Direct provider keys in Worker secrets are exceptions, not the default.
+Production default: AI Gateway stored keys/BYOK. Direct provider keys in Worker secrets are exceptions.
 
 ## Email Split
 
 - Inbound: Cloudflare Email Routing / Email Workers
 - Transactional outbound: Resend or Postmark
-- Marketing: Loops, Customer.io, or similar
+- Marketing: lifecycle platform
 
-Do not let agents directly send arbitrary email.
+Agents do not send arbitrary email.
 
-## French Docs
+## Oxlint + Oxfmt, Not ESLint/Prettier
 
-French pages should preserve slugs and code identifiers. Translate prose, not package names, commands, API names, or code contracts.
-
-## Diagrams
-
-Mermaid source lives in `src/diagrams/*.mmd`. Generated SVGs live in `public/diagrams/*.svg` and are created by:
-
-```bash
-pnpm diagrams:build
-```
-
-## Alchemy v1 vs v2
-
-The npm package is `alchemy`, not the legacy Alchemy framework package. Alchemy v2 is an Effect-based rewrite with `Alchemy.Stack(...)` and `Cloudflare.Worker(...)`; v1 examples from old docs or blog posts will not work against v2.
-
-## Redis Does Not Belong in the Default Stack
-
-Use Cloudflare-native primitives: KV for cache, the Workers rate limiting binding for simple limits, and Durable Objects for custom quota semantics. Do not add external Redis for default rate limiting.
+Lint is Oxlint, format is Oxfmt, usually via Ultracite repo scripts. Do not add ESLint/Prettier beside them “for completeness.”
 
 ## tsgo Does Not Replace the typescript Package
 
-tsgo uses the native TypeScript 7/Corsa toolchain for fast type checks. Keep `typescript` installed side-by-side for tools that consume the legacy Strada programmatic API until the Corsa API stabilizes.
+tsgo is the fast typecheck path. Keep `typescript` installed for tooling that still needs the programmatic API.
 
-## Drizzle v1 Is Not the Client Default Yet
+## Alchemy Is Not Default Deploy
 
-Drizzle v1 is in RC and includes breaking changes such as RQBv2 and casing API changes. Client work stays on patched 0.44.x until v1 is stable and the migration plan is written. Do not let agents upgrade Drizzle as a drive-by cleanup.
+Default is Wrangler. Alchemy v2 only on multi-resource / multi-stage / multi-account triggers. Package is `alchemy`; v1 examples are dead. Effect samples are Alchemy-only, not app architecture law.
+
+## Redis Does Not Belong
+
+Use KV, Workers rate limiting bindings, or Durable Objects. No external Redis for default rate limiting.
+
+## Drizzle v1 Is Not Client Default Yet
+
+Stay on latest patched 0.4x until `drizzle-orm` latest is 1.x **and** a migration plan exists. No drive-by RC upgrades.
 
 ## Auth/RPC/ORM Security Updates Are Not Optional
 
-Better Auth, ORPC, and Drizzle all had meaningful security advisories in 2026. Product repos need automated dependency monitoring plus `pnpm audit --audit-level high`; auth/RPC/ORM major bumps require explicit review.
+Better Auth, ORPC, and Drizzle need automated dependency monitoring plus `pnpm audit --audit-level high`. Majors require explicit review.
+
+## French Docs Are Not Second Law
+
+Translate prose only. Keep slugs, package names, commands, and contracts aligned with English source. When FR drifts, English wins.
+
+## Diagrams
+
+Mermaid: `src/diagrams/*.mmd` → `pnpm diagrams:build` → `public/diagrams/*.svg`.

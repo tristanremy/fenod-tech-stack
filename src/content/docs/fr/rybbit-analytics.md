@@ -48,6 +48,6 @@ Forwarder l'IP visiteur via `CF-Connecting-IP` (inclus dans le template).
 ## Docs Liees
 
 - [Cloudflare Compute](/fr/cloudflare-compute/) — primitives Worker
-- [Deployment](/fr/deployment/) — Alchemy / Wrangler
+- [Deployment](/fr/deployment/) — Wrangler (Alchemy sur triggers seulement)
 - [Environment and Secrets](/fr/environment-secrets/) — Infisical + Worker vars
 - [Astro SEO Guide](/fr/astro-seo-guide/) — patterns layout / metadata

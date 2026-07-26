@@ -29,6 +29,8 @@ Treat a page as stale when:
 
 Do not bump `verified` as a cosmetic change. Bump it only after checking the substance of the page.
 
+Agents: prefer English law pages. Do not treat FR as a second source of defaults when EN and FR disagree.
+
 ## Related Guides
 
 - [Agent Operating Contract](/agent-operating-contract/)

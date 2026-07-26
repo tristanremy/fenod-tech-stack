@@ -7,18 +7,17 @@ verified: 2026-06
 
 ![Flux de déploiement Cloudflare sécurisé](/diagrams/cloudflare-deploy-safety-fr.svg)
 
-> Déployez sur Cloudflare avec Alchemy, gérez les environnements et validez la configuration.
+> Déployez sur Cloudflare avec **Wrangler par défaut**. Alchemy v2 seulement sur triggers. Loi: [Contrat de Stack](/fr/stack-contract/) (EN: [/stack-contract/](/stack-contract/)). Détail canonique: page EN [/deployment/](/deployment/).
 
-## Stack
+## Chemin par defaut
 
 | Outil | Rôle |
 |------|---------|
-| **Alchemy** | Infrastructure-as-code pour Cloudflare |
-| **Wrangler** | CLI Cloudflare pour le dev/debug |
-| **Infisical** | Stockage des secrets, injection d'environnement local et livraison des secrets CI/runtime |
-| **D1** | Base SQLite à l’edge |
-| **R2** | Stockage objet |
-| **KV** | Stockage clé-valeur |
+| **Wrangler** | Deploy + dev par defaut |
+| **Workers** | Runtime par defaut (static assets inclus) |
+| **Infisical** | Source de verite secrets humains/CI + secrets Worker |
+| **D1 / R2 / KV** | Bindings data/fichiers/cache |
+| **Alchemy v2** | Optionnel sur triggers seulement |
 
 ---
 
@@ -573,15 +572,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 9
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm test:run
+      - run: pnpm test
       - run: pnpm build
 
   deploy:
@@ -589,23 +586,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 9
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: 'pnpm'
       - run: pnpm install
       - run: pnpm build
 
-      # Option A: Wrangler
       - name: Deploy with Wrangler
         run: wrangler deploy --env production
 
-      # Option B: Alchemy
-      - name: Deploy with Alchemy
-        run: ALCHEMY_PHASE=production pnpm alchemy deploy
+      # Seulement si triggers Alchemy:
+      # - run: pnpm exec alchemy deploy
 ```
 
 ### Preview Deployments
@@ -623,19 +616,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: 'pnpm'
       - run: pnpm install
       - run: pnpm build
 
-      - name: Deploy Preview
+      - name: Deploy Preview Worker
         id: deploy
-        run: |
-          OUTPUT=$(wrangler pages deploy ./dist --project-name my-app --branch ${{ github.head_ref }})
-          echo "url=$(echo $OUTPUT | grep -oP 'https://[^\s]+')" >> $GITHUB_OUTPUT
+        run: wrangler deploy --env preview
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 

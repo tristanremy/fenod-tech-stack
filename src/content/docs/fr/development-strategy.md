@@ -1629,14 +1629,14 @@ Utilisez this checklist to track your progress:
 ## Deployment Checklist
 
 ### Pre-deployment
-- [ ] Environment variables configured in Alchemy
+- [ ] Variables d'environnement via Infisical + secrets Worker
 - [ ] Database migrations applied to production
 - [ ] API keys and secrets secured
 - [ ] Error tracking configured (Sentry, etc.)
 - [ ] Analytics configured
 
 ### Deployment
-- [ ] Deploy to Cloudflare Workers via Alchemy
+- [ ] Deploy sur Cloudflare Workers via Wrangler
 - [ ] Verify all routes work in production
 - [ ] Test authentication flows
 - [ ] Verify database connections

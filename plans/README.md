@@ -28,7 +28,7 @@ Written against commit `4f918dc` ("docs: add Fenod agent skills") after the Star
 
 ## Resolved since the original audit (by `e814d33`/`4f918dc` — no plans needed)
 
-- CI with link check and public-safety check (was hygiene finding #1/#2; the `audrain-patrimoine` leak is gone).
+- CI with link check and public-safety check (prior private-name leak cleaned).
 - Pages-vs-Workers staleness: stack-contract.md:32 and deployment.md:106 now state Workers-first with a deliberate Pages exception for already-connected static projects.
 - Freshness dates: `verified:` frontmatter + `/freshness/` policy exist.
 - Agent entry points: ai-index, stack-contract, agent-operating-contract, gotchas, recipes, llms.txt.

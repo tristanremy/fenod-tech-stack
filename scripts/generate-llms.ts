@@ -1,6 +1,11 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 const baseUrl = 'https://stack.fenod.fr';
+
+/** Keep in lockstep with stack-contract.md — this is the agent machine surface. */
+const coreDefaults =
+  'Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro/Starlight for content, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, TanStack AI+AI Gateway, Wrangler deploy, Infisical+Worker secrets, Oxlint+Oxfmt via Ultracite, tsgo, Vitest, Playwright.';
+
 const docs = [
   ['AI Index', 'ai-index'],
   ['Stack Contract', 'stack-contract'],
@@ -11,12 +16,36 @@ const docs = [
   ['Cloudflare API Tokens', 'cloudflare-api-tokens'],
   ['AI Providers', 'ai-providers'],
   ['Tooling', 'tooling'],
+  ['Deployment', 'deployment'],
   ['Email', 'email'],
-];
+] as const;
 
 await mkdir('public', { recursive: true });
 
-const llms = `# Fenod Stack\n\n> Cloudflare-first TypeScript stack handbook for humans and AI agents.\n\nDocs: ${baseUrl}\n\n## Read first\n\n${docs.map(([title, slug]) => `- [${title}](${baseUrl}/${slug}/)`).join('\n')}\n\n## Core defaults\n\nNode 22, pnpm, TanStack Start, Hono, ORPC, Drizzle, D1, Better Auth, Tailwind v4, shadcn/ui, TanStack AI, Cloudflare Workers/Pages, Alchemy, Infisical, Ultracite, tsgo, Vitest, Playwright.\n`;
+const llms = `# Fenod Stack
+
+> Cloudflare-first TypeScript stack handbook for humans and AI agents. Stack Contract is law.
+
+Docs: ${baseUrl}
+
+## Read first
+
+${docs
+  .slice(0, 6)
+  .map(([title, slug]) => `- [${title}](${baseUrl}/${slug}/)`)
+  .join('\n')}
+
+## Core defaults
+
+${coreDefaults}
+
+## Also useful
+
+${docs
+  .slice(6)
+  .map(([title, slug]) => `- [${title}](${baseUrl}/${slug}/)`)
+  .join('\n')}
+`;
 
 await writeFile('public/llms.txt', llms);
 

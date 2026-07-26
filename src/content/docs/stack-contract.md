@@ -1,84 +1,185 @@
 ---
 title: "Stack Contract"
-description: "Canonical Fenod stack defaults for humans and AI agents."
+description: "Law for Fenod stack defaults. Other pages explain; this page resolves conflicts."
 verified: 2026-06
 ---
 
-This page is the contract. If another page is more detailed, use this page to resolve defaults.
+This page is **law**. If another page is longer, newer-looking, or more detailed, this page still wins unless a project `STACK.md` / repo AGENTS explicitly overrides a line.
 
-## Documentation Rules
+One-liner:
 
-- The [Fenod Stack Handbook](./) is the canonical documentation surface.
-- English is the Source Locale unless a page explicitly says otherwise.
-- Major guides should follow the Guide Shape: Default Path, Gotchas, Agent Notes, and Related Guides.
-- Recipes should be Implementation Recipes: exact tools, file locations, commands, gotchas, and verification.
-- Diagrams should be Decision Diagrams: useful for boundaries, flows, lifecycle loops, and decision maps.
+> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt via Ultracite. Infisical + Worker secrets. Hono/ORPC only when an API boundary needs it. Smallest gate. No secrets in git, no prod authority for agents, no stack thrash.
 
-## Use
+## Authority
 
-- Node 24 for new projects; Node 22 only for existing projects until migration
-- pnpm
-- TanStack Start for full-stack apps
-- Astro/Starlight for docs and content-heavy sites
-- Hono + ORPC for APIs
-- Drizzle 0.44.x stable + D1 for relational data; do not upgrade client work to Drizzle v1 RC yet
-- Better Auth latest 1.6.x for authentication
-- Tailwind v4 + shadcn/ui for UI foundations
-- TanStack Query/Router/Form/Table where relevant
-- TanStack AI for app-level chat, tools, streaming, and agent state
-- Cloudflare AI Gateway for provider routing, budgets, and stored keys
-- Cloudflare Workers as the default runtime for new apps and dynamic sites
-- Cloudflare Workers Static Assets for new static/docs/content sites when starting fresh
-- Cloudflare Pages only for existing connected docs/static projects where the GitHub integration is already the simplest path
-- R2 for files
-- KV for config/cache, not relational data
-- Queues/Workflows for async jobs
-- Durable Objects for stateful coordination
-- Wrangler for deploys by default; Alchemy v2 only for multi-resource/multi-stage projects (see [Deployment](/deployment/))
-- Infisical or Bitwarden Secrets Manager for secrets
-- Vite 8 + Rolldown for new projects; `rolldown-vite` only as a Vite 7 migration bridge
-- Ultracite + tsgo + Vitest + Playwright for quality gates
-- tsdown for internal package builds
+| Rank | Source | Wins when |
+|------|--------|-----------|
+| 1 | This contract | always, unless a project override exists |
+| 2 | Project `STACK.md` / repo AGENTS | project-specific lines only |
+| 3 | Skills + recipes | how to implement law |
+| 4 | Long guides | rationale and depth only |
 
-## Do Not Use By Default
+`ai-index`, `llms.txt`, and Fenod skills must match this page. Drift is a bug.
 
-- npm/yarn instead of pnpm
-- Prisma instead of Drizzle
-- Postgres unless explicitly requested
+English is the Source Locale for contracts. French pages are human convenience, not a second law. **Agents should load EN contract pages** (`/stack-contract/`, `/ai-index/`, `/agent-operating-contract/`, `/gotchas/`). FR is optional for humans.
+
+## Defaults
+
+| Area | Law |
+|------|-----|
+| Language | TypeScript strict |
+| Local/CI runtime | **Node 24** + **pnpm** |
+| App | **TanStack Start** on **Cloudflare Workers** |
+| Content / docs / marketing | **Astro** (Starlight for docs) on Workers static assets |
+| API | Start server functions first. **Hono + ORPC** only when you need a real API boundary or non-UI clients |
+| Data | **Drizzle** latest patched **0.4x** + **D1** |
+| Auth | **Better Auth** latest patched stable line (review majors; ship security patches fast) |
+| UI | **Tailwind v4 + shadcn/ui** |
+| Client data | **TanStack Query + Router** (Form/Table when needed) |
+| Files | **R2** + metadata in D1 |
+| Cache / config | **KV** — not a database |
+| Async work | **Queues / Workflows** |
+| Stateful coordination | **Durable Objects** only when needed |
+| Edge cache | Workers Cache + `Cache-Control` / `Cache-Tag` for public SSR and cacheable GET APIs |
+| AI in apps | **TanStack AI** + **Cloudflare AI Gateway** (provider keys in gateway, never in the browser) |
+| Deploy | **`wrangler.jsonc` + `wrangler deploy`** |
+| Secrets | **Infisical** + Cloudflare Worker secrets at runtime |
+| Observability | Workers Observability on every Worker; **Sentry** only for product / paying apps |
+| Rate limits | Cloudflare-native binding or DO — **no Redis** |
+| Lint | **Oxlint** |
+| Format | **Oxfmt** |
+| Lint/format UX | **Ultracite** as the repo command / shared config |
+| Types | **tsgo** for `typecheck`; keep **`typescript`** installed for editor/tooling APIs |
+| Unit/integration tests | **Vitest** |
+| Browser tests | **Playwright** for real UI flows |
+| Bundler | **Vite 8 + Rolldown** for new projects; `rolldown-vite` only as a Vite 7 bridge |
+| Internal packages | **tsdown** when a package must build artifacts |
+
+### Do not use by default
+
+- npm / yarn
+- Bun or Deno as required repo baselines
+- Prisma
+- Postgres (until an escape hatch trigger below)
 - Express when Hono fits
-- tRPC when ORPC is the stack choice
-- Clean/hexagonal architecture ceremony for small apps
+- tRPC when the stack choice is ORPC
+- Vercel AI SDK for new app code unless an unsupported workflow forces it
+- Clean / hexagonal ceremony for small apps
 - repository interfaces around Drizzle without real pain
-- raw Cloudflare Global API Key
-- broad account-scoped deploy tokens
-- plaintext `.env` files in Git
-- provider keys in client-side code
-- unreviewed major upgrades of auth/RPC/ORM packages
-- Drizzle v1 RC on client projects before the stable migration plan is written
-- Vercel AI SDK for new app code unless an unsupported workflow requires it
+- Alchemy as day-one deploy
+- Cloudflare Pages for new projects
+- Redis
+- Global API Key or broad account-scoped deploy tokens
+- plaintext secrets in Git, prompts, issues, or client bundles
+- Drizzle v1 RC on client work before a written migration plan
+- unreviewed major upgrades of auth / RPC / ORM
 
-## Architecture Rule
+## Shape
 
-Use feature slices:
+### Day-one app
+
+One package. Not a monorepo.
 
 ```txt
-packages/api/src/routers/{feature}/
-├── index.ts
-├── router.ts
-└── service.ts
+app/
+  src/           # UI + server entry
+  wrangler.jsonc
+  package.json
 ```
 
-Routers validate and expose contracts. Services hold business logic and call Drizzle directly.
+Scaffold:
 
-## Verification Rule
+```bash
+pnpm dlx @tanstack/cli@latest create my-app \
+  --package-manager pnpm \
+  --deployment cloudflare \
+  --add-ons oRPC,drizzle,better-auth,shadcn,tanstack-query \
+  --yes --non-interactive --no-git --no-toolchain
+```
 
-Before declaring work done, run the smallest relevant ladder:
+Convert scaffold Postgres defaults to **D1**. Living reference: `examples/smoke` in the handbook repo.
+
+Add Hono only when the HTTP/API boundary needs it. Do not create `apps/web` + `apps/server` + four packages on day one.
+
+### Grow only on triggers
+
+| Trigger | Then add |
+|---------|----------|
+| Second deployable or shared library across apps | monorepo + packages (+ Turborepo if orchestration hurts) |
+| Multiple API consumers or thick procedures | feature slices under `packages/api` or `src/server` |
+| 4+ Cloudflare resources with shared lifecycle, 3+ real stages, multi-account, or infra-as-code tests | **Alchemy v2** |
+| Reporting needs, client Postgres mandate, or D1 limits hit | **Postgres** (+ Hyperdrive if staying on Cloudflare) |
+| Users regularly work offline in the field | project-specific offline design — Query persist is enough otherwise |
+| Existing docs/static site already on Pages and switching costs more than it saves | keep **Pages** for that site only |
+
+### Feature slices (when an API package exists)
+
+```txt
+{api}/routers/{feature}/
+├── index.ts
+├── router.ts    # validate + expose
+└── service.ts   # business logic + Drizzle directly
+```
+
+No ports/adapters. No generic repository layer.
+
+## Secrets and Cloudflare authority
+
+- **Infisical** is the default secrets manager. Bitwarden SM only with an explicit project override.
+- Commit names and placeholders only (`.env.example`, `infisical.json` without secret values).
+- Never commit `.env`, `.env.local`, or `.dev.vars` with real values.
+- Local Wrangler must not accidentally prefer an exported token:
+
+```bash
+env -u CLOUDFLARE_API_TOKEN wrangler whoami
+```
+
+- Production deploys, D1 migrations, DNS, and destroys go through CI / broker / explicit human approval.
+- AI provider keys: AI Gateway stored keys / BYOK in production.
+
+## Verification
+
+### Ship gate (default done bar)
 
 ```bash
 pnpm lint
 pnpm typecheck
 pnpm test
-pnpm build
 ```
 
-For UI changes, verify in a browser. For production-impacting changes, require explicit approval and auditability.
+### Merge / higher-risk gate
+
+```bash
+pnpm build
+# UI flows:
+pnpm test:e2e
+# Visual changes: verify in a browser
+```
+
+React Doctor, full monorepo pipelines, and extra scanners are optional merge aids when a repo configures them — not universal law on every edit.
+
+Production-impacting work also needs explicit approval and an audit trail.
+
+## Documentation rules
+
+Major guides use this shape:
+
+1. Default Path
+2. Use something else when…
+3. Gotchas
+4. Agent Notes
+5. Related Guides
+
+Recipes stay short: tools, paths, commands, gotchas, verification. Diagrams are for boundaries/flows/decisions, not lists.
+
+Long guides are depth. They do not outrank this contract.
+
+## Related
+
+- [AI Index](/ai-index/)
+- [Agent Operating Contract](/agent-operating-contract/)
+- [Gotchas](/gotchas/)
+- [Recipes](/recipes/)
+- [Security Model](/security-model/)
+- [Deployment](/deployment/)
+- [Tooling](/tooling/)

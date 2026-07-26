@@ -1,100 +1,95 @@
 ---
 title: "Recipes"
-description: "Canonical implementation recipes for common Fenod stack tasks."
+description: "Short implementation recipes for common Fenod stack tasks."
 verified: 2026-06
 ---
 
-## Start a Full-Stack App
+Recipes implement the [Stack Contract](/stack-contract/). Keep them short.
 
-Use TanStack Start with add-ons, then add Hono manually if the app needs a dedicated API layer.
+## Start a full-stack app
+
+One package on Workers:
 
 ```bash
-pnpm create @tanstack/start@latest my-app \
-  --add-ons oRPC,drizzle,better-auth,shadcn,tanstack-query,cloudflare
+pnpm dlx @tanstack/cli@latest create my-app \
+  --package-manager pnpm \
+  --deployment cloudflare \
+  --add-ons oRPC,drizzle,better-auth,shadcn,tanstack-query \
+  --yes --non-interactive --no-git --no-toolchain
 ```
 
-## Add an API Feature
+Then align with law: **D1 not Postgres**, Ultracite (Oxlint/Oxfmt), Infisical, Wrangler observability.
 
-Create a feature slice:
+Living reference in this repo: [`examples/smoke`](https://github.com/tristanremy/fenod-tech-stack/tree/main/examples/smoke) (`STACK.md` maps each law line).
+
+Do not create a monorepo on day one. Add Hono only when you need a dedicated HTTP/API boundary.
+
+## Add an API feature
+
+When an API module exists, use a feature slice:
 
 ```txt
-packages/api/src/routers/{feature}/
+{api}/routers/{feature}/
 ├── index.ts
 ├── router.ts
 └── service.ts
 ```
 
-Keep `router.ts` thin. Put business logic and Drizzle calls in `service.ts`.
+`router.ts` stays thin. `service.ts` owns business logic and Drizzle.
 
-## Add Auth
+## Add auth
 
-Use Better Auth with D1. Keep auth config server-side and validate session state at API boundaries.
+Better Auth + D1. Server-only config. Validate session at API boundaries.
 
-## Add AI Chat
+## Add AI chat
 
-Use:
-
-- TanStack AI for chat/tool/streaming state
+- TanStack AI for chat/tools/streaming state
 - `@cloudflare/tanstack-ai` for Workers AI / AI Gateway
-- Cloudflare AI Gateway stored provider keys in production
+- AI Gateway stored provider keys in production
+- never expose provider keys to the browser
 
-Do not expose provider keys to the browser.
+## Add file uploads
 
-## Add File Uploads
+R2 for objects, D1 for metadata, authorize server-side.
 
-Use R2 for object storage and D1 for metadata. Keep upload authorization server-side.
-
-## Add Email
-
-Inbound:
+## Add email
 
 ```txt
-Cloudflare Email Routing → Email Worker → Queue/D1/R2
+Inbound:  Cloudflare Email Routing → Email Worker → Queue/D1/R2
+Outbound: app policy → Queue → Resend/Postmark
+Marketing: lifecycle platform
 ```
 
-Outbound transactional:
+Agents do not send arbitrary email.
 
-```txt
-Server-side app policy → Queue → Resend/Postmark
+## Add analytics
+
+Prefer a first-party proxy. Public site IDs are config, not secrets.
+
+## Offline
+
+Default: TanStack Query cache/persist.  
+Full offline-first only for real field/dead-zone products — design per project, not as stack scaffolding.
+
+## Deploy an app
+
+```bash
+pnpm lint && pnpm typecheck && pnpm test && pnpm build
+env -u CLOUDFLARE_API_TOKEN wrangler deploy
 ```
 
-Marketing:
+Inject runtime secrets with Infisical (e.g. `infisical run --env=prod -- wrangler deploy`). Alchemy only on Stack Contract triggers.
 
-```txt
-Lifecycle email platform
-```
-
-## Add Analytics
-
-Use a first-party proxy for privacy-friendly analytics when possible. Store public site IDs as public config and provider hosts as non-secret vars.
-
-## Add Offline Support
-
-Only implement full offline-first if users work in dead zones or unstable networks. Otherwise TanStack Query cache is usually enough.
-
-## Deploy Docs
-
-This repo is a Starlight site.
+## Deploy this handbook
 
 ```bash
 pnpm build
 ```
 
-Cloudflare Pages:
+This Starlight site may stay on Pages if already connected; new projects still default to Workers.
 
-```txt
-Build command: pnpm build
-Output directory: dist
-Production branch: main
-Custom domain: stack.fenod.fr
-```
+## Add a diagram
 
-## Add a Diagram
-
-1. Add Mermaid source to `src/diagrams/name.mmd`.
-2. Run `pnpm diagrams:build`.
-3. Embed with:
-
-```md
-![Diagram title](/diagrams/name.svg)
-```
+1. `src/diagrams/name.mmd`
+2. `pnpm diagrams:build`
+3. `![Title](/diagrams/name.svg)`

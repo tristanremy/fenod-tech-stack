@@ -1,81 +1,80 @@
 ---
 name: fenod-quality
-description: Fenod's quality gates and verification workflow — TDD with AI, Vitest, Playwright, Ultracite (Oxlint/Oxfmt), tsgo, Husky hooks, and React Doctor. Use this skill whenever writing or fixing tests, setting up linting or formatting, adding git hooks, deciding what to verify before a commit or PR, refactoring existing code, or whenever an agent is about to make code changes in a Fenod repo and needs to know which checks to run and in what order.
+description: Fenod's quality gates and verification workflow — TDD with AI, Vitest, Playwright, Oxlint, Oxfmt, Ultracite, tsgo, and optional React Doctor. Use this skill whenever writing or fixing tests, setting up linting or formatting, deciding what to verify before a commit or PR, refactoring existing code, or whenever an agent is about to make code changes in a Fenod repo and needs to know which checks to run and in what order.
 ---
 
 # Fenod Quality
 
-Fast feedback through one coherent toolchain (VoidZero direction). The rule for agents: run the smallest useful gate first, climb as risk increases, and never push code that hasn't been through the ladder.
+**Stack Contract is law.** Fast feedback, smallest useful gate first.
 
-## Verification ladder
+## Ship gate (default done bar)
 
 ```bash
-pnpm lint        # Ultracite (Oxlint/Oxfmt backend)
+pnpm lint        # Ultracite → Oxlint + Oxfmt
 pnpm typecheck   # tsgo --noEmit
 pnpm test        # Vitest
+```
+
+## Higher-risk / merge gate
+
+```bash
 pnpm build
+pnpm test:e2e            # UI flows (Playwright)
+# browser check for visual changes
+pnpm doctor:react:diff   # optional, only if repo configures React Doctor
 ```
 
-UI changes add:
+Do not run the entire optional toolbox on every one-line fix. Prefer repo scripts over ad hoc binaries.
 
-```bash
-pnpm test:e2e    # Playwright
-```
+## Lint / format law
 
-React-heavy changes add (when configured):
+| Tool | Role |
+|------|------|
+| **Oxlint** | lint |
+| **Oxfmt** | format |
+| **Ultracite** | repo command / shared config |
 
-```bash
-pnpm doctor:react:diff   # React Doctor — security, perf, best-practice gate before merge
-```
+Do not add ESLint or Prettier beside Oxlint/Oxfmt “for completeness.”  
+Do not remove the `typescript` package because tsgo exists — keep both until tooling APIs catch up.
 
-Prefer repo scripts over ad hoc commands. Do not add a new lint/format/test tool without removing or integrating the old path. Do not remove the `typescript` package when tsgo is present; keep both side-by-side until the TypeScript 7/Corsa programmatic API stabilizes and dependent tools migrate.
+## TDD with AI
 
-## TDD with AI — the loop
+AI output is plausible, not proven. Prefer:
 
-AI produces plausible code, not guaranteed-correct code. A failing test turns intent into an executable contract and stops broad rewrites.
+1. **Red** — one failing test for behavior
+2. **Green** — smallest pass
+3. **Narrow verify** — targeted test first
+4. **Refactor** while green
+5. Next behavior
 
-1. **Red** — write one failing test for the behavior, not the implementation.
-2. **Green** — make the smallest change that passes. One step; no cleanup + optimization + rewrite combined.
-3. **Verify narrow** — run the targeted test first, widen only if the change crosses layers.
-4. **Refactor while green** — simplify names, extract duplication, align with repo patterns.
-5. **Next case** — grow by behavior: edge cases, error paths, auth rules, null states, retries.
+High value: services, routers/actions, validation/mappers, auth rules.  
+Low value: pure presentational UI (manual/browser often cheaper).
 
-Where TDD pays off first: services/business rules, routers/loaders/actions, validation/parsing/mappers (all high). Critical UI flows (medium). Pure presentational UI (low — manual review is cheaper). Prompt ladder and full guidance: `src/content/docs/tdd-with-ai.md`.
+## Tests
 
-## Test placement
+- **Vitest** unit/integration, prefer colocated with the feature
+- **Playwright** real browser flows
+- Copy an existing test file’s style before inventing a new one
 
-- Unit/integration: **Vitest**, colocated within the feature slice (`{feature}/service.test.ts` next to `service.ts`). Test the service's public behavior, not Drizzle internals.
-- Browser flows and regressions: **Playwright**.
-- Follow an existing test file in the repo as the pattern before writing a new style.
-
-## Git hooks
-
-Husky + lint-staged: pre-commit runs lint/format on staged files; the `prepare` script installs hooks automatically after `pnpm install`. Setup pattern: `src/content/docs/code-patterns.md` (Husky section).
-
-## Tooling adoption posture
+## Tooling posture
 
 | Tool | Status |
 |------|--------|
-| Vite 8, Vitest, Ultracite, tsgo, Playwright | Stable default for new projects |
-| `rolldown-vite` | Vite 7 migration bridge before Vite 8, not the new-project default |
-| `tsdown` | Default for internal package builds (ESM-first, typed exports, explicit `exports` map) |
-| Vite+ | Prototypes only, not client production |
+| Node 24, pnpm, Vite 8, Vitest, Oxlint, Oxfmt, Ultracite, tsgo, Playwright | default |
+| `rolldown-vite` | Vite 7 bridge only |
+| `tsdown` | internal package builds |
+| React Doctor / husky | optional repo choices, not universal law |
+| Vite+ | prototypes only |
 
 ## Dependency security
 
-Product repos use Renovate or Dependabot plus `pnpm audit --audit-level high` in CI. Better Auth, ORPC, and Drizzle are security-sensitive: review quickly, keep patched, and never merge auth/RPC/ORM major upgrades as drive-by cleanup.
+Renovate or Dependabot + `pnpm audit --audit-level high` in product repos. Better Auth, ORPC, Drizzle: patch fast; majors need explicit review.
 
 ## Deep references
 
-Resolve `src/content/docs/<slug>.md` in this order:
-1. `../../src/content/docs/<slug>.md` relative to this skill (inside the `fenod-tech-stack` checkout);
-2. `~/dev/fenod-tech-stack/src/content/docs/<slug>.md`;
-3. `https://raw.githubusercontent.com/tristanremy/fenod-tech-stack/main/src/content/docs/<slug>.md`.
-
-| When you need | Read |
-|---------------|------|
-| Vitest/Playwright setup, slice testing, React Doctor gates | `TESTING.md` |
-| Red/green/refactor with AI, prompt ladder | `TDD-WITH-AI.md` |
-| Toolchain defaults and adoption rules | `tooling.md` |
-| Wrangler tail, DevTools, logging | `DEBUGGING.md` |
-| Perf, security, error handling on existing apps | `APP-IMPROVEMENT-GUIDE.md` |
+| Need | Read |
+|------|------|
+| Law | `stack-contract.md` |
+| Toolchain | `tooling.md` |
+| TDD detail | `tdd-with-ai.md` |
+| Test setup depth | `testing.md` |

@@ -507,24 +507,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 9
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: 'pnpm'
 
       - run: pnpm install
       - run: pnpm lint
       - run: pnpm typecheck
-      - run: pnpm test:run
+      - run: pnpm test
       - run: pnpm build
 ```
 
 ---
 
 ## Step 10: Final Structure
+
+Day-one law is still **one package**. The tree below is a **grown** multi-package shape after triggers fire — not the scaffold default.
 
 ```
 my-app/

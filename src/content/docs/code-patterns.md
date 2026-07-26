@@ -1,11 +1,13 @@
 ---
 title: "Code Patterns"
+description: "Pattern museum / depth. Stack Contract is law; copy only what the current repo needs."
 verified: 2026-06
 ---
 
 [Disponible en français](/code-patterns/)
 
-> Copy-paste patterns for common implementations. For architecture context, see [README](./).
+> **Depth, not law.** Copy only what the current repo needs. Defaults and shape live in the [Stack Contract](/stack-contract/).
+> Paths like `apps/web/` / `packages/api/` are grown-shape examples, not the day-one scaffold.
 
 ## Table of Contents
 
