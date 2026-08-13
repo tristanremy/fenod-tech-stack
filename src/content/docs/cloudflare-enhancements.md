@@ -36,7 +36,7 @@ This page tracks recent Cloudflare platform features that should shape Fenod def
 24. **Event subscriptions into Queues** — react to Cloudflare account/service events without polling.
 25. **Hyperdrive + Cloudflare-billed PlanetScale** — only for projects explicitly choosing external Postgres/MySQL; D1 remains default.
 26. **Temporary Wrangler deployments for agents** — useful for previews and demos; production deploys still require real account auth and review.
-27. **`@cloudflare/workers-types` v5** — use for new Worker TypeScript projects to avoid stale runtime types.
+27. **`wrangler types`** — generate Worker bindings/runtime types. Do not maintain `@cloudflare/workers-types` by hand.
 28. **Import `env` from `cloudflare:workers`** — use when a binding is needed outside the request handler; otherwise pass `env` explicitly.
 29. **Source map stack trace remapping** — enable for production Workers where stack traces matter.
 30. **Workers Cache cross-version cache** — opt in only for stable public content where deploys should not cold-start the cache.

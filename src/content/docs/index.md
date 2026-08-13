@@ -53,7 +53,7 @@ verified: 2026-06
 | [Stack Contract](/stack-contract/) | **Law** — defaults, shape, gates, authority |
 | [AI Index](/ai-index/) | Minimum agent entry path |
 | [Stack Overview](/stack-overview/) | Why the defaults and escape hatches |
-| [Tooling](/tooling/) | Oxlint, Oxfmt, Ultracite, Vite, Vitest, tsgo, Playwright |
+| [Tooling](/tooling/) | Oxlint, Oxfmt, Vite, Vitest, tsgo, Playwright |
 | [Recipes](/recipes/) | Short task paths |
 | [Gotchas](/gotchas/) | High-signal traps |
 | [Migration Guide](/migration/) | Scaffold → production depth |

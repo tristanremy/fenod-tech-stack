@@ -18,7 +18,7 @@ Only then open long guides.
 
 ## Law in one breath
 
-> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt via Ultracite. Infisical + Worker secrets. Hono/ORPC only when an API boundary needs it. Smallest gate. No secrets in git, no prod authority, no stack thrash.
+> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt. Infisical + Worker secrets. Hono/ORPC only when an API boundary needs it. Smallest gate. No secrets in git, no prod authority, no stack thrash.
 
 ## Fast defaults
 
@@ -34,7 +34,7 @@ Only then open long guides.
 | AI | TanStack AI + AI Gateway |
 | Deploy | Wrangler (`wrangler.jsonc` + `wrangler deploy`) |
 | Secrets | Infisical + Worker secrets |
-| Lint/format | Oxlint + Oxfmt via Ultracite |
+| Lint/format | Oxlint + Oxfmt |
 | Types | tsgo (+ keep `typescript` installed) |
 | Tests | Vitest; Playwright for UI flows |
 

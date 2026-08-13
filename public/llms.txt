@@ -15,7 +15,7 @@ Docs: https://stack.fenod.fr
 
 ## Core defaults
 
-Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro/Starlight for content, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, TanStack AI+AI Gateway, Wrangler deploy, Infisical+Worker secrets, Oxlint+Oxfmt via Ultracite, tsgo, Vitest, Playwright.
+Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro/Starlight for content, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, TanStack AI+AI Gateway, Wrangler deploy, Infisical+Worker secrets, Oxlint+Oxfmt, tsgo, Vitest, Playwright.
 
 ## Also useful
 

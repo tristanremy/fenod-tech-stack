@@ -15,6 +15,13 @@
       "when": 1785059085499,
       "tag": "0001_neat_young_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1786627549453,
+      "tag": "0002_mighty_stellaris",
+      "breakpoints": true
     }
   ]
 }

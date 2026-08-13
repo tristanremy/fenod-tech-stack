@@ -34,7 +34,7 @@ Cette page suit les nouveautes Cloudflare qui doivent influencer les defaults Fe
 24. **Events Cloudflare vers Queues** — reagir sans polling.
 25. **Hyperdrive + PlanetScale facture via Cloudflare** — seulement si Postgres/MySQL externe est explicitement choisi; D1 reste default.
 26. **Deploys temporaires Wrangler pour agents** — previews/demos; production avec vraie auth et revue.
-27. **`@cloudflare/workers-types` v5** — nouveaux projets Worker TypeScript.
+27. **`wrangler types`** — generer les types Worker. Ne pas maintenir `@cloudflare/workers-types` a la main.
 28. **Import `env` depuis `cloudflare:workers`** — seulement quand un binding est necessaire hors handler.
 29. **Source maps remappees** — Workers production ou les stack traces comptent.
 30. **Workers Cache cross-version cache** — opt-in seulement pour contenu public stable.

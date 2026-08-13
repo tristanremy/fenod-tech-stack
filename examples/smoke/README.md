@@ -2,7 +2,7 @@
 
 Living reference for the [Fenod Stack Contract](https://stack.fenod.fr/stack-contract/).
 
-One package. TanStack Start on Cloudflare Workers. Drizzle + D1. Better Auth. oRPC demo. Ultracite (Oxlint/Oxfmt). Wrangler.
+One package. TanStack Start on Cloudflare Workers. Drizzle + D1. Better Auth. Hono + oRPC. Oxlint + Oxfmt. Wrangler.
 
 ## Setup
 
@@ -22,10 +22,13 @@ infisical run --env=dev -- pnpm dev
 ## Ship gate
 
 ```bash
+pnpm format:check
 pnpm lint
 pnpm typecheck
 pnpm test
 ```
+
+Or `pnpm ship`.
 
 Higher risk:
 
@@ -38,7 +41,8 @@ pnpm build
 1. `pnpm dlx wrangler d1 create fenod-smoke` → put `database_id` in `wrangler.jsonc`
 2. `pnpm db:remote` (migrations)
 3. Put secrets: `infisical run --env=prod -- pnpm exec wrangler secret put BETTER_AUTH_SECRET` (or sync from Infisical)
-4. `pnpm deploy` (uses `env -u CLOUDFLARE_API_TOKEN` when possible via script)
+4. Set `BETTER_AUTH_URL` to the public origin
+5. `pnpm deploy` (uses `env -u CLOUDFLARE_API_TOKEN` when possible via script)
 
 ## Law map
 

@@ -6,7 +6,7 @@ verified: 2026-06
 
 Cette page est la **loi**. Si une autre page est plus longue ou plus detaillee, celle-ci gagne sauf override explicite dans un `STACK.md` / AGENTS de projet.
 
-> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt via Ultracite. Infisical + secrets Worker. Hono/ORPC seulement si une frontiere API le demande. Plus petite gate. Pas de secrets dans git, pas d'autorite prod pour les agents, pas de thrash de stack.
+> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt. Infisical + secrets Worker. Hono/ORPC seulement si une frontiere API le demande. Plus petite gate. Pas de secrets dans git, pas d'autorite prod pour les agents, pas de thrash de stack.
 
 L'anglais est la Source Locale des contrats. Cette page FR est une commodite humaine, pas une seconde loi. En cas de derive: [Stack Contract EN](/stack-contract/).
 
@@ -43,9 +43,8 @@ L'anglais est la Source Locale des contrats. Cette page FR est une commodite hum
 | Secrets | **Infisical** + secrets Worker |
 | Observability | Workers Observability; Sentry pour apps produit |
 | Rate limits | natif CF / DO — **pas de Redis** |
-| Lint | **Oxlint** |
-| Format | **Oxfmt** |
-| UX lint/format | **Ultracite** |
+| Lint | **Oxlint** (`pnpm lint`) |
+| Format | **Oxfmt** (`pnpm format` / `pnpm format:check`) |
 | Types | **tsgo** (+ garder `typescript`) |
 | Tests | **Vitest**; **Playwright** pour flux UI |
 | Bundler | **Vite 8 + Rolldown** |

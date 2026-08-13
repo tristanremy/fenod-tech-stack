@@ -66,7 +66,7 @@ Agents do not send arbitrary email.
 
 ## Oxlint + Oxfmt, Not ESLint/Prettier
 
-Lint is Oxlint, format is Oxfmt, usually via Ultracite repo scripts. Do not add ESLint/Prettier beside them “for completeness.”
+Lint is Oxlint, format is Oxfmt. Do not add ESLint, Prettier, Biome, or Ultracite beside them “for completeness.”
 
 ## tsgo Does Not Replace the typescript Package
 

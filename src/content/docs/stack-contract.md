@@ -8,7 +8,7 @@ This page is **law**. If another page is longer, newer-looking, or more detailed
 
 One-liner:
 
-> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt via Ultracite. Infisical + Worker secrets. Hono/ORPC only when an API boundary needs it. Smallest gate. No secrets in git, no prod authority for agents, no stack thrash.
+> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt. Infisical + Worker secrets. Hono/ORPC only when an API boundary needs it. Smallest gate. No secrets in git, no prod authority for agents, no stack thrash.
 
 ## Authority
 
@@ -46,9 +46,8 @@ English is the Source Locale for contracts. French pages are human convenience, 
 | Secrets | **Infisical** + Cloudflare Worker secrets at runtime |
 | Observability | Workers Observability on every Worker; **Sentry** only for product / paying apps |
 | Rate limits | Cloudflare-native binding or DO — **no Redis** |
-| Lint | **Oxlint** |
-| Format | **Oxfmt** |
-| Lint/format UX | **Ultracite** as the repo command / shared config |
+| Lint | **Oxlint** (`pnpm lint`) |
+| Format | **Oxfmt** (`pnpm format` / `pnpm format:check`) |
 | Types | **tsgo** for `typecheck`; keep **`typescript`** installed for editor/tooling APIs |
 | Unit/integration tests | **Vitest** |
 | Browser tests | **Playwright** for real UI flows |

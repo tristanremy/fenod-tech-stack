@@ -18,7 +18,7 @@ Loi canonique en anglais: [Stack Contract](/stack-contract/).
 
 ## Loi en une phrase
 
-> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt via Ultracite. Infisical + secrets Worker. Hono/ORPC seulement si frontiere API. Plus petite gate. Pas de secrets dans git, pas d'autorite prod, pas de thrash de stack.
+> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt. Infisical + secrets Worker. Hono/ORPC seulement si frontiere API. Plus petite gate. Pas de secrets dans git, pas d'autorite prod, pas de thrash de stack.
 
 ## Defaults rapides
 
@@ -34,7 +34,7 @@ Loi canonique en anglais: [Stack Contract](/stack-contract/).
 | IA | TanStack AI + AI Gateway |
 | Deploy | Wrangler |
 | Secrets | Infisical + secrets Worker |
-| Lint/format | Oxlint + Oxfmt via Ultracite |
+| Lint/format | Oxlint + Oxfmt |
 | Types | tsgo (+ `typescript`) |
 | Tests | Vitest; Playwright pour UI |
 

@@ -10,7 +10,7 @@ export const Route = createFileRoute("/demo/orpc-todo")({
     await context.queryClient.prefetchQuery(
       orpc.listTodos.queryOptions({
         input: {},
-      })
+      }),
     );
   },
 });
@@ -19,7 +19,7 @@ function ORPCTodos() {
   const { data, refetch } = useQuery(
     orpc.listTodos.queryOptions({
       input: {},
-    })
+    }),
   );
 
   const [todo, setTodo] = useState("");
@@ -29,7 +29,7 @@ function ORPCTodos() {
         refetch();
         setTodo("");
       },
-    })
+    }),
   );
 
   const submitTodo = useCallback(() => {
@@ -61,11 +61,7 @@ function ORPCTodos() {
             placeholder="Enter a new todo..."
             className="demo-input"
           />
-          <button
-            disabled={todo.trim().length === 0}
-            onClick={submitTodo}
-            className="demo-button"
-          >
+          <button disabled={todo.trim().length === 0} onClick={submitTodo} className="demo-button">
             Add todo
           </button>
         </div>

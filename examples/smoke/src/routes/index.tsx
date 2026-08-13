@@ -11,8 +11,8 @@ function App() {
           Law reference app
         </h1>
         <p className="mb-8 max-w-2xl text-base text-[var(--sea-ink-soft)] sm:text-lg">
-          One package. TanStack Start on Workers. Drizzle + D1. Better Auth.
-          oRPC. Ultracite. Wrangler. See STACK.md.
+          One package. TanStack Start on Workers. Drizzle + D1. Better Auth. oRPC. Ultracite.
+          Wrangler. See STACK.md.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link

@@ -1,8 +1,9 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "fenod-smoke",
-  "compatibility_date": "2026-06-01",
-  "compatibility_flags": ["nodejs_compat"],
+  // 2026-08-04+ enables nodejs_compat by default. Do not add nodejs_als
+  // unless a dependency is proven to need only ALS and nothing else.
+  "compatibility_date": "2026-08-04",
   "main": "@tanstack/react-start/server-entry",
   "observability": {
     "enabled": true,

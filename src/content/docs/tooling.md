@@ -18,7 +18,7 @@ JavaScript/TypeScript tooling defaults. **[Stack Contract](/stack-contract/) is 
 | Dev/build | Vite 8 + Rolldown | TanStack Start, Astro, or plain Vite |
 | Lint | **Oxlint** | Fast lint; no ESLint-by-default |
 | Format | **Oxfmt** | Fast format; no Prettier-by-default |
-| Lint/format UX | **Ultracite** | Repo scripts and shared config over bare ad hoc Oxc setup |
+| Lint/format scripts | `oxlint` / `oxfmt` | No ESLint, Prettier, Biome, or Ultracite wrapper |
 | Types | tsgo | Keep `typescript` installed for tooling APIs |
 | Unit/integration | Vitest | Vite-aware |
 | Browser | Playwright | Real UI flows |
@@ -34,7 +34,7 @@ Cloudflare’s VoidZero acquisition aligns runtime + tooling, and concentrates v
 | Vite 8 | new projects | — |
 | `rolldown-vite` | Vite 7 migration bridge | new projects |
 | Oxlint + Oxfmt | always | adding ESLint/Prettier “for completeness” |
-| Ultracite | default repo command | strong existing standard must be preserved temporarily |
+| Oxlint + Oxfmt scripts | default repo command | adding ESLint/Prettier/Biome/Ultracite beside them |
 | Vitest | default | browser-only behavior → Playwright |
 | tsdown | internal packages | app builds owned by the framework |
 | Vite+ | prototypes | production client baseline |
@@ -48,7 +48,8 @@ tsgo is the fast typecheck path. It does not fully replace the `typescript` pack
 Ship gate:
 
 ```bash
-pnpm lint        # Ultracite → Oxlint/Oxfmt
+pnpm lint        # oxlint .
+pnpm format:check
 pnpm typecheck   # tsgo --noEmit
 pnpm test        # Vitest
 ```

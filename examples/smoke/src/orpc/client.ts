@@ -6,15 +6,16 @@ import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 
+import { getSession } from "#/lib/auth";
 import router from "#/orpc/router";
 
 const getORPCClient = createIsomorphicFn()
   .server(() =>
     createRouterClient(router, {
-      context: () => ({
-        headers: getRequestHeaders(),
+      context: async () => ({
+        session: await getSession(getRequestHeaders()),
       }),
-    })
+    }),
   )
   .client((): RouterClient<typeof router> => {
     const link = new RPCLink({

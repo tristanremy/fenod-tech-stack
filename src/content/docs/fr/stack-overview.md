@@ -29,7 +29,7 @@ Vue operationnelle. **[Contrat de Stack](/fr/stack-contract/) est la loi** (sour
 | AI | TanStack AI + AI Gateway | Etat app + cles routees |
 | Deploy | Wrangler | Un Worker pour la plupart des apps PME |
 | Secrets | Infisical + secrets Worker | Pas d'env plaintext dans git |
-| Lint/format | Oxlint + Oxfmt via Ultracite | Chemin VoidZero rapide |
+| Lint/format | Oxlint + Oxfmt | Chemin VoidZero rapide |
 | Types/tests | tsgo, Vitest, Playwright | Check rapide + comportement reel |
 
 Day-one = **un package app**. Monorepo, Alchemy, Postgres, offline complet = triggers (contrat).

@@ -17,7 +17,7 @@ const getTodos = createServerFn({
 const createTodo = createServerFn({
   method: "POST",
 })
-  .inputValidator((data: { title: string }) => data)
+  .validator((data: { title: string }) => data)
   .handler(async ({ data }) => {
     const db = getDb();
     await db.insert(todos).values({ title: data.title });
@@ -64,16 +64,11 @@ function DemoDrizzle() {
             </li>
           ))}
           {rows.length === 0 && (
-            <li className="demo-list-item demo-muted text-center">
-              No todos yet.
-            </li>
+            <li className="demo-list-item demo-muted text-center">No todos yet.</li>
           )}
         </ul>
 
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-2 sm:flex-row"
-        >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
           <input
             type="text"
             name="title"

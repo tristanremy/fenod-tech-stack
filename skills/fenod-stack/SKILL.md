@@ -9,7 +9,7 @@ description: Fenod's opinionated stack for building web apps, sites, and APIs. U
 
 ## One-liner
 
-> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt via Ultracite. Infisical + Worker secrets. Hono/ORPC only when an API boundary needs it. Smallest gate. No secrets in git, no prod authority, no stack thrash.
+> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt. Infisical + Worker secrets. Hono/ORPC only when an API boundary needs it. Smallest gate. No secrets in git, no prod authority, no stack thrash.
 
 ## Decision matrix
 
@@ -41,7 +41,7 @@ pnpm dlx @tanstack/cli@latest create my-app \
 - **Node 24** + **pnpm**. No npm/yarn. Bun/Deno not required baselines.
 - **Vite 8 + Rolldown** for new apps; `rolldown-vite` only as Vite 7 bridge.
 - **Drizzle 0.4x** until v1 stable + migration plan.
-- **Oxlint + Oxfmt** via Ultracite. No ESLint/Prettier by default.
+- **Oxlint + Oxfmt**. No ESLint/Prettier/Biome/Ultracite by default.
 - **tsgo** for typecheck; keep `typescript` installed.
 - Validate env with **Zod**. Secrets via **Infisical**. Never commit real `.env` / `.dev.vars`.
 - UI: **Tailwind v4 + shadcn/ui**.

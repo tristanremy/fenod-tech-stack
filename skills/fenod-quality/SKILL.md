@@ -1,6 +1,6 @@
 ---
 name: fenod-quality
-description: Fenod's quality gates and verification workflow — TDD with AI, Vitest, Playwright, Oxlint, Oxfmt, Ultracite, tsgo, and optional React Doctor. Use this skill whenever writing or fixing tests, setting up linting or formatting, deciding what to verify before a commit or PR, refactoring existing code, or whenever an agent is about to make code changes in a Fenod repo and needs to know which checks to run and in what order.
+description: Fenod's quality gates and verification workflow — TDD with AI, Vitest, Playwright, Oxlint, Oxfmt, tsgo, and optional React Doctor. Use this skill whenever writing or fixing tests, setting up linting or formatting, deciding what to verify before a commit or PR, refactoring existing code, or whenever an agent is about to make code changes in a Fenod repo and needs to know which checks to run and in what order.
 ---
 
 # Fenod Quality
@@ -10,7 +10,7 @@ description: Fenod's quality gates and verification workflow — TDD with AI, Vi
 ## Ship gate (default done bar)
 
 ```bash
-pnpm lint        # Ultracite → Oxlint + Oxfmt
+pnpm lint        # oxlint .
 pnpm typecheck   # tsgo --noEmit
 pnpm test        # Vitest
 ```
@@ -32,9 +32,8 @@ Do not run the entire optional toolbox on every one-line fix. Prefer repo script
 |------|------|
 | **Oxlint** | lint |
 | **Oxfmt** | format |
-| **Ultracite** | repo command / shared config |
 
-Do not add ESLint or Prettier beside Oxlint/Oxfmt “for completeness.”  
+Do not add ESLint, Prettier, Biome, or Ultracite beside Oxlint/Oxfmt “for completeness.”  
 Do not remove the `typescript` package because tsgo exists — keep both until tooling APIs catch up.
 
 ## TDD with AI
@@ -60,7 +59,7 @@ Low value: pure presentational UI (manual/browser often cheaper).
 
 | Tool | Status |
 |------|--------|
-| Node 24, pnpm, Vite 8, Vitest, Oxlint, Oxfmt, Ultracite, tsgo, Playwright | default |
+| Node 24, pnpm, Vite 8, Vitest, Oxlint, Oxfmt, tsgo, Playwright | default |
 | `rolldown-vite` | Vite 7 bridge only |
 | `tsdown` | internal package builds |
 | React Doctor / husky | optional repo choices, not universal law |

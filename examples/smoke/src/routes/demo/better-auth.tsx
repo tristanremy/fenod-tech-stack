@@ -31,9 +31,7 @@ function BetterAuthDemo() {
           <div className="space-y-1.5">
             <p className="island-kicker mb-2">Better Auth</p>
             <h1 className="demo-title">Welcome back</h1>
-            <p className="demo-muted text-sm">
-              You're signed in as {session.user.email}
-            </p>
+            <p className="demo-muted text-sm">You're signed in as {session.user.email}</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -47,9 +45,7 @@ function BetterAuthDemo() {
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">
-                {session.user.name}
-              </p>
+              <p className="text-sm font-medium truncate">{session.user.name}</p>
               <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">
                 {session.user.email}
               </p>
@@ -117,9 +113,7 @@ function BetterAuthDemo() {
     <main className="demo-page demo-center">
       <section className="demo-panel w-full max-w-md">
         <p className="island-kicker mb-2">Better Auth</p>
-        <h1 className="demo-title">
-          {isSignUp ? "Create an account" : "Sign in"}
-        </h1>
+        <h1 className="demo-title">{isSignUp ? "Create an account" : "Sign in"}</h1>
         <p className="demo-muted mt-2 mb-6 text-sm">
           {isSignUp
             ? "Enter your information to create an account"
@@ -129,10 +123,7 @@ function BetterAuthDemo() {
         <form onSubmit={handleSubmit} className="grid gap-4">
           {isSignUp && (
             <div className="grid gap-2">
-              <label
-                htmlFor="name"
-                className="text-sm font-medium leading-none"
-              >
+              <label htmlFor="name" className="text-sm font-medium leading-none">
                 Name
               </label>
               <input
@@ -161,10 +152,7 @@ function BetterAuthDemo() {
           </div>
 
           <div className="grid gap-2">
-            <label
-              htmlFor="password"
-              className="text-sm font-medium leading-none"
-            >
+            <label htmlFor="password" className="text-sm font-medium leading-none">
               Password
             </label>
             <input
@@ -184,11 +172,7 @@ function BetterAuthDemo() {
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="demo-button w-full"
-          >
+          <button type="submit" disabled={loading} className="demo-button w-full">
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-neutral-400 border-t-white dark:border-neutral-600 dark:border-t-neutral-900" />
@@ -211,9 +195,7 @@ function BetterAuthDemo() {
             }}
             className="demo-muted text-sm transition-colors hover:text-[var(--sea-ink)]"
           >
-            {isSignUp
-              ? "Already have an account? Sign in"
-              : "Don't have an account? Sign up"}
+            {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
           </button>
         </div>
 

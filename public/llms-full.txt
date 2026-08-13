@@ -15,7 +15,7 @@ Docs: https://stack.fenod.fr
 
 ## Core defaults
 
-Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro/Starlight for content, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, TanStack AI+AI Gateway, Wrangler deploy, Infisical+Worker secrets, Oxlint+Oxfmt via Ultracite, tsgo, Vitest, Playwright.
+Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro/Starlight for content, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, TanStack AI+AI Gateway, Wrangler deploy, Infisical+Worker secrets, Oxlint+Oxfmt, tsgo, Vitest, Playwright.
 
 ## Also useful
 
@@ -55,7 +55,7 @@ Only then open long guides.
 
 ## Law in one breath
 
-> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt via Ultracite. Infisical + Worker secrets. Hono/ORPC only when an API boundary needs it. Smallest gate. No secrets in git, no prod authority, no stack thrash.
+> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt. Infisical + Worker secrets. Hono/ORPC only when an API boundary needs it. Smallest gate. No secrets in git, no prod authority, no stack thrash.
 
 ## Fast defaults
 
@@ -71,7 +71,7 @@ Only then open long guides.
 | AI | TanStack AI + AI Gateway |
 | Deploy | Wrangler (`wrangler.jsonc` + `wrangler deploy`) |
 | Secrets | Infisical + Worker secrets |
-| Lint/format | Oxlint + Oxfmt via Ultracite |
+| Lint/format | Oxlint + Oxfmt |
 | Types | tsgo (+ keep `typescript` installed) |
 | Tests | Vitest; Playwright for UI flows |
 
@@ -104,7 +104,7 @@ This page is **law**. If another page is longer, newer-looking, or more detailed
 
 One-liner:
 
-> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt via Ultracite. Infisical + Worker secrets. Hono/ORPC only when an API boundary needs it. Smallest gate. No secrets in git, no prod authority for agents, no stack thrash.
+> Node 24 + pnpm. TanStack Start + Workers. Drizzle/D1 + Better Auth. Tailwind v4 + shadcn. Wrangler. Oxlint + Oxfmt. Infisical + Worker secrets. Hono/ORPC only when an API boundary needs it. Smallest gate. No secrets in git, no prod authority for agents, no stack thrash.
 
 ## Authority
 
@@ -142,9 +142,8 @@ English is the Source Locale for contracts. French pages are human convenience, 
 | Secrets | **Infisical** + Cloudflare Worker secrets at runtime |
 | Observability | Workers Observability on every Worker; **Sentry** only for product / paying apps |
 | Rate limits | Cloudflare-native binding or DO — **no Redis** |
-| Lint | **Oxlint** |
-| Format | **Oxfmt** |
-| Lint/format UX | **Ultracite** as the repo command / shared config |
+| Lint | **Oxlint** (`pnpm lint`) |
+| Format | **Oxfmt** (`pnpm format` / `pnpm format:check`) |
 | Types | **tsgo** for `typecheck`; keep **`typescript`** installed for editor/tooling APIs |
 | Unit/integration tests | **Vitest** |
 | Browser tests | **Playwright** for real UI flows |
@@ -434,7 +433,7 @@ Agents do not send arbitrary email.
 
 ## Oxlint + Oxfmt, Not ESLint/Prettier
 
-Lint is Oxlint, format is Oxfmt, usually via Ultracite repo scripts. Do not add ESLint/Prettier beside them “for completeness.”
+Lint is Oxlint, format is Oxfmt. Do not add ESLint, Prettier, Biome, or Ultracite beside them “for completeness.”
 
 ## tsgo Does Not Replace the typescript Package
 
@@ -489,7 +488,7 @@ pnpm dlx @tanstack/cli@latest create my-app \
   --yes --non-interactive --no-git --no-toolchain
 ```
 
-Then align with law: **D1 not Postgres**, Ultracite (Oxlint/Oxfmt), Infisical, Wrangler observability.
+Then align with law: **D1 not Postgres**, Oxlint + Oxfmt, Infisical, Wrangler observability.
 
 Living reference in this repo: [`examples/smoke`](https://github.com/tristanremy/fenod-tech-stack/tree/main/examples/smoke) (`STACK.md` maps each law line).
 
@@ -1277,7 +1276,7 @@ JavaScript/TypeScript tooling defaults. **[Stack Contract](/stack-contract/) is 
 | Dev/build | Vite 8 + Rolldown | TanStack Start, Astro, or plain Vite |
 | Lint | **Oxlint** | Fast lint; no ESLint-by-default |
 | Format | **Oxfmt** | Fast format; no Prettier-by-default |
-| Lint/format UX | **Ultracite** | Repo scripts and shared config over bare ad hoc Oxc setup |
+| Lint/format scripts | `oxlint` / `oxfmt` | No ESLint, Prettier, Biome, or Ultracite wrapper |
 | Types | tsgo | Keep `typescript` installed for tooling APIs |
 | Unit/integration | Vitest | Vite-aware |
 | Browser | Playwright | Real UI flows |
@@ -1293,7 +1292,7 @@ Cloudflare’s VoidZero acquisition aligns runtime + tooling, and concentrates v
 | Vite 8 | new projects | — |
 | `rolldown-vite` | Vite 7 migration bridge | new projects |
 | Oxlint + Oxfmt | always | adding ESLint/Prettier “for completeness” |
-| Ultracite | default repo command | strong existing standard must be preserved temporarily |
+| Oxlint + Oxfmt scripts | default repo command | adding ESLint/Prettier/Biome/Ultracite beside them |
 | Vitest | default | browser-only behavior → Playwright |
 | tsdown | internal packages | app builds owned by the framework |
 | Vite+ | prototypes | production client baseline |
@@ -1307,7 +1306,8 @@ tsgo is the fast typecheck path. It does not fully replace the `typescript` pack
 Ship gate:
 
 ```bash
-pnpm lint        # Ultracite → Oxlint/Oxfmt
+pnpm lint        # oxlint .
+pnpm format:check
 pnpm typecheck   # tsgo --noEmit
 pnpm test        # Vitest
 ```

@@ -155,38 +155,30 @@ export async function remove(id: number) {
 ### Hono Server
 
 ```ts
-// apps/server/src/index.ts
-import { env } from "cloudflare:workers";
+// Same-origin default: no CORS. Session is resolved once, then injected.
 import { RPCHandler } from "@orpc/server/fetch";
 import { Hono } from "hono";
-import { cors } from "hono/cors";
-import { logger } from "hono/logger";
-import { auth } from "@my-app/auth";
-import { appRouter } from "@my-app/api/routers/index";
-import { createContext } from "@my-app/api/context";
+import { auth, getSession } from "#/lib/auth";
+import type { AuthSession } from "#/lib/auth";
+import router from "#/orpc/router";
 
-const app = new Hono();
+const app = new Hono<{ Variables: { session: AuthSession } }>();
+const rpcHandler = new RPCHandler(router);
 
-app.use(logger());
-app.use("/*", cors({
-  origin: env.CORS_ORIGIN || "",
-  allowMethods: ["GET", "POST", "OPTIONS"],
-  allowHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-}));
+app.all("/api/auth/*", (c) => auth.handler(c.req.raw));
 
-app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
-
-const rpcHandler = new RPCHandler(appRouter);
-
-app.use("/*", async (c, next) => {
-  const context = await createContext({ context: c });
-  const result = await rpcHandler.handle(c.req.raw, {
-    prefix: "/rpc",
-    context,
-  });
-  if (result.matched) return c.newResponse(result.response.body);
+app.use("/api/rpc/*", async (c, next) => {
+  c.set("session", await getSession(c.req.raw.headers));
   await next();
+});
+
+app.use("/api/rpc/*", async (c) => {
+  const { matched, response } = await rpcHandler.handle(c.req.raw, {
+    prefix: "/api/rpc",
+    context: { session: c.get("session") },
+  });
+  if (matched && response) return c.newResponse(response.body, response);
+  return c.text("Not Found", 404);
 });
 
 export default app;
@@ -408,11 +400,10 @@ function BulkImportButton({ urls }: { urls: string[] }) {
 ### Server Setup (Better Auth)
 
 ```ts
-import { betterAuth } from "better-auth";
+import { betterAuth } from "better-auth/minimal";
 
 export const auth = betterAuth({
-  database: env.DB, // D1 binding — auto-detected in v1.5.0+
-  experimental: { joins: true },
+  database: drizzleAdapter(getDb(), { provider: "sqlite", schema }),
 
   emailAndPassword: {
     enabled: true,
@@ -426,7 +417,7 @@ export const auth = betterAuth({
     cookieCache: {
       enabled: true,
       maxAge: 5 * 60,
-      strategy: "jwe",
+      strategy: "compact",
     },
   },
 
@@ -1489,24 +1480,22 @@ export default defineConfig({
 
 ### Wrangler Config
 
+Do not put `BETTER_AUTH_SECRET` in `vars`. Use Infisical / `wrangler secret`. Same-origin apps do not need CORS `*`.
+
 ```jsonc
 // wrangler.jsonc
 {
   "name": "my-app",
-  "compatibility_date": "2025-01-20",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_date": "2026-08-04",
   "main": "@tanstack/react-start/server-entry",
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "my-db",
-      "database_id": "your-database-id"
+      "database_id": "your-database-id",
+      "migrations_dir": "drizzle"
     }
-  ],
-  "vars": {
-    "BETTER_AUTH_SECRET": "your-secret",
-    "BETTER_AUTH_URL": "https://your-app.workers.dev"
-  }
+  ]
 }
 ```
 

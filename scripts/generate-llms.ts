@@ -4,7 +4,7 @@ const baseUrl = 'https://stack.fenod.fr';
 
 /** Keep in lockstep with stack-contract.md — this is the agent machine surface. */
 const coreDefaults =
-  'Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro/Starlight for content, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, TanStack AI+AI Gateway, Wrangler deploy, Infisical+Worker secrets, Oxlint+Oxfmt via Ultracite, tsgo, Vitest, Playwright.';
+  'Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro/Starlight for content, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, TanStack AI+AI Gateway, Wrangler deploy, Infisical+Worker secrets, Oxlint+Oxfmt, tsgo, Vitest, Playwright.';
 
 const docs = [
   ['AI Index', 'ai-index'],

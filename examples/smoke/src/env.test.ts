@@ -8,8 +8,6 @@ describe("validateNodeEnv", () => {
   });
 
   it("rejects invalid NODE_ENV", () => {
-    expect(() => validateNodeEnv({ NODE_ENV: "nope" })).toThrow(
-      /Invalid Node env/u
-    );
+    expect(() => validateNodeEnv({ NODE_ENV: "nope" })).toThrow(/Invalid Node env/u);
   });
 });

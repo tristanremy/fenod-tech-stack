@@ -14,7 +14,7 @@ Defaults JS/TS. **[Contrat de Stack](/fr/stack-contract/) est la loi.**
 | Dev/build | Vite 8 + Rolldown |
 | Lint | **Oxlint** |
 | Format | **Oxfmt** |
-| UX lint/format | **Ultracite** |
+| Scripts lint/format | `oxlint` / `oxfmt` |
 | Types | tsgo (+ garder `typescript`) |
 | Tests | Vitest; Playwright pour UI |
 | Packages internes | tsdown |

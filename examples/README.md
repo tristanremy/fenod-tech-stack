@@ -2,7 +2,7 @@
 
 | Path | Role |
 |------|------|
-| [`smoke/`](./smoke/) | **Law reference app** — single-package TanStack Start + Workers + D1 + Better Auth + Wrangler + Ultracite |
+| [`smoke/`](./smoke/) | **Law reference app** — single-package TanStack Start + Workers + D1 + Better Auth + Hono/oRPC + Wrangler + Oxlint/Oxfmt |
 
 ## Start a real product from smoke
 

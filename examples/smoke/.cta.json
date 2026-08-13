@@ -9,7 +9,7 @@
   "intent": false,
   "addOnOptions": {
     "drizzle": {
-      "database": "postgresql"
+      "database": "d1"
     }
   },
   "projectPreset": "default",
@@ -17,12 +17,5 @@
   "routerOnly": false,
   "version": 1,
   "framework": "react",
-  "chosenAddOns": [
-    "oRPC",
-    "drizzle",
-    "better-auth",
-    "shadcn",
-    "tanstack-query",
-    "cloudflare"
-  ]
+  "chosenAddOns": ["oRPC", "drizzle", "better-auth", "shadcn", "tanstack-query", "cloudflare"]
 }

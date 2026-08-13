@@ -18,7 +18,7 @@ pnpm dlx @tanstack/cli@latest create my-app \
   --yes --non-interactive --no-git --no-toolchain
 ```
 
-Then align with law: **D1 not Postgres**, Ultracite (Oxlint/Oxfmt), Infisical, Wrangler observability.
+Then align with law: **D1 not Postgres**, Oxlint + Oxfmt, Infisical, Wrangler observability.
 
 Living reference in this repo: [`examples/smoke`](https://github.com/tristanremy/fenod-tech-stack/tree/main/examples/smoke) (`STACK.md` maps each law line).
 

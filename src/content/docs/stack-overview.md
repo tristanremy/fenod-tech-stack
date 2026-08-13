@@ -31,7 +31,7 @@ Operating view of the Fenod stack. **[Stack Contract](/stack-contract/) is law.*
 | AI | TanStack AI + AI Gateway | App state + routed provider keys |
 | Deploy | Wrangler | One Worker config for most SME apps |
 | Secrets | Infisical + Worker secrets | No plaintext env in git |
-| Lint/format | Oxlint + Oxfmt via Ultracite | Fast VoidZero path, one repo command |
+| Lint/format | Oxlint + Oxfmt | Fast VoidZero path, one repo command |
 | Types/tests | tsgo, Vitest, Playwright | Fast check + real behavior |
 
 Day-one shape is **one app package**. Monorepo, Alchemy, Postgres, and full offline are trigger-based — see the Stack Contract.
@@ -52,7 +52,7 @@ Prefer Vite 8, Vitest, Oxlint/Oxfmt, Rolldown, and tsdown because they match the
 | Vite 8 + Rolldown | default for new projects |
 | `rolldown-vite` | Vite 7 migration bridge only |
 | Vitest / Playwright | default tests |
-| Oxlint + Oxfmt / Ultracite | default lint/format |
+| Oxlint + Oxfmt | default lint/format |
 | tsgo (+ `typescript` package kept) | default typecheck |
 | tsdown | internal package builds |
 | Vite+ | experimental prototypes only |

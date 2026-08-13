@@ -8,7 +8,7 @@ Les recettes implementent le [Contrat de Stack](/fr/stack-contract/). Rester cou
 
 ## Demarrer une app full-stack
 
-Voir page EN [/recipes/](/recipes/) et la reference vivante `examples/smoke` (D1, Wrangler, Ultracite). Un package. Pas de monorepo day-one.
+Voir page EN [/recipes/](/recipes/) et la reference vivante `examples/smoke` (D1, Wrangler, Oxlint + Oxfmt). Un package. Pas de monorepo day-one.
 
 ## Ajouter une feature API
 
