@@ -29,7 +29,7 @@ Operating view of the Fenod stack. **[Stack Contract](/stack-contract/) is law.*
 | Auth | Better Auth | TypeScript-first, D1-friendly |
 | UI | Tailwind v4 + shadcn/ui | Fast product UI with a maintainable base |
 | AI | TanStack AI + AI Gateway | App state + routed provider keys |
-| Deploy | Wrangler | One Worker config for most SME apps |
+| Deploy | Workers | One Worker: Git-connect / Wrangler. Shared multi-Worker graph: Alchemy |
 | Secrets | Infisical + Worker secrets | No plaintext env in git |
 | Lint/format | Oxlint + Oxfmt | Fast VoidZero path, one repo command |
 | Types/tests | tsgo, Vitest, Playwright | Fast check + real behavior |

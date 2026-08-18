@@ -39,7 +39,7 @@ L'anglais est la Source Locale des contrats. Cette page FR est une commodite hum
 | Jobs | **Queues / Workflows** |
 | Coordination | **Durable Objects** si besoin |
 | AI | **TanStack AI** + **AI Gateway** |
-| Deploy | **`wrangler.jsonc` + `wrangler deploy`** |
+| Deploy | **Workers**, jamais de nouveau Pages. **1 Worker** → Git-connect ou CI `wrangler deploy`. **2+ Workers qui partagent des bindings** → **Alchemy** via GitHub Action. L'agent pousse Git ; il ne deploie pas. |
 | Secrets | **Infisical** + secrets Worker |
 | Observability | Workers Observability; Sentry pour apps produit |
 | Rate limits | natif CF / DO — **pas de Redis** |
@@ -68,10 +68,19 @@ app/
 |---------|-------|
 | 2e deployable / libs partagees | monorepo |
 | API multi-consumers | slices Hono/ORPC |
-| 4+ ressources CF, 3+ stages, multi-compte | Alchemy v2 |
+| 2+ Workers qui partagent D1 / R2 / KV / queues / domaines | **Alchemy** — l'Action deploie la plus petite unite |
+| 4+ ressources CF, 3+ stages, multi-compte | **Alchemy** |
+| 1 Worker (site Astro, app Start/Hono) | **Workers Builds Git-connect** ou CI `wrangler deploy` |
 | Reporting / mandat Postgres / plafond D1 | Postgres (+ Hyperdrive) |
 | Vrai offline terrain | design projet; Query persist sinon |
-| Site Pages deja connecte | garder Pages pour ce site |
+| Site Pages deja connecte | garder Pages pour ce site seulement |
+
+## Qui deploie
+
+- L'agent ne parle pas a Cloudflare pour staging/prod. Il pousse Git.
+- 1 Worker : Workers Builds (Git-connect) ou CI `wrangler deploy`.
+- 2+ Workers Alchemy : GitHub Action lance Alchemy. Ne pas Git-connecter ces Workers.
+- Pages n'est pas eteint, mais gele. Pas de nouveau projet Pages.
 
 ## Verification
 

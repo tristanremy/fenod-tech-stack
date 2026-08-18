@@ -34,7 +34,7 @@ Pas ESLint/Prettier "en plus".
 
 ## Alchemy / Redis / Drizzle v1 / D1 / KV / R2 / AI Gateway / email
 
-Meme regles que la page EN: Wrangler par defaut; pas de Redis; Drizzle 0.4x; D1=SQLite; KV≠DB; R2=objets; cles via AI Gateway; agents n'envoient pas d'emails arbitraires.
+Meme regles que la page EN: Wrangler ou Git-connect pour 1 Worker; Alchemy si 2+ Workers partagent des bindings; ne pas Git-connecter un Worker Alchemy; l'agent ne deploie pas; pas de Redis; Drizzle 0.4x; D1=SQLite; KV≠DB; R2=objets; cles via AI Gateway; agents n'envoient pas d'emails arbitraires.
 
 ## FR n'est pas une seconde loi
 

@@ -9,9 +9,12 @@ description: Deploy and operate Fenod projects on Cloudflare — Wrangler-first 
 
 ## Golden rules
 
-- **Workers everywhere**, including static assets. Pages only for already-connected legacy static/docs sites.
-- **Default:** `wrangler.jsonc` + `wrangler deploy`.
-- **Alchemy v2 only when triggered:** 4+ CF resources with shared lifecycle, 3+ stages beyond Wrangler envs, infra tests/OTel as code, or multiple accounts.
+- **Workers everywhere**, including static assets. Pages is not sunset, but frozen — no new Pages projects.
+- **Who deploys:** agents push Git. They do not run `wrangler deploy` or `alchemy deploy` to staging/prod.
+- **One Worker:** Workers Builds Git-connect, or CI `wrangler.jsonc` + `wrangler deploy`.
+- **2+ Workers that share bindings:** Alchemy via GitHub Action. Never Git-connect those Workers — that overwrites bindings outside Alchemy state.
+- **Alchemy also when:** 4+ CF resources with shared lifecycle, 3+ stages, infra tests/OTel as code, or multiple accounts.
+- **Smallest Alchemy unit:** site files → site; admin → admin; API/DB/auth/bindings → core; two units or shared config → all.
 - Never use Alchemy v1 examples. Package is `alchemy`. Effect stays inside Alchemy config — not app architecture law.
 - Every Worker: `observability.enabled = true` + an error alert. Product apps add Sentry.
 - Rate limits: Workers rate limiting binding or DO. **No Redis.**
@@ -56,7 +59,9 @@ env -u CLOUDFLARE_API_TOKEN wrangler deploy --env staging
 
 ## Alchemy
 
-Only after triggers match. See `deployment.md` for the Effect-based v2 shape. Do not scaffold `alchemy.run.ts` on day-one SME apps.
+Only after triggers match. See `deployment.md`. Do not scaffold `alchemy.run.ts` on a one-Worker SME app.
+
+GitHub Action owns Cloudflare tokens (`staging` / `production` environments). Push `dev` deploys staging. Push `main` deploys prod behind protection. A branch preview is not staging.
 
 ## Compute chooser
 

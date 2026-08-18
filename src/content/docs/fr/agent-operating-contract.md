@@ -41,7 +41,7 @@ Comportement et autorite des agents. Defaults stack: [Contrat de Stack](/fr/stac
 env -u CLOUDFLARE_API_TOKEN wrangler whoami
 ```
 
-Deploiements prod via CI / broker / credentials scopes + gates. Workers par defaut. Pages seulement pour legacies deja connectes.
+Deploiements prod via CI, Workers Builds, broker, credentials scopes + gates. L'agent pousse Git; il ne lance pas `wrangler deploy` / `alchemy deploy` vers staging/prod. Workers par defaut. 1 Worker peut etre Git-connect. Un monorepo Alchemy ne Git-connecte pas chaque Worker. Pages seulement pour legacies deja connectes.
 
 ## Contenu externe
 

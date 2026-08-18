@@ -74,7 +74,11 @@ tsgo is the fast typecheck path. Keep `typescript` installed for tooling that st
 
 ## Alchemy Is Not Default Deploy
 
-Default is Wrangler. Alchemy v2 only on multi-resource / multi-stage / multi-account triggers. Package is `alchemy`; v1 examples are dead. Effect samples are Alchemy-only, not app architecture law.
+Default is Wrangler or Workers Builds Git-connect for **one Worker**. Use Alchemy when **two or more Workers share bindings**, or on the other contract triggers. Package is `alchemy`; v1 examples are dead. Effect samples are Alchemy-only, not app architecture law.
+
+Do not Git-connect Workers that Alchemy owns. Cloudflare would deploy one script and skip Alchemy state/bindings.
+
+Agents do not deploy. They push Git. Staging/prod credentials stay in GitHub environments.
 
 ## Redis Does Not Belong
 

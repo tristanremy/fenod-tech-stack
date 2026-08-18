@@ -27,7 +27,7 @@ Vue operationnelle. **[Contrat de Stack](/fr/stack-contract/) est la loi** (sour
 | Auth | Better Auth | TS-first, D1-friendly |
 | UI | Tailwind v4 + shadcn/ui | UI produit rapide |
 | AI | TanStack AI + AI Gateway | Etat app + cles routees |
-| Deploy | Wrangler | Un Worker pour la plupart des apps PME |
+| Deploy | Workers | 1 Worker: Git-connect / Wrangler. 2+ Workers partages: Alchemy |
 | Secrets | Infisical + secrets Worker | Pas d'env plaintext dans git |
 | Lint/format | Oxlint + Oxfmt | Chemin VoidZero rapide |
 | Types/tests | tsgo, Vitest, Playwright | Check rapide + comportement reel |

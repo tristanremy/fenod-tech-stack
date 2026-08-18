@@ -100,11 +100,32 @@ export default {
 
 ---
 
+## Qui deploie
+
+L'agent ne deploie pas staging/prod. Il valide, commit, pousse. Detail EN: [/deployment/](/deployment/).
+
+| Forme du repo | Qui deploie | Interdit |
+|------|-------------|----------|
+| **1 Worker** (Astro, app Start/Hono) | **Workers Builds** Git-connect, ou Action `wrangler deploy` | nouveau Pages ; `wrangler deploy` par l'agent |
+| **Monorepo Alchemy** (2+ Workers qui partagent D1/R2/KV/queues) | **GitHub Action → Alchemy**, plus petite unite | Git-connecter chaque Worker ; `alchemy deploy` par l'agent |
+| Site Pages deja connecte | garder Pages | migrer seulement si une feature Worker manque |
+
+Git-connect = **1 repo → 1 Worker**. Ca n'ecrit pas l'etat Alchemy et peut ecraser les bindings.
+
+Push `dev` → Action staging. Push `main` → Action prod protegee. PR → CI seulement.
+
+| Fichiers changes | Unite |
+|------------------|-------|
+| site / contenu | site |
+| admin seul | admin |
+| API, Drizzle, auth, bindings | core |
+| 2 unites, config partagee, Alchemy | all |
+
+Une preview de branche n'est pas le staging.
+
 ## Default d'Hebergement Cloudflare
 
-Pour les nouveaux projets Fenod, preferer **Cloudflare Workers** comme surface de deploiement, y compris Workers Static Assets pour les sites statiques/docs/contenu. Workers couvre assets statiques, apps framework, APIs, bindings et routing de requetes dans un seul modele.
-
-Utiliser **Cloudflare Pages** quand un projet docs/statique est deja connecte a GitHub et que l'integration Pages reste le chemin de publication le plus simple. Ce Fenod Stack Handbook peut rester sur Pages pour cette raison, mais les nouveaux starters d'app doivent cibler Workers d'abord.
+Le neuf Fenod va sur **Workers**. Pages n'est pas eteint, mais gele. Pas de nouveau projet Pages. Un site Pages deja connecte peut rester.
 
 ## Default Path: Wrangler
 

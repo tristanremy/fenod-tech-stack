@@ -69,7 +69,7 @@ Only then open long guides.
 | Auth | Better Auth |
 | UI | Tailwind v4 + shadcn/ui |
 | AI | TanStack AI + AI Gateway |
-| Deploy | Wrangler (`wrangler.jsonc` + `wrangler deploy`) |
+| Deploy | Workers. One Worker: Git-connect or CI Wrangler. Shared multi-Worker graph: Alchemy via GitHub Action |
 | Secrets | Infisical + Worker secrets |
 | Lint/format | Oxlint + Oxfmt |
 | Types | tsgo (+ keep `typescript` installed) |
@@ -80,6 +80,7 @@ Only then open long guides.
 - Day one: **one app package**, not a monorepo.
 - No hexagonal / repository theater around Drizzle.
 - Alchemy, Postgres, full offline, Pages: **triggers only** — see Stack Contract.
+- Agents push Git. They do not deploy staging/prod.
 
 ## Rule of thumb
 
@@ -138,7 +139,7 @@ English is the Source Locale for contracts. French pages are human convenience, 
 | Stateful coordination | **Durable Objects** only when needed |
 | Edge cache | Workers Cache + `Cache-Control` / `Cache-Tag` for public SSR and cacheable GET APIs |
 | AI in apps | **TanStack AI** + **Cloudflare AI Gateway** (provider keys in gateway, never in the browser) |
-| Deploy | **`wrangler.jsonc` + `wrangler deploy`** |
+| Deploy | **Workers**, never new Pages. **One Worker** → Git-connect or CI `wrangler deploy`. **2+ Workers that share bindings** → **Alchemy** via GitHub Action. Agents push Git; they do not deploy. |
 | Secrets | **Infisical** + Cloudflare Worker secrets at runtime |
 | Observability | Workers Observability on every Worker; **Sentry** only for product / paying apps |
 | Rate limits | Cloudflare-native binding or DO — **no Redis** |
@@ -161,8 +162,10 @@ English is the Source Locale for contracts. French pages are human convenience, 
 - Vercel AI SDK for new app code unless an unsupported workflow forces it
 - Clean / hexagonal ceremony for small apps
 - repository interfaces around Drizzle without real pain
-- Alchemy as day-one deploy
+- Alchemy as day-one deploy for a one-Worker app
 - Cloudflare Pages for new projects
+- Git-connecting each Worker in an Alchemy monorepo
+- `wrangler deploy` / `alchemy deploy` from an agent session to staging or prod
 - Redis
 - Global API Key or broad account-scoped deploy tokens
 - plaintext secrets in Git, prompts, issues, or client bundles
@@ -202,7 +205,9 @@ Add Hono only when the HTTP/API boundary needs it. Do not create `apps/web` + `a
 |---------|----------|
 | Second deployable or shared library across apps | monorepo + packages (+ Turborepo if orchestration hurts) |
 | Multiple API consumers or thick procedures | feature slices under `packages/api` or `src/server` |
-| 4+ Cloudflare resources with shared lifecycle, 3+ real stages, multi-account, or infra-as-code tests | **Alchemy v2** |
+| 2+ Workers that share D1 / R2 / KV / Queues / domains | **Alchemy** — GitHub Action deploys the smallest unit |
+| 4+ Cloudflare resources with shared lifecycle, 3+ real stages, multi-account, or infra-as-code tests | **Alchemy** |
+| One Worker (Astro site, one-package Start/Hono app) | **Workers Builds Git-connect** or CI `wrangler deploy` |
 | Reporting needs, client Postgres mandate, or D1 limits hit | **Postgres** (+ Hyperdrive if staying on Cloudflare) |
 | Users regularly work offline in the field | project-specific offline design — Query persist is enough otherwise |
 | Existing docs/static site already on Pages and switching costs more than it saves | keep **Pages** for that site only |
@@ -230,6 +235,9 @@ env -u CLOUDFLARE_API_TOKEN wrangler whoami
 ```
 
 - Production deploys, D1 migrations, DNS, and destroys go through CI / broker / explicit human approval.
+- **Who deploys:** the agent never talks to Cloudflare for staging/prod. Push Git. Cloudflare Workers Builds deploys a one-Worker repo. A GitHub Action runs Alchemy for a multi-Worker repo. Do not Git-connect Workers that Alchemy owns — that overwrites bindings outside Alchemy state.
+- **Smallest Alchemy unit:** site-only files → site app; admin-only → admin; API/DB/auth/bindings → core; two or more units or shared config → all.
+- Pages is not sunset, but it is frozen. New Fenod work is Workers. Do not start new Pages projects.
 - AI provider keys: AI Gateway stored keys / BYOK in production.
 
 ## Verification
@@ -327,7 +335,7 @@ How agents operate in Fenod repos. Stack defaults live in the [Stack Contract](/
 env -u CLOUDFLARE_API_TOKEN wrangler whoami
 ```
 
-Production deploys go through GitHub Actions, a deploy broker, or another path with resource-scoped credentials and approval gates. Prefer Workers. Pages only for already-connected legacy static/docs projects.
+Production deploys go through GitHub Actions, Workers Builds, a deploy broker, or another path with resource-scoped credentials and approval gates. Agents push Git; they do not run `wrangler deploy` or `alchemy deploy` to staging/prod. Prefer Workers. One Worker may Git-connect. Alchemy monorepos must not Git-connect each Worker. Pages only for already-connected legacy static/docs projects.
 
 ## External content
 
@@ -441,7 +449,11 @@ tsgo is the fast typecheck path. Keep `typescript` installed for tooling that st
 
 ## Alchemy Is Not Default Deploy
 
-Default is Wrangler. Alchemy v2 only on multi-resource / multi-stage / multi-account triggers. Package is `alchemy`; v1 examples are dead. Effect samples are Alchemy-only, not app architecture law.
+Default is Wrangler or Workers Builds Git-connect for **one Worker**. Use Alchemy when **two or more Workers share bindings**, or on the other contract triggers. Package is `alchemy`; v1 examples are dead. Effect samples are Alchemy-only, not app architecture law.
+
+Do not Git-connect Workers that Alchemy owns. Cloudflare would deploy one script and skip Alchemy state/bindings.
+
+Agents do not deploy. They push Git. Staging/prod credentials stay in GitHub environments.
 
 ## Redis Does Not Belong
 
@@ -1442,15 +1454,44 @@ export default {
 
 ---
 
+## Who deploys
+
+Agents do not deploy staging or production. They validate, commit, and push. Cloudflare or GitHub owns the deploy credentials.
+
+| Repo shape | Who deploys | Do not |
+|------|-------------|--------|
+| **One Worker** (Astro site, one-package Start/Hono) | **Workers Builds** Git-connect, or a GitHub Action that runs `wrangler deploy` | New Pages project; agent `wrangler deploy` |
+| **Alchemy monorepo** (2+ Workers that share D1 / R2 / KV / Queues / domains) | **GitHub Action → Alchemy**, smallest unit | Git-connect each Worker; agent `alchemy deploy` |
+| Existing Pages docs site already connected | keep that Pages project | migrate only when a Worker feature is required |
+
+Git-connect is **one repo → one Worker**. Cloudflare then runs build + `wrangler deploy` on that Worker. It does not update Alchemy state and can overwrite bindings.
+
+Alchemy owns the **graph**: Worker names, D1, R2, KV, queues, domains, and bindings. A later `alchemy deploy` will fight a Git-connected Worker.
+
+### Alchemy monorepo router
+
+Push `dev` → staging Action. Push `main` → production Action (protected). PRs run CI only.
+
+| Changed files | Deploy unit |
+|---------------|-------------|
+| public site / content only | site app (`alchemy.site.ts`) |
+| admin SPA only | admin app |
+| API, Drizzle, auth, bindings | core app |
+| two units, shared config, lockfile, Alchemy config | all (`alchemy.run.ts`) |
+
+A branch preview URL is not staging. Staging has the real D1 / R2 / domains.
+
+Destructive D1 work is never a normal push deploy.
+
 ## Cloudflare Hosting Default
 
-For new Fenod projects, prefer **Cloudflare Workers** as the deployment surface, including Workers Static Assets for static/docs/content sites. Workers cover static assets, framework apps, APIs, bindings, and request routing in one model.
+New Fenod work is **Cloudflare Workers**, including Workers Static Assets for Astro/Starlight/static sites. Pages is **not sunset**, but new features land on Workers. Do not start new Pages projects.
 
-Use **Cloudflare Pages** when a docs/static project is already connected to GitHub and the Pages integration is the lowest-friction publishing path. This Fenod Stack Handbook can stay on Pages for that reason, but new app starters should target Workers first.
+Keep an existing Pages site only when it is already connected and switching costs more than it saves. This handbook may stay on Pages for that reason.
 
 ## Default Path: Wrangler
 
-For a typical SME app or site, use `wrangler.jsonc` and `wrangler deploy`. A one-Worker project with D1, KV, R2, static assets, and secrets does not need an IaC framework.
+For a typical SME app or site, use `wrangler.jsonc` and `wrangler deploy`. A one-Worker project with D1, KV, R2, static assets, and secrets does not need an IaC framework. Prefer Workers Builds Git-connect so the agent never needs a Cloudflare token.
 
 ```jsonc
 {
@@ -1500,7 +1541,9 @@ A project uses Alchemy v2 instead of plain Wrangler when **any** of these hold:
 - infra-level tests or OTel wiring as code;
 - multiple Cloudflare accounts.
 
-Everything else (typical SME site/app: one Worker, one D1, maybe one R2): Wrangler only.
+Also use Alchemy as soon as **two Workers share bindings**. Then GitHub Actions call the smallest Alchemy app. Do not Git-connect those Workers.
+
+Everything else (typical SME site/app: one Worker, one D1, maybe one R2): Wrangler or Workers Builds only.
 
 ## Alchemy v2 Setup
 

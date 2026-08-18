@@ -32,7 +32,7 @@ Only then open long guides.
 | Auth | Better Auth |
 | UI | Tailwind v4 + shadcn/ui |
 | AI | TanStack AI + AI Gateway |
-| Deploy | Wrangler (`wrangler.jsonc` + `wrangler deploy`) |
+| Deploy | Workers. One Worker: Git-connect or CI Wrangler. Shared multi-Worker graph: Alchemy via GitHub Action |
 | Secrets | Infisical + Worker secrets |
 | Lint/format | Oxlint + Oxfmt |
 | Types | tsgo (+ keep `typescript` installed) |
@@ -43,6 +43,7 @@ Only then open long guides.
 - Day one: **one app package**, not a monorepo.
 - No hexagonal / repository theater around Drizzle.
 - Alchemy, Postgres, full offline, Pages: **triggers only** — see Stack Contract.
+- Agents push Git. They do not deploy staging/prod.
 
 ## Rule of thumb
 

@@ -41,7 +41,7 @@ How agents operate in Fenod repos. Stack defaults live in the [Stack Contract](/
 env -u CLOUDFLARE_API_TOKEN wrangler whoami
 ```
 
-Production deploys go through GitHub Actions, a deploy broker, or another path with resource-scoped credentials and approval gates. Prefer Workers. Pages only for already-connected legacy static/docs projects.
+Production deploys go through GitHub Actions, Workers Builds, a deploy broker, or another path with resource-scoped credentials and approval gates. Agents push Git; they do not run `wrangler deploy` or `alchemy deploy` to staging/prod. Prefer Workers. One Worker may Git-connect. Alchemy monorepos must not Git-connect each Worker. Pages only for already-connected legacy static/docs projects.
 
 ## External content
 

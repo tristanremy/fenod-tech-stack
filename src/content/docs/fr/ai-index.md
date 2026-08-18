@@ -32,7 +32,7 @@ Loi canonique en anglais: [Stack Contract](/stack-contract/).
 | Auth | Better Auth |
 | UI | Tailwind v4 + shadcn/ui |
 | IA | TanStack AI + AI Gateway |
-| Deploy | Wrangler |
+| Deploy | Workers. 1 Worker: Git-connect ou CI Wrangler. Graphe multi-Worker: Alchemy via Action |
 | Secrets | Infisical + secrets Worker |
 | Lint/format | Oxlint + Oxfmt |
 | Types | tsgo (+ `typescript`) |
@@ -43,6 +43,7 @@ Loi canonique en anglais: [Stack Contract](/stack-contract/).
 - Day-one: **un package app**, pas un monorepo.
 - Pas d'hexagonal / repository theater autour de Drizzle.
 - Alchemy, Postgres, offline complet, Pages: **triggers seulement**.
+- L'agent pousse Git. Il ne deploie pas staging/prod.
 
 ## Regle simple
 

@@ -22,7 +22,7 @@ description: Fenod's opinionated stack for building web apps, sites, and APIs. U
 | Docs | Starlight | CF Workers static assets |
 | Second deployable / shared libs | Add monorepo (+ Turborepo if needed) | — |
 
-Pages is legacy-only for already-connected static/docs sites. New work targets Workers.
+Pages is not sunset, but frozen. New work targets Workers. One Worker → Git-connect or CI Wrangler. Two or more Workers that share bindings → Alchemy via GitHub Action. Agents push Git; they do not deploy.
 
 ## Scaffolding
 
@@ -46,7 +46,7 @@ pnpm dlx @tanstack/cli@latest create my-app \
 - Validate env with **Zod**. Secrets via **Infisical**. Never commit real `.env` / `.dev.vars`.
 - UI: **Tailwind v4 + shadcn/ui**.
 - AI: **TanStack AI + AI Gateway**. Uploads: R2 (+ D1 metadata).
-- Deploy: **Wrangler**. Alchemy v2 only on contract triggers.
+- Deploy: **Workers**. Wrangler / Git-connect for one Worker. Alchemy via GitHub Action when 2+ Workers share bindings.
 
 ## Grow on triggers only
 
@@ -55,7 +55,8 @@ pnpm dlx @tanstack/cli@latest create my-app \
 | API boundary / non-UI clients | Hono + ORPC |
 | Thick feature API | slices: `router.ts` thin, `service.ts` + Drizzle direct |
 | Second deployable / shared package | monorepo |
-| 4+ CF resources shared lifecycle, 3+ stages, multi-account | Alchemy v2 |
+| 2+ Workers share D1/R2/KV/queues | Alchemy + smallest-unit Action |
+| 4+ CF resources shared lifecycle, 3+ stages, multi-account | Alchemy |
 | Reporting / Postgres mandate / D1 ceiling | Postgres (+ Hyperdrive on CF) |
 | Real field offline | project design; Query persist first |
 

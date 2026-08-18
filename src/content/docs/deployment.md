@@ -101,15 +101,44 @@ export default {
 
 ---
 
+## Who deploys
+
+Agents do not deploy staging or production. They validate, commit, and push. Cloudflare or GitHub owns the deploy credentials.
+
+| Repo shape | Who deploys | Do not |
+|------|-------------|--------|
+| **One Worker** (Astro site, one-package Start/Hono) | **Workers Builds** Git-connect, or a GitHub Action that runs `wrangler deploy` | New Pages project; agent `wrangler deploy` |
+| **Alchemy monorepo** (2+ Workers that share D1 / R2 / KV / Queues / domains) | **GitHub Action → Alchemy**, smallest unit | Git-connect each Worker; agent `alchemy deploy` |
+| Existing Pages docs site already connected | keep that Pages project | migrate only when a Worker feature is required |
+
+Git-connect is **one repo → one Worker**. Cloudflare then runs build + `wrangler deploy` on that Worker. It does not update Alchemy state and can overwrite bindings.
+
+Alchemy owns the **graph**: Worker names, D1, R2, KV, queues, domains, and bindings. A later `alchemy deploy` will fight a Git-connected Worker.
+
+### Alchemy monorepo router
+
+Push `dev` → staging Action. Push `main` → production Action (protected). PRs run CI only.
+
+| Changed files | Deploy unit |
+|---------------|-------------|
+| public site / content only | site app (`alchemy.site.ts`) |
+| admin SPA only | admin app |
+| API, Drizzle, auth, bindings | core app |
+| two units, shared config, lockfile, Alchemy config | all (`alchemy.run.ts`) |
+
+A branch preview URL is not staging. Staging has the real D1 / R2 / domains.
+
+Destructive D1 work is never a normal push deploy.
+
 ## Cloudflare Hosting Default
 
-For new Fenod projects, prefer **Cloudflare Workers** as the deployment surface, including Workers Static Assets for static/docs/content sites. Workers cover static assets, framework apps, APIs, bindings, and request routing in one model.
+New Fenod work is **Cloudflare Workers**, including Workers Static Assets for Astro/Starlight/static sites. Pages is **not sunset**, but new features land on Workers. Do not start new Pages projects.
 
-Use **Cloudflare Pages** when a docs/static project is already connected to GitHub and the Pages integration is the lowest-friction publishing path. This Fenod Stack Handbook can stay on Pages for that reason, but new app starters should target Workers first.
+Keep an existing Pages site only when it is already connected and switching costs more than it saves. This handbook may stay on Pages for that reason.
 
 ## Default Path: Wrangler
 
-For a typical SME app or site, use `wrangler.jsonc` and `wrangler deploy`. A one-Worker project with D1, KV, R2, static assets, and secrets does not need an IaC framework.
+For a typical SME app or site, use `wrangler.jsonc` and `wrangler deploy`. A one-Worker project with D1, KV, R2, static assets, and secrets does not need an IaC framework. Prefer Workers Builds Git-connect so the agent never needs a Cloudflare token.
 
 ```jsonc
 {
@@ -159,7 +188,9 @@ A project uses Alchemy v2 instead of plain Wrangler when **any** of these hold:
 - infra-level tests or OTel wiring as code;
 - multiple Cloudflare accounts.
 
-Everything else (typical SME site/app: one Worker, one D1, maybe one R2): Wrangler only.
+Also use Alchemy as soon as **two Workers share bindings**. Then GitHub Actions call the smallest Alchemy app. Do not Git-connect those Workers.
+
+Everything else (typical SME site/app: one Worker, one D1, maybe one R2): Wrangler or Workers Builds only.
 
 ## Alchemy v2 Setup
 
