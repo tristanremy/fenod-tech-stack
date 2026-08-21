@@ -45,7 +45,7 @@ pnpm dlx @tanstack/cli@latest create my-app \
 - **tsgo** for typecheck; keep `typescript` installed.
 - Validate env with **Zod**. Secrets via **Infisical**. Never commit real `.env` / `.dev.vars`.
 - UI: **Tailwind v4 + shadcn/ui**.
-- AI: **TanStack AI + AI Gateway**. Uploads: R2 (+ D1 metadata).
+- AI: **TanStack AI + AI Gateway**. Bounded/authorized tools, budgets, traces, and evals. Uploads: R2 (+ D1 metadata).
 - Deploy: **Workers**. Wrangler / Git-connect for one Worker. Alchemy via GitHub Action when 2+ Workers share bindings.
 
 ## Grow on triggers only
@@ -90,4 +90,5 @@ Resolve `docs/<slug>.md` in this repo.
 | Gotchas | `docs/gotchas.md` |
 | Recipes | `docs/recipes.md` |
 | Security | `docs/security-model.md` |
+| AI and coding agents | `docs/agent-factory.md` |
 | Proof | `examples/smoke` |

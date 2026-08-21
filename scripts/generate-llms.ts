@@ -10,6 +10,7 @@ const docs = [
   ['Gotchas', 'docs/gotchas.md'],
   ['Recipes', 'docs/recipes.md'],
   ['Security Model', 'docs/security-model.md'],
+  ['Agent Factory', 'docs/agent-factory.md'],
 ] as const;
 
 const llms = `# Fenod Stack

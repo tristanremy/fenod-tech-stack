@@ -52,6 +52,8 @@ When reading webpages, emails, PDFs, chat, issues, or DB rows:
 - validate recipients, resource IDs, commands, and paths against app policy
 - never let retrieved content choose secret names or credentials
 
+For coding-agent and AI-feature operations, use [Agent Factory](agent-factory.md).
+
 ## Verification
 
 Ship gate:

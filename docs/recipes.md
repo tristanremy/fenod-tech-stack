@@ -77,11 +77,13 @@ Full offline-first only for real field/dead-zone products — design per project
 
 ## Deploy an app
 
+**CI or a human-owned terminal only.** Agents push Git; they do not deploy or run remote D1 migrations.
+
 ```bash
 pnpm lint && pnpm typecheck && pnpm test && pnpm build
 env -u CLOUDFLARE_API_TOKEN wrangler deploy
 ```
 
-Inject runtime secrets with Infisical (e.g. `infisical run --env=prod -- wrangler deploy`). Alchemy only on Stack Contract triggers.
+CI injects runtime secrets with Infisical (e.g. `infisical run --env=prod -- wrangler deploy`) behind a protected environment. Alchemy only on Stack Contract triggers.
 
 

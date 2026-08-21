@@ -9,7 +9,8 @@
   "scripts": {
     "llms:build": "tsx scripts/generate-llms.ts",
     "check:llms": "tsx scripts/check-llms-defaults.ts",
-    "check": "pnpm llms:build && pnpm check:llms"
+    "check:enforcement": "tsx scripts/check-contract-enforcement.ts",
+    "check": "pnpm llms:build && pnpm check:llms && pnpm check:enforcement"
   },
   "devDependencies": {
     "tsx": "4.23.12"

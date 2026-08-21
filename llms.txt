@@ -10,6 +10,7 @@
 - Gotchas: docs/gotchas.md
 - Recipes: docs/recipes.md
 - Security Model: docs/security-model.md
+- Agent Factory: docs/agent-factory.md
 
 ## Core defaults
 

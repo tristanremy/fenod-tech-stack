@@ -68,7 +68,7 @@ Put **Cloudflare Access** in front of preview URLs, staging, and internal admin.
 
 ## Dependency Security
 
-Every product repo should use automated dependency monitoring plus an audit gate. Prefer Renovate with security-sensitive labels for auth/RPC/ORM packages, and run `pnpm audit --audit-level high` in CI.
+Every product repo should use automated dependency monitoring plus an audit gate. Prefer Renovate with security-sensitive labels for auth/RPC/ORM packages, and run `pnpm audit --audit-level high` in CI. Pin GitHub Actions to full commit SHAs, keep workflow permissions read-only by default, and run dependency review on pull requests.
 
 Security-sensitive packages require explicit review before major upgrades:
 
@@ -158,6 +158,8 @@ Before shipping a project:
 
 - [ ] `.env`, `.env.*`, `.dev.vars`, dumps, and backups are ignored
 - [ ] secret scan passes
+- [ ] CI pins GitHub Actions to full commit SHAs and uses read-only default permissions
+- [ ] CI runs dependency review and `pnpm audit --audit-level high`
 - [ ] Cloudflare deploy token is resource-scoped
 - [ ] DNS token is separate from deploy token
 - [ ] D1 migration flow has approval/backup for production

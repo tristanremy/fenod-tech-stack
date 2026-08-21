@@ -41,7 +41,7 @@ One-liner:
 | Async work | **Queues / Workflows** |
 | Stateful coordination | **Durable Objects** only when needed |
 | Edge cache | Workers Cache + `Cache-Control` / `Cache-Tag` for public SSR and cacheable GET APIs |
-| AI in apps | **TanStack AI** + **Cloudflare AI Gateway** (provider keys in gateway, never in the browser) |
+| AI in apps | **TanStack AI** + **Cloudflare AI Gateway** (provider keys in gateway, never in the browser); bounded tools, authorization, budgets, traces, and evals |
 | Deploy | **Workers**, never new Pages. **One Worker** → Git-connect or CI `wrangler deploy`. **2+ Workers that share bindings** → **Alchemy** via GitHub Action. Agents push Git; they do not deploy. |
 | Secrets | **Infisical** + Cloudflare Worker secrets at runtime |
 | Observability | Workers Observability on every Worker; **Sentry** only for product / paying apps |
@@ -178,4 +178,5 @@ This repo is agent-first: `AGENTS.md` + these `docs/*.md` + `examples/smoke`. No
 - [Gotchas](gotchas.md)
 - [Recipes](recipes.md)
 - [Security](security-model.md)
+- [Agent factory](agent-factory.md)
 - Living reference: `examples/smoke`

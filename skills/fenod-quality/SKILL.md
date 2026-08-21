@@ -68,7 +68,7 @@ Low value: pure presentational UI (manual/browser often cheaper).
 
 ## Dependency security
 
-Renovate or Dependabot + `pnpm audit --audit-level high` in product repos. Better Auth, ORPC, Drizzle: patch fast; majors need explicit review.
+Renovate or Dependabot + `pnpm audit --audit-level high` in product repos. Pin CI actions to full commit SHAs, run dependency review and a secret scan. Better Auth, ORPC, Drizzle: patch fast; majors need explicit review.
 
 ## Deep references
 
