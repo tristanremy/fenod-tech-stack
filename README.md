@@ -1,3 +1,7 @@
+<p align="center">
+  <img alt="Fenod" src="https://fenod.fr/favicon.svg" width="80">
+</p>
+
 # Fenod stack
 
 Opinionated defaults for building full-stack TypeScript products on Cloudflare Workers.
