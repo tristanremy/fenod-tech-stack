@@ -34,7 +34,7 @@ One-liner:
 | API | Start server functions first. **Hono + ORPC** only when you need a real API boundary or non-UI clients |
 | Data | **Drizzle** latest patched **0.4x** + **D1** |
 | Auth | **Better Auth** latest patched stable line (review majors; ship security patches fast) |
-| UI | **Tailwind v4 + shadcn/ui** |
+| UI | **Tailwind v4 + shadcn/ui**. Install requested official components and blocks with `pnpm dlx shadcn@latest add <item>`; do not recreate lookalikes. |
 | Client data | **TanStack Query + Router** (Form/Table when needed) |
 | Files | **R2** + metadata in D1 |
 | Cache / config | **KV** — not a database |

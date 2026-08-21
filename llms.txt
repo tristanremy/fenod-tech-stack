@@ -19,7 +19,8 @@
 - **AI feature / coding agent / eval / sandbox** → docs/agent-factory.md, docs/security-model.md
 - **auth / permissions / sensitive data** → docs/security-model.md, docs/agent-operating-contract.md, examples/smoke/src/lib/auth.ts
 - **test / lint / typecheck / refactor** → skills/fenod-quality/SKILL.md, examples/smoke/package.json
-- **UI / TanStack Start / D1 reference** → examples/smoke/STACK.md, examples/smoke/package.json
+- **UI / shadcn component or block** → docs/recipes.md, skills/fenod-stack/SKILL.md, examples/smoke/components.json
+- **TanStack Start / D1 reference** → examples/smoke/STACK.md, examples/smoke/package.json
 
 ## Core defaults
 

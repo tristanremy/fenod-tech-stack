@@ -19,7 +19,8 @@ const routes = [
   { task: 'AI feature / coding agent / eval / sandbox', read: ['docs/agent-factory.md', 'docs/security-model.md'] },
   { task: 'auth / permissions / sensitive data', read: ['docs/security-model.md', 'docs/agent-operating-contract.md', 'examples/smoke/src/lib/auth.ts'] },
   { task: 'test / lint / typecheck / refactor', read: ['skills/fenod-quality/SKILL.md', 'examples/smoke/package.json'] },
-  { task: 'UI / TanStack Start / D1 reference', read: ['examples/smoke/STACK.md', 'examples/smoke/package.json'] },
+  { task: 'UI / shadcn component or block', read: ['docs/recipes.md', 'skills/fenod-stack/SKILL.md', 'examples/smoke/components.json'] },
+  { task: 'TanStack Start / D1 reference', read: ['examples/smoke/STACK.md', 'examples/smoke/package.json'] },
 ] as const;
 
 const llms = `# Fenod Stack\n\n> Agent-first Cloudflare TypeScript stack. Stack Contract is law. Proof: examples/smoke.\n\n## Read first\n\n${docs.map(([title, path]) => `- ${title}: ${path}`).join('\n')}\n\n## Route by task\n\n${routes.map(({ task, read }) => `- **${task}** → ${read.join(', ')}`).join('\n')}\n\n## Core defaults\n\n${coreDefaults}\n\n## Verification\n\n\`pnpm lint && pnpm typecheck && pnpm test\` (add build/browser checks for higher risk).\n`;

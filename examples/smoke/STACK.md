@@ -11,7 +11,7 @@ Implements [Fenod Stack Contract](../../docs/stack-contract.md).
 | Better Auth              | `src/lib/auth.ts` — `better-auth/minimal`, Drizzle/D1, cookie cache, CF IP, D1 rate limits     |
 | Same-origin API          | `/api/auth/*` and `/api/rpc/*` on one origin. No CORS.                                         |
 | Hono + oRPC              | `src/server/app.ts` mounts Better Auth and oRPC. Session resolved once per `/api/rpc` request. |
-| Tailwind v4 + shadcn     | Radix `new-york` in `components.json`. Do not silently switch to Base UI.                      |
+| Tailwind v4 + shadcn     | Radix `new-york` in `components.json`. Install official components/blocks with `pnpm dlx shadcn@latest add <item>`; do not silently switch to Base UI or recreate lookalikes. |
 | Wrangler deploy          | `pnpm deploy`                                                                                  |
 | Worker types             | `pnpm cf-types` (`wrangler types`)                                                             |
 | Infisical                | use `infisical run -- pnpm dev` in real projects; local may use `.dev.vars` untracked          |

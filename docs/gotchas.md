@@ -80,6 +80,10 @@ New Workers: today's date + `observability.enabled`. Do not paste `nodejs_compat
 
 Optional laptop: `nub run` / `nubx`. Repo law stays **pnpm** (`pnpm-lock.yaml`, `packageManager`, CI). Do not `nub pm use nub`.
 
+## Shadcn Means the Official CLI
+
+When a task asks for a shadcn component or block, use `pnpm dlx shadcn@latest add <item>`. Do not substitute custom primitives or a similar layout. Customize the installed component only after the official baseline exists.
+
 ## Oxlint + Oxfmt, Not ESLint/Prettier
 
 Lint is Oxlint, format is Oxfmt. Do not add ESLint, Prettier, Biome, or Ultracite beside them “for completeness.”

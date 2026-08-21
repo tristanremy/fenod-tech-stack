@@ -11,7 +11,7 @@ Opinionated defaults for building full-stack TypeScript products on Cloudflare W
 | App | TanStack Start on Cloudflare Workers |
 | Data | Drizzle + D1 |
 | Auth | Better Auth |
-| UI | Tailwind v4 + shadcn/ui |
+| UI | Tailwind v4 + shadcn/ui; install requested official components/blocks with `pnpm dlx shadcn@latest add <item>` |
 | API | Start server functions first; Hono + oRPC when a real API boundary exists |
 | Files / async work | R2 / Queues / Workflows |
 | AI | TanStack AI + Cloudflare AI Gateway |
@@ -69,6 +69,16 @@ flowchart TD
   F -- Shared deployables --> H[Add monorepo / Alchemy]
   F -- Shared live state --> I[Consider Durable Object]
 ```
+
+## UI rule
+
+When you want shadcn, use the real item, not a similar implementation:
+
+```bash
+pnpm dlx shadcn@latest add <item>
+```
+
+This applies to primitives and blocks, including the default sidebar. Customize after it is installed so future shadcn updates remain easy.
 
 ## What we deliberately do not start with
 

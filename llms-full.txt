@@ -19,7 +19,8 @@
 - **AI feature / coding agent / eval / sandbox** → docs/agent-factory.md, docs/security-model.md
 - **auth / permissions / sensitive data** → docs/security-model.md, docs/agent-operating-contract.md, examples/smoke/src/lib/auth.ts
 - **test / lint / typecheck / refactor** → skills/fenod-quality/SKILL.md, examples/smoke/package.json
-- **UI / TanStack Start / D1 reference** → examples/smoke/STACK.md, examples/smoke/package.json
+- **UI / shadcn component or block** → docs/recipes.md, skills/fenod-stack/SKILL.md, examples/smoke/components.json
+- **TanStack Start / D1 reference** → examples/smoke/STACK.md, examples/smoke/package.json
 
 ## Core defaults
 
@@ -60,7 +61,7 @@ Do not load old Starlight pages, French translations, or `code-patterns`.
 
 - Node 24 + **pnpm** (not npm/yarn; Nub is not the lockfile)
 - TanStack Start on **Cloudflare Workers**. Astro only for marketing/content sites.
-- Drizzle **0.4x** + **D1**. Better Auth. Tailwind v4 + shadcn.
+- Drizzle **0.4x** + **D1**. Better Auth. Tailwind v4 + shadcn. When asked for a shadcn component or block, install the exact official item with `pnpm dlx shadcn@latest add <item>`; do not recreate a lookalike. Customize only after installation.
 - Start server functions first. Hono + oRPC only when an API boundary needs it.
 - Oxlint + Oxfmt + tsgo. Ship gate: `pnpm lint && pnpm typecheck && pnpm test`
 - Infisical + Worker secrets. Never commit `.env` / `.dev.vars` with real values.
@@ -121,7 +122,7 @@ One-liner:
 | API | Start server functions first. **Hono + ORPC** only when you need a real API boundary or non-UI clients |
 | Data | **Drizzle** latest patched **0.4x** + **D1** |
 | Auth | **Better Auth** latest patched stable line (review majors; ship security patches fast) |
-| UI | **Tailwind v4 + shadcn/ui** |
+| UI | **Tailwind v4 + shadcn/ui**. Install requested official components and blocks with `pnpm dlx shadcn@latest add <item>`; do not recreate lookalikes. |
 | Client data | **TanStack Query + Router** (Form/Table when needed) |
 | Files | **R2** + metadata in D1 |
 | Cache / config | **KV** — not a database |
@@ -436,6 +437,10 @@ New Workers: today's date + `observability.enabled`. Do not paste `nodejs_compat
 
 Optional laptop: `nub run` / `nubx`. Repo law stays **pnpm** (`pnpm-lock.yaml`, `packageManager`, CI). Do not `nub pm use nub`.
 
+## Shadcn Means the Official CLI
+
+When a task asks for a shadcn component or block, use `pnpm dlx shadcn@latest add <item>`. Do not substitute custom primitives or a similar layout. Customize the installed component only after the official baseline exists.
+
 ## Oxlint + Oxfmt, Not ESLint/Prettier
 
 Lint is Oxlint, format is Oxfmt. Do not add ESLint, Prettier, Biome, or Ultracite beside them “for completeness.”
@@ -502,6 +507,16 @@ Then align with law: **D1 not Postgres**, Oxlint + Oxfmt, Infisical, Wrangler ob
 Living reference in this repo: [`examples/smoke`](https://github.com/tristanremy/fenod-tech-stack/tree/main/examples/smoke) (`STACK.md` maps each law line).
 
 Do not create a monorepo on day one. Add Hono only when you need a dedicated HTTP/API boundary.
+
+## Add UI components and blocks
+
+When a request names a shadcn component or block, install the **exact official item** first:
+
+```bash
+pnpm dlx shadcn@latest add <item>
+```
+
+Examples: `button`, `dialog`, or an official sidebar block such as `sidebar-07`. Do not hand-build a visual approximation. Make product changes after installation; this preserves the upstream baseline for later updates.
 
 ## Add an API feature
 

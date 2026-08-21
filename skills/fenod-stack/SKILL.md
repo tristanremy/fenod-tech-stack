@@ -44,7 +44,7 @@ pnpm dlx @tanstack/cli@latest create my-app \
 - **Oxlint + Oxfmt**. React plugin + `correctness`. No ESLint/Prettier/Biome/Ultracite. No hand-wired `oxc-transform-react`.
 - **tsgo** for typecheck; keep `typescript` installed.
 - Validate env with **Zod**. Secrets via **Infisical**. Never commit real `.env` / `.dev.vars`.
-- UI: **Tailwind v4 + shadcn/ui**.
+- UI: **Tailwind v4 + shadcn/ui**. When requested, install the exact official component/block with `pnpm dlx shadcn@latest add <item>` before customizing it. Never recreate a shadcn lookalike.
 - AI: **TanStack AI + AI Gateway**. Bounded/authorized tools, budgets, traces, and evals. Uploads: R2 (+ D1 metadata).
 - Deploy: **Workers**. Wrangler / Git-connect for one Worker. Alchemy via GitHub Action when 2+ Workers share bindings.
 

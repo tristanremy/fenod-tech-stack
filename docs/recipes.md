@@ -24,6 +24,16 @@ Living reference in this repo: [`examples/smoke`](https://github.com/tristanremy
 
 Do not create a monorepo on day one. Add Hono only when you need a dedicated HTTP/API boundary.
 
+## Add UI components and blocks
+
+When a request names a shadcn component or block, install the **exact official item** first:
+
+```bash
+pnpm dlx shadcn@latest add <item>
+```
+
+Examples: `button`, `dialog`, or an official sidebar block such as `sidebar-07`. Do not hand-build a visual approximation. Make product changes after installation; this preserves the upstream baseline for later updates.
+
 ## Add an API feature
 
 When an API module exists, use a feature slice:

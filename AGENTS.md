@@ -19,7 +19,7 @@ Do not load old Starlight pages, French translations, or `code-patterns`.
 
 - Node 24 + **pnpm** (not npm/yarn; Nub is not the lockfile)
 - TanStack Start on **Cloudflare Workers**. Astro only for marketing/content sites.
-- Drizzle **0.4x** + **D1**. Better Auth. Tailwind v4 + shadcn.
+- Drizzle **0.4x** + **D1**. Better Auth. Tailwind v4 + shadcn. When asked for a shadcn component or block, install the exact official item with `pnpm dlx shadcn@latest add <item>`; do not recreate a lookalike. Customize only after installation.
 - Start server functions first. Hono + oRPC only when an API boundary needs it.
 - Oxlint + Oxfmt + tsgo. Ship gate: `pnpm lint && pnpm typecheck && pnpm test`
 - Infisical + Worker secrets. Never commit `.env` / `.dev.vars` with real values.

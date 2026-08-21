@@ -45,7 +45,15 @@
       ]
     },
     {
-      "task": "UI / TanStack Start / D1 reference",
+      "task": "UI / shadcn component or block",
+      "read": [
+        "docs/recipes.md",
+        "skills/fenod-stack/SKILL.md",
+        "examples/smoke/components.json"
+      ]
+    },
+    {
+      "task": "TanStack Start / D1 reference",
       "read": [
         "examples/smoke/STACK.md",
         "examples/smoke/package.json"
