@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
-const [ci, recipes, factory, security, stack, deploySkill, qualitySkill, smokePackage] =
+const [ci, recipes, factory, security, stack, deploySkill, qualitySkill, smokePackage, contextText] =
   await Promise.all([
     readFile('.github/workflows/ci.yml', 'utf8'),
     readFile('docs/recipes.md', 'utf8'),
@@ -10,6 +10,7 @@ const [ci, recipes, factory, security, stack, deploySkill, qualitySkill, smokePa
     readFile('skills/fenod-cloudflare-deploy/SKILL.md', 'utf8'),
     readFile('skills/fenod-quality/SKILL.md', 'utf8'),
     readFile('examples/smoke/package.json', 'utf8'),
+    readFile('agent-context.json', 'utf8'),
   ]);
 
 const requirements = [
@@ -25,6 +26,9 @@ const requirements = [
   ['deploy skill preserves agent deploy boundary', deploySkill, 'agents push Git. They do not run'],
   ['quality skill requires audit', qualitySkill, 'pnpm audit --audit-level high'],
   ['smoke reference has Workers verification scripts', smokePackage, '"cf-types"'],
+  ['agent context has task routes', contextText, '"routes"'],
+  ['agent context routes deployment', contextText, 'deploy / Cloudflare'],
+  ['agent context routes AI work', contextText, 'AI feature / coding agent'],
 ] as const;
 
 const unpinnedActions = [...ci.matchAll(/^\s*uses:\s+[^@\s]+@([^\s#]+)/gm)]

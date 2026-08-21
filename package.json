@@ -8,6 +8,7 @@
   },
   "scripts": {
     "llms:build": "tsx scripts/generate-llms.ts",
+    "check:context": "node --input-type=module -e \"JSON.parse(await import('node:fs/promises').then(fs => fs.readFile('agent-context.json', 'utf8')))\"",
     "check:llms": "tsx scripts/check-llms-defaults.ts",
     "check:enforcement": "tsx scripts/check-contract-enforcement.ts",
     "check": "pnpm llms:build && pnpm check:llms && pnpm check:enforcement"

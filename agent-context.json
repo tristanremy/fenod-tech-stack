@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "readFirst": [
+    "AGENTS.md",
+    "docs/stack-contract.md",
+    "docs/agent-operating-contract.md"
+  ],
+  "routes": [
+    {
+      "task": "new app / architecture / stack choice",
+      "read": [
+        "docs/stack-contract.md",
+        "skills/fenod-stack/SKILL.md",
+        "examples/smoke/STACK.md"
+      ]
+    },
+    {
+      "task": "deploy / Cloudflare / secrets / D1 migration",
+      "read": [
+        "docs/agent-operating-contract.md",
+        "docs/security-model.md",
+        "skills/fenod-cloudflare-deploy/SKILL.md"
+      ]
+    },
+    {
+      "task": "AI feature / coding agent / eval / sandbox",
+      "read": [
+        "docs/agent-factory.md",
+        "docs/security-model.md"
+      ]
+    },
+    {
+      "task": "auth / permissions / sensitive data",
+      "read": [
+        "docs/security-model.md",
+        "docs/agent-operating-contract.md",
+        "examples/smoke/src/lib/auth.ts"
+      ]
+    },
+    {
+      "task": "test / lint / typecheck / refactor",
+      "read": [
+        "skills/fenod-quality/SKILL.md",
+        "examples/smoke/package.json"
+      ]
+    },
+    {
+      "task": "UI / TanStack Start / D1 reference",
+      "read": [
+        "examples/smoke/STACK.md",
+        "examples/smoke/package.json"
+      ]
+    }
+  ],
+  "defaults": "Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler, Infisical+Worker secrets, Oxlint+Oxfmt, tsgo, Vitest, Playwright.",
+  "verification": [
+    "pnpm lint",
+    "pnpm typecheck",
+    "pnpm test"
+  ],
+  "forbidden": [
+    "npm",
+    "yarn",
+    "new Pages projects",
+    "Redis",
+    "production deploys from agent sessions",
+    "real secrets in Git"
+  ]
+}

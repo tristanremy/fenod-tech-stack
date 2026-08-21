@@ -4,7 +4,7 @@
 
 ## Read first
 
-- AGENTS: AGENTS.md
+- Agent entry: AGENTS.md
 - Stack Contract: docs/stack-contract.md
 - Agent Operating Contract: docs/agent-operating-contract.md
 - Gotchas: docs/gotchas.md
@@ -12,6 +12,19 @@
 - Security Model: docs/security-model.md
 - Agent Factory: docs/agent-factory.md
 
+## Route by task
+
+- **new app / architecture / stack choice** → docs/stack-contract.md, skills/fenod-stack/SKILL.md, examples/smoke/STACK.md
+- **deploy / Cloudflare / secrets / D1 migration** → docs/agent-operating-contract.md, docs/security-model.md, skills/fenod-cloudflare-deploy/SKILL.md
+- **AI feature / coding agent / eval / sandbox** → docs/agent-factory.md, docs/security-model.md
+- **auth / permissions / sensitive data** → docs/security-model.md, docs/agent-operating-contract.md, examples/smoke/src/lib/auth.ts
+- **test / lint / typecheck / refactor** → skills/fenod-quality/SKILL.md, examples/smoke/package.json
+- **UI / TanStack Start / D1 reference** → examples/smoke/STACK.md, examples/smoke/package.json
+
 ## Core defaults
 
-Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler deploy, Infisical+Worker secrets, Oxlint+Oxfmt, tsgo, Vitest, Playwright.
+Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler, Infisical+Worker secrets, Oxlint+Oxfmt, tsgo, Vitest, Playwright.
+
+## Verification
+
+`pnpm lint && pnpm typecheck && pnpm test` (add build/browser checks for higher risk).
