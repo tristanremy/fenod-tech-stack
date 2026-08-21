@@ -1,9 +1,0 @@
-flowchart LR
-  App[Worker app / TanStack AI] --> Gateway[Cloudflare AI Gateway]
-  Gateway --> Policy[Budget, cache, rate limit]
-  Policy --> Route{Route policy}
-  Route -->|Primary| StoredKey[Stored provider key]
-  Route -->|Fallback| FallbackKey[Fallback stored key]
-  StoredKey --> ProviderA[Provider A]
-  FallbackKey --> ProviderB[Provider B]
-  Gateway --> Logs[Unified logs]

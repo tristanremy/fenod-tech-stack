@@ -7,41 +7,11 @@
     "node": ">=24"
   },
   "scripts": {
-    "dev": "pnpm diagrams:build && astro dev",
-    "diagrams:build": "tsx scripts/render-diagrams.ts",
     "llms:build": "tsx scripts/generate-llms.ts",
-    "build": "pnpm diagrams:build && pnpm llms:build && astro check && astro build",
-    "check:links": "tsx scripts/check-internal-links.ts",
-    "check:public": "tsx scripts/check-public-safety.ts",
     "check:llms": "tsx scripts/check-llms-defaults.ts",
-    "audit:deps": "pnpm audit --audit-level high",
-    "check": "pnpm build && pnpm check:links && pnpm check:public && pnpm check:llms",
-    "check:full": "pnpm check && pnpm audit:deps",
-    "preview": "astro preview"
-  },
-  "dependencies": {
-    "@astrojs/check": "0.9.10",
-    "@astrojs/starlight": "0.39.3",
-    "@iconify-json/ph": "1.2.2",
-    "astro": "6.4.8",
-    "beautiful-mermaid": "1.1.3",
-    "starlight-plugin-icons": "1.1.6",
-    "typescript": "5.9.3"
+    "check": "pnpm llms:build && pnpm check:llms"
   },
   "devDependencies": {
-    "@unocss/astro": "66.7.5",
-    "tsx": "4.23.12",
-    "unocss": "66.7.5"
-  },
-  "pnpm": {
-    "overrides": {
-      "brace-expansion": ">=5.0.9",
-      "fast-uri": ">=3.1.5",
-      "js-yaml": "4.3.1",
-      "nanoid": ">=3.3.17",
-      "postcss": ">=8.5.23",
-      "sharp": ">=0.35.0",
-      "svgo": ">=4.0.2"
-    }
+    "tsx": "4.23.12"
   }
 }

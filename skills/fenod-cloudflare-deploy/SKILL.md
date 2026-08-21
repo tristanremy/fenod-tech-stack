@@ -16,7 +16,8 @@ description: Deploy and operate Fenod projects on Cloudflare — Wrangler-first 
 - **Alchemy also when:** 4+ CF resources with shared lifecycle, 3+ stages, infra tests/OTel as code, or multiple accounts.
 - **Smallest Alchemy unit:** site files → site; admin → admin; API/DB/auth/bindings → core; two units or shared config → all.
 - Never use Alchemy v1 examples. Package is `alchemy`. Effect stays inside Alchemy config — not app architecture law.
-- Every Worker: `observability.enabled = true` + an error alert. Product apps add Sentry.
+- Every Worker: today's `compatibility_date` + `observability.enabled = true` + an error alert. Dates `>= 2026-08-04` already include `nodejs_compat` — do not paste the flag. `nodejs_als` only for Sentry/ALS. Product apps add Sentry.
+- Staging / `*.workers.dev` previews / internal admin: **Cloudflare Access**. Public marketing/docs: no. Access ≠ Better Auth.
 - Rate limits: Workers rate limiting binding or DO. **No Redis.**
 - Never commit secrets. **Infisical** + Worker secrets at runtime (Bitwarden SM only with project override).
 - Local Wrangler:
@@ -41,7 +42,7 @@ env -u CLOUDFLARE_API_TOKEN wrangler whoami
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "my-app",
   "main": "./dist/worker.js",
-  "compatibility_date": "2026-06-01",
+  "compatibility_date": "2026-08-19",
   "assets": {
     "directory": "./dist/client",
     "binding": "ASSETS",
@@ -87,9 +88,7 @@ GitHub Action owns Cloudflare tokens (`staging` / `production` environments). Pu
 
 | Need | Read |
 |------|------|
-| Law | `stack-contract.md` |
-| Full deploy depth | `deployment.md` |
-| Secrets | `environment-secrets.md` |
-| Tokens | `cloudflare-api-tokens.md` |
-| Observability | `observability.md` |
-| Security | `security-model.md` |
+| Law | `docs/stack-contract.md` |
+| Recipes | `docs/recipes.md` |
+| Security | `docs/security-model.md` |
+| Proof | `examples/smoke` |

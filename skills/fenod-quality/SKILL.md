@@ -30,10 +30,11 @@ Do not run the entire optional toolbox on every one-line fix. Prefer repo script
 
 | Tool | Role |
 |------|------|
-| **Oxlint** | lint |
+| **Oxlint** | lint — React plugin + `correctness` (React Compiler rules). Never `react/react-compiler`. |
 | **Oxfmt** | format |
 
-Do not add ESLint, Prettier, Biome, or Ultracite beside Oxlint/Oxfmt “for completeness.”  
+Do not add ESLint, Prettier, Biome, Ultracite, Babel, or `oxc-transform-react` beside this.
+Do not add `useMemo` / `useCallback` / `memo` unless measured or required for identity.  
 Do not remove the `typescript` package because tsgo exists — keep both until tooling APIs catch up.
 
 ## TDD with AI

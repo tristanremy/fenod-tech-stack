@@ -1,6 +1,6 @@
 # fenod-smoke — law reference app
 
-Implements [Fenod Stack Contract](https://stack.fenod.fr/stack-contract/).
+Implements [Fenod Stack Contract](../../docs/stack-contract.md).
 
 | Law                      | This app                                                                                       |
 | ------------------------ | ---------------------------------------------------------------------------------------------- |
@@ -15,7 +15,7 @@ Implements [Fenod Stack Contract](https://stack.fenod.fr/stack-contract/).
 | Wrangler deploy          | `pnpm deploy`                                                                                  |
 | Worker types             | `pnpm cf-types` (`wrangler types`)                                                             |
 | Infisical                | use `infisical run -- pnpm dev` in real projects; local may use `.dev.vars` untracked          |
-| Oxlint + Oxfmt           | `pnpm lint` / `pnpm format`                                                                    |
+| Oxlint + Oxfmt + tsgo    | `pnpm lint` / `pnpm format` / `pnpm typecheck` (`tsgo --noEmit`)                               |
 | Ship gate                | `pnpm check && pnpm test`                                                                      |
 
 ## Local secrets

@@ -1,0 +1,16 @@
+# Fenod Stack
+
+> Agent-first Cloudflare TypeScript stack. Stack Contract is law. Proof: examples/smoke.
+
+## Read first
+
+- AGENTS: AGENTS.md
+- Stack Contract: docs/stack-contract.md
+- Agent Operating Contract: docs/agent-operating-contract.md
+- Gotchas: docs/gotchas.md
+- Recipes: docs/recipes.md
+- Security Model: docs/security-model.md
+
+## Core defaults
+
+Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler deploy, Infisical+Worker secrets, Oxlint+Oxfmt, tsgo, Vitest, Playwright.

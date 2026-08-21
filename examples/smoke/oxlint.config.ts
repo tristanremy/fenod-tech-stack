@@ -1,11 +1,14 @@
 import { defineConfig } from "oxlint";
 
-// Law-owned paths are linted. Scaffold demo UI stays ignored.
+// React Compiler recommended rules live in correctness via the react plugin.
+// Do not set react/react-compiler — that nursery rule is gone.
 export default defineConfig({
+  plugins: ["react"],
+  categories: {
+    correctness: "error",
+  },
   ignorePatterns: [
     "src/routes/demo/**",
-    "src/components/**",
-    "src/integrations/**",
     "src/routeTree.gen.ts",
     "worker-configuration.d.ts",
     "drizzle/**",

@@ -1,9 +1,0 @@
-flowchart LR
-  Browser[Navigateur utilisateur] --> App[Application / Worker]
-  App --> Data[(D1 / R2 / KV / Queues)]
-  App --> Gateway[Cloudflare AI Gateway]
-  Gateway --> Providers[Fournisseurs IA]
-  Agent[Agent de code IA] --> Repo[Depot]
-  Agent --> Broker[Broker de deploiement / CI]
-  Broker --> Cloudflare[Plateforme Cloudflare]
-  CI[GitHub Actions] --> Cloudflare

@@ -1,7 +1,8 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
 
+import { Button } from "#/components/ui/button";
 import { orpc } from "#/orpc/client";
 
 export const Route = createFileRoute("/demo/orpc-todo")({
@@ -16,17 +17,15 @@ export const Route = createFileRoute("/demo/orpc-todo")({
 });
 
 function ORPCTodos() {
-  const { data, refetch } = useQuery(
-    orpc.listTodos.queryOptions({
-      input: {},
-    }),
-  );
+  const queryClient = useQueryClient();
+  const listQuery = orpc.listTodos.queryOptions({ input: {} });
+  const { data } = useQuery(listQuery);
 
   const [todo, setTodo] = useState("");
   const { mutate: addTodo } = useMutation(
     orpc.addTodo.mutationOptions({
       onSuccess: () => {
-        refetch();
+        void queryClient.invalidateQueries({ queryKey: listQuery.queryKey });
         setTodo("");
       },
     }),
@@ -61,9 +60,9 @@ function ORPCTodos() {
             placeholder="Enter a new todo..."
             className="demo-input"
           />
-          <button disabled={todo.trim().length === 0} onClick={submitTodo} className="demo-button">
+          <Button disabled={todo.trim().length === 0} onClick={submitTodo}>
             Add todo
-          </button>
+          </Button>
         </div>
       </section>
     </main>

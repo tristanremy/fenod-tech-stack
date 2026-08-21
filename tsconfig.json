@@ -1,4 +1,12 @@
 {
-  "extends": "astro/tsconfigs/strict",
-  "exclude": ["examples", "dist", "node_modules"]
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "Preserve",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["scripts/**/*.ts"]
 }

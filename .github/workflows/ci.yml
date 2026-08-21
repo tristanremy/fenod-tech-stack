@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build and verify docs
+      - name: Verify llms.txt
         run: pnpm check
 
   smoke:

@@ -1,6 +1,6 @@
 # fenod-smoke
 
-Living reference for the [Fenod Stack Contract](https://stack.fenod.fr/stack-contract/).
+Living reference for the [Fenod Stack Contract](../../docs/stack-contract.md).
 
 One package. TanStack Start on Cloudflare Workers. Drizzle + D1. Better Auth. Hono + oRPC. Oxlint + Oxfmt. Wrangler.
 

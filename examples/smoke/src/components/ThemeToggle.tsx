@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 type ThemeMode = "light" | "dark" | "auto";
 
-function getInitialMode(): ThemeMode {
+const themeListeners = new Set<() => void>();
+
+function readTheme(): ThemeMode {
   if (typeof window === "undefined") {
     return "auto";
   }
@@ -31,23 +33,36 @@ function applyThemeMode(mode: ThemeMode) {
   document.documentElement.style.colorScheme = resolved;
 }
 
+function writeTheme(next: ThemeMode) {
+  window.localStorage.setItem("theme", next);
+  applyThemeMode(next);
+  for (const listener of themeListeners) {
+    listener();
+  }
+}
+
+function subscribeTheme(onChange: () => void) {
+  themeListeners.add(onChange);
+  return () => {
+    themeListeners.delete(onChange);
+  };
+}
+
 export default function ThemeToggle() {
-  const [mode, setMode] = useState<ThemeMode>("auto");
+  const mode = useSyncExternalStore<ThemeMode>(
+    subscribeTheme,
+    readTheme,
+    () => "auto",
+  );
 
   useEffect(() => {
-    const initialMode = getInitialMode();
-    setMode(initialMode);
-    applyThemeMode(initialMode);
-  }, []);
-
-  useEffect(() => {
+    applyThemeMode(mode);
     if (mode !== "auto") {
       return;
     }
 
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     const onChange = () => applyThemeMode("auto");
-
     media.addEventListener("change", onChange);
     return () => {
       media.removeEventListener("change", onChange);
@@ -55,10 +70,7 @@ export default function ThemeToggle() {
   }, [mode]);
 
   function toggleMode() {
-    const nextMode: ThemeMode = mode === "light" ? "dark" : mode === "dark" ? "auto" : "light";
-    setMode(nextMode);
-    applyThemeMode(nextMode);
-    window.localStorage.setItem("theme", nextMode);
+    writeTheme(mode === "light" ? "dark" : mode === "dark" ? "auto" : "light");
   }
 
   const label =

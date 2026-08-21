@@ -5,7 +5,7 @@ description: Fenod's opinionated stack for building web apps, sites, and APIs. U
 
 # Fenod Stack
 
-**Stack Contract is law.** This skill is the short operating copy. If anything here drifts, follow `src/content/docs/stack-contract.md` (or https://stack.fenod.fr/stack-contract/).
+**Stack Contract is law.** This skill is the short operating copy. If anything here drifts, follow `docs/stack-contract.md`.
 
 ## One-liner
 
@@ -38,10 +38,10 @@ pnpm dlx @tanstack/cli@latest create my-app \
 
 ## Non-negotiables
 
-- **Node 24** + **pnpm**. No npm/yarn. Bun/Deno not required baselines.
+- **Node 24** + **pnpm**. No npm/yarn. Bun/Deno not required baselines. Nub is optional local (`nub run` / `nubx`), not the lockfile.
 - **Vite 8 + Rolldown** for new apps; `rolldown-vite` only as Vite 7 bridge.
 - **Drizzle 0.4x** until v1 stable + migration plan.
-- **Oxlint + Oxfmt**. No ESLint/Prettier/Biome/Ultracite by default.
+- **Oxlint + Oxfmt**. React plugin + `correctness`. No ESLint/Prettier/Biome/Ultracite. No hand-wired `oxc-transform-react`.
 - **tsgo** for typecheck; keep `typescript` installed.
 - Validate env with **Zod**. Secrets via **Infisical**. Never commit real `.env` / `.dev.vars`.
 - UI: **Tailwind v4 + shadcn/ui**.
@@ -75,19 +75,19 @@ No hexagonal. No repository interfaces around Drizzle without pain.
 
 - Match repo patterns; minimal diffs.
 - Do not swap stack pieces unless asked.
-- Data fetching: prefer existing repo patterns; see `tanstack-data-fetching.md` only if needed.
+- Data fetching: prefer existing repo patterns; `invalidateQueries` default. `live-queries.md` only with a written multi-user trigger.
 - React: `react-best-practices.md` for a11y/security basics.
 - Long guides are depth, not law.
 
 ## Deep references
 
-Resolve `src/content/docs/<slug>.md` via this repo checkout or `https://raw.githubusercontent.com/tristanremy/fenod-tech-stack/main/src/content/docs/<slug>.md`.
+Resolve `docs/<slug>.md` in this repo.
 
 | Need | Read |
 |------|------|
-| Law | `stack-contract.md` |
-| Agent entry | `ai-index.md` |
-| Deploy | `deployment.md` |
-| Tooling | `tooling.md` |
-| Gotchas | `gotchas.md` |
-| Recipes | `recipes.md` |
+| Law | `docs/stack-contract.md` |
+| Agent entry | `AGENTS.md` |
+| Gotchas | `docs/gotchas.md` |
+| Recipes | `docs/recipes.md` |
+| Security | `docs/security-model.md` |
+| Proof | `examples/smoke` |

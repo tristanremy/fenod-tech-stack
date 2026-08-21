@@ -1,9 +1,0 @@
-flowchart LR
-  Spec[Comportement ou bug] --> Red[Ecrire un test qui echoue]
-  Red --> Agent[Implementation par agent]
-  Agent --> Green[Tests verts]
-  Green --> Refactor[Refactoriser sans risque]
-  Refactor --> Regression[Suite de regression]
-  Regression --> Review[Revue humaine ou agent]
-  Review --> Ship[Livrer]
-  Regression -->|Echec| Agent

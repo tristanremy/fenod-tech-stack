@@ -1,8 +1,0 @@
-flowchart TB
-  A[Read docs and config] --> B[Edit repo files]
-  B --> C[Run local build and tests]
-  C --> D[Run safe broker scripts]
-  D --> E[Dispatch protected CI]
-  E --> F[Production approval gate]
-  F --> G[Resource-scoped Cloudflare mutation]
-  G --> H[Break-glass temporary credential]

@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
-const path = 'public/llms.txt';
+const path = 'llms.txt';
 const text = await readFile(path, 'utf8');
 
 const required = [
@@ -12,13 +12,7 @@ const required = [
   'Stack Contract is law',
 ] as const;
 
-const forbidden = [
-  // stale default runtime — Node 22 only allowed as migration note, not default line
-  /Node 22(?! only)/,
-  /Workers\/Pages,\s*Alchemy/,
-  /Deploy \| Cloudflare Workers\/Pages \+ Alchemy/,
-  /one secrets manager \(Infisical or Bitwarden/,
-] as const;
+const forbidden = [/Node 22(?! only)/, /Workers\/Pages,\s*Alchemy/] as const;
 
 const missing = required.filter((s) => !text.includes(s));
 const hits = forbidden.filter((re) => re.test(text)).map(String);
