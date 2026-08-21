@@ -49,11 +49,7 @@ function subscribeTheme(onChange: () => void) {
 }
 
 export default function ThemeToggle() {
-  const mode = useSyncExternalStore<ThemeMode>(
-    subscribeTheme,
-    readTheme,
-    () => "auto",
-  );
+  const mode = useSyncExternalStore<ThemeMode>(subscribeTheme, readTheme, () => "auto");
 
   useEffect(() => {
     applyThemeMode(mode);
