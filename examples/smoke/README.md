@@ -17,7 +17,10 @@ Preferred secrets path (real projects):
 
 ```bash
 infisical run --env=dev -- pnpm dev
+infisical scan git-changes --staged
 ```
+
+Infisical is the source of truth. Sync secrets to Workers, use `.dev.vars` only as an ignored local fallback, and validate runtime config with Zod.
 
 ## Ship gate
 

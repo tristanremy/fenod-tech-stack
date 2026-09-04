@@ -1,6 +1,6 @@
 ---
 title: "Security Model"
-verified: 2026-06
+verified: 2026-09
 ---
 
 Security posture for secrets, Cloudflare, AI agents, user data, and production changes.
@@ -12,7 +12,7 @@ Agents may help build and operate systems, but they should not directly hold bro
 ## Trust Boundaries
 
 | Boundary | What crosses it | Rule |
-|----------|-----------------|------|
+| ---------- | ----------------- | ------ |
 | User/browser → app | user input, files, auth state | validate server-side, sanitize output |
 | App → Cloudflare resources | D1/R2/KV/Queues/DO bindings | least-privilege bindings per environment |
 | App → AI providers | prompts, retrieved context, tool results | route through AI Gateway where possible |
@@ -23,7 +23,7 @@ Agents may help build and operate systems, but they should not directly hold bro
 
 ## Secrets
 
-Secrets live in **Infisical** (default), Cloudflare Worker secrets, and CI secret storage as needed. Bitwarden SM only with an explicit project override. They do not live in prompts, docs, issues, PRs, checked-in `.env` files, or browser bundles.
+Secrets live in **Infisical** (default), Cloudflare Worker secrets, and CI secret storage as needed. Infisical is the source of truth; sync it to Workers instead of fetching it per request. Bitwarden SM only with an explicit project override. They do not live in prompts, docs, issues, PRs, checked-in `.env` files, or browser bundles.
 
 Allowed in Git:
 
@@ -97,8 +97,6 @@ Use direct Worker secrets only for unsupported providers/workflows or local deve
 
 ## Agent Permissions
 
-
-
 Agents should get capabilities in this order:
 
 1. read-only docs/config
@@ -134,7 +132,7 @@ Defenses:
 Use the smallest dataset that proves the point.
 
 | Data type | Default handling |
-|-----------|------------------|
+| ----------- | ------------------ |
 | Production user data | avoid locally; use sampled/redacted fixtures |
 | Uploaded files | scan/size-limit; store in R2 with scoped access |
 | Logs | redact secrets, tokens, cookies, auth headers |
@@ -157,9 +155,10 @@ Production-impacting actions need at least one hard gate:
 Before shipping a project:
 
 - [ ] `.env`, `.env.*`, `.dev.vars`, dumps, and backups are ignored
-- [ ] secret scan passes
+- [ ] staged changes pass one secret scanner (`infisical scan git-changes --staged` by default)
+- [ ] GitHub push protection is enabled when available
 - [ ] CI pins GitHub Actions to full commit SHAs and uses read-only default permissions
-- [ ] CI runs dependency review and `pnpm audit --audit-level high`
+- [ ] CI runs dependency review and `pnpm audit --audit-level high`; moderate findings are tracked until fixed
 - [ ] Cloudflare deploy token is resource-scoped
 - [ ] DNS token is separate from deploy token
 - [ ] D1 migration flow has approval/backup for production
@@ -171,5 +170,6 @@ Before shipping a project:
 
 ## Related
 
+- [Environment and secrets](environment-secrets.md)
 - [stack-contract.md](stack-contract.md)
 - [agent-operating-contract.md](agent-operating-contract.md)

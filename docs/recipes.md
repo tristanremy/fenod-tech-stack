@@ -1,7 +1,7 @@
 ---
 title: "Recipes"
 description: "Short implementation recipes for common Fenod stack tasks."
-verified: 2026-06
+verified: 2026-09
 ---
 
 Recipes implement [stack-contract.md](stack-contract.md). Keep them short.
@@ -23,6 +23,15 @@ Then align with law: **D1 not Postgres**, Oxlint + Oxfmt, Infisical, Wrangler ob
 Living reference in this repo: [`examples/smoke`](https://github.com/tristanremy/fenod-tech-stack/tree/main/examples/smoke) (`STACK.md` maps each law line).
 
 Do not create a monorepo on day one. Add Hono only when you need a dedicated HTTP/API boundary.
+
+## Configure environment and secrets
+
+```bash
+infisical run --env=dev -- pnpm dev
+infisical scan git-changes --staged
+```
+
+Use Infisical as the source of truth and sync sensitive runtime values to Cloudflare Worker secrets. Keep non-secret values in `wrangler.jsonc` `vars`; validate required runtime config with Zod 4.5.x. `.dev.vars` is local-only and ignored. Do not add Varlock unless the application meets its written trigger in [Environment and secrets](environment-secrets.md).
 
 ## Add UI components and blocks
 
@@ -95,5 +104,3 @@ env -u CLOUDFLARE_API_TOKEN wrangler deploy
 ```
 
 CI injects runtime secrets with Infisical (e.g. `infisical run --env=prod -- wrangler deploy`) behind a protected environment. Alchemy only on Stack Contract triggers.
-
-

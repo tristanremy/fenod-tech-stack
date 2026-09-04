@@ -1,7 +1,7 @@
 ---
 title: "Gotchas"
 description: "High-signal traps in the Fenod stack."
-verified: 2026-06
+verified: 2026-09
 ---
 
 ## Stack Contract Wins
@@ -78,7 +78,7 @@ New Workers: today's date + `observability.enabled`. Do not paste `nodejs_compat
 
 ## Nub Is Not the Package Manager
 
-Optional laptop: `nub run` / `nubx`. Repo law stays **pnpm** (`pnpm-lock.yaml`, `packageManager`, CI). Do not `nub pm use nub`.
+Optional laptop: `nub run` / `nubx`. Repo law stays **pnpm 12** (`pnpm-lock.yaml`, `packageManager`, CI). Do not `nub pm use nub`. pnpm 12 must use its official release channel; npm `latest` can select an older major.
 
 ## Shadcn Means the Official CLI
 
@@ -88,9 +88,9 @@ When a task asks for a shadcn component or block, use `pnpm dlx shadcn@latest ad
 
 Lint is Oxlint, format is Oxfmt. Do not add ESLint, Prettier, Biome, or Ultracite beside them “for completeness.”
 
-## tsgo Does Not Replace the typescript Package
+## TypeScript 7 Needs a Tooling Check
 
-tsgo is the fast typecheck path. Keep `typescript` installed for tooling that still needs the programmatic API.
+Use stable TypeScript 7 `tsc` for typechecks. Do not retain `@typescript/native-preview` / `tsgo` by habit. TypeScript 7 does not yet expose the historical compiler API; keep the TypeScript 6 compatibility package only when a proven tool still needs it.
 
 ## Alchemy Is Not Default Deploy
 

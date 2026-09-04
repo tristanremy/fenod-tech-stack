@@ -14,8 +14,8 @@ Implements [Fenod Stack Contract](../../docs/stack-contract.md).
 | Tailwind v4 + shadcn     | Radix `new-york` in `components.json`. Install official components/blocks with `pnpm dlx shadcn@latest add <item>`; do not silently switch to Base UI or recreate lookalikes. |
 | Wrangler deploy          | `pnpm deploy`                                                                                                                                                                 |
 | Worker types             | `pnpm cf-types` (`wrangler types`)                                                                                                                                            |
-| Infisical                | use `infisical run -- pnpm dev` in real projects; local may use `.dev.vars` untracked                                                                                         |
-| Oxlint + Oxfmt + tsgo    | `pnpm lint` / `pnpm format` / `pnpm typecheck` (`tsgo --noEmit`)                                                                                                              |
+| Environment and secrets  | Infisical is the source of truth; use `infisical run -- pnpm dev` or untracked `.dev.vars`; validate runtime config with Zod 4.5.x                                            |
+| TypeScript 7 transition  | Target: replace `@typescript/native-preview` / `tsgo` with stable `typescript` / `tsc` after tooling validation                                                               |
 | Ship gate                | `pnpm check && pnpm test`                                                                                                                                                     |
 
 ## Local secrets

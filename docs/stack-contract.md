@@ -1,7 +1,7 @@
 ---
 title: "Stack Contract"
 description: "Law for Fenod stack defaults. Other pages explain; this page resolves conflicts."
-verified: 2026-06
+verified: 2026-09
 ---
 
 This page is **law**. If another page is longer, newer-looking, or more detailed, this page still wins unless a project `STACK.md` / repo AGENTS explicitly overrides a line.
@@ -13,7 +13,7 @@ One-liner:
 ## Authority
 
 | Rank | Source | Wins when |
-|------|--------|-----------|
+| ------ | -------- | ----------- |
 | 1 | This contract | always, unless a project override exists |
 | 2 | Project `STACK.md` / repo AGENTS | project-specific lines only |
 | 3 | Skills + recipes | how to implement law |
@@ -26,7 +26,7 @@ One-liner:
 ## Defaults
 
 | Area | Law |
-|------|-----|
+| ------ | ----- |
 | Language | TypeScript strict |
 | Local/CI runtime | **Node 24** + **pnpm** |
 | App | **TanStack Start** on **Cloudflare Workers** |
@@ -43,13 +43,13 @@ One-liner:
 | Edge cache | Workers Cache + `Cache-Control` / `Cache-Tag` for public SSR and cacheable GET APIs |
 | AI in apps | **TanStack AI** + **Cloudflare AI Gateway** (provider keys in gateway, never in the browser); bounded tools, authorization, budgets, traces, and evals |
 | Deploy | **Workers**, never new Pages. **One Worker** → Git-connect or CI `wrangler deploy`. **2+ Workers that share bindings** → **Alchemy** via GitHub Action. Agents push Git; they do not deploy. |
-| Secrets | **Infisical** + Cloudflare Worker secrets at runtime |
+| Secrets | **Infisical** → Cloudflare Worker secrets at runtime; validate config with Zod 4.5.x |
 | Observability | Workers Observability on every Worker; **Sentry** only for product / paying apps |
 | Rate limits | Cloudflare-native binding or DO — **no Redis** |
 | Lint | **Oxlint** (`pnpm lint`). React apps: plugin `react` + `correctness` (Compiler rules). Type-aware lint is not CI default until TypeScript 7 is the repo baseline. |
 | Format | **Oxfmt** (`pnpm format` / `pnpm format:check`) |
-| Types | **tsgo** for `typecheck`; keep **`typescript`** installed for editor/tooling APIs |
-| Unit/integration tests | **Vitest** |
+| Types | **TypeScript 7** `tsc` for `typecheck`; keep TypeScript 6 only when tooling still needs its compiler API |
+| Unit/integration tests | **Vitest 5** |
 | Browser tests | **Playwright** for real UI flows |
 | Bundler | **Vite 8 + Rolldown** for new projects; `rolldown-vite` only as a Vite 7 bridge |
 | Internal packages | **tsdown** when a package must build artifacts |
@@ -106,7 +106,7 @@ Add Hono only when the HTTP/API boundary needs it. Do not create `apps/web` + `a
 ### Grow only on triggers
 
 | Trigger | Then add |
-|---------|----------|
+| --------- | ---------- |
 | Second deployable or shared library across apps | monorepo + packages (+ Turborepo if orchestration hurts) |
 | Multiple API consumers or thick procedures | feature slices under `packages/api` or `src/server` |
 | 2+ Workers that share D1 / R2 / KV / Queues / domains | **Alchemy** — GitHub Action deploys the smallest unit |
@@ -129,9 +129,10 @@ No ports/adapters. No generic repository layer.
 
 ## Secrets and Cloudflare authority
 
-- **Infisical** is the default secrets manager. Bitwarden SM only with an explicit project override.
-- Commit names and placeholders only (`.env.example`, `infisical.json` without secret values).
-- Never commit `.env`, `.env.local`, or `.dev.vars` with real values.
+- **Infisical** is the default secrets manager. Sync it to Cloudflare Worker secrets; Bitwarden SM only with an explicit project override.
+- Validate runtime configuration with Zod. Commit names and placeholders only (`.env.example`, `infisical.json` without secret values).
+- Never commit `.env`, `.env.local`, or `.dev.vars` with real values. Scan staged changes and enable GitHub push protection when available.
+- Varlock is not a default. Use it only after a written trigger; its Worker deploy replaces vars and secrets absent from its schema.
 - Local Wrangler must not accidentally prefer an exported token:
 
 ```bash
@@ -177,6 +178,7 @@ This repo is agent-first: `AGENTS.md` + these `docs/*.md` + `examples/smoke`. No
 - [Agent operating contract](agent-operating-contract.md)
 - [Gotchas](gotchas.md)
 - [Recipes](recipes.md)
+- [Environment and secrets](environment-secrets.md)
 - [Security](security-model.md)
 - [Agent factory](agent-factory.md)
 - Living reference: `examples/smoke`

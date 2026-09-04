@@ -21,8 +21,8 @@ Do not load old Starlight pages, French translations, or `code-patterns`.
 - TanStack Start on **Cloudflare Workers**. Astro only for marketing/content sites.
 - Drizzle **0.4x** + **D1**. Better Auth. Tailwind v4 + shadcn. When asked for a shadcn component or block, install the exact official item with `pnpm dlx shadcn@latest add <item>`; do not recreate a lookalike. Customize only after installation.
 - Start server functions first. Hono + oRPC only when an API boundary needs it.
-- Oxlint + Oxfmt + tsgo. Ship gate: `pnpm lint && pnpm typecheck && pnpm test`
-- Infisical + Worker secrets. Never commit `.env` / `.dev.vars` with real values.
+- Oxlint + Oxfmt + TypeScript 7 `tsc`. Ship gate: `pnpm lint && pnpm typecheck && pnpm test`
+- Infisical + Worker secrets + Zod 4.5.x config validation. Scan staged changes; never commit `.env` / `.dev.vars` with real values.
 - Agents **push Git**. They do not `wrangler deploy` / `alchemy deploy` to staging/prod.
 - Mutation → `invalidateQueries`. No Convex. No live DO without a written multi-user trigger.
 - `wrangler types`. Dates `>= 2026-08-04` already include `nodejs_compat`. Observability on every Worker.
