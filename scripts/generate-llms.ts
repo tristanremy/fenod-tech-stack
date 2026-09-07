@@ -20,6 +20,7 @@ const routes = [
   { task: 'auth / permissions / sensitive data', read: ['docs/security-model.md', 'docs/agent-operating-contract.md', 'examples/smoke/src/lib/auth.ts'] },
   { task: 'test / lint / typecheck / refactor', read: ['skills/fenod-quality/SKILL.md', 'examples/smoke/package.json'] },
   { task: 'UI / shadcn component or block', read: ['docs/recipes.md', 'skills/fenod-stack/SKILL.md', 'examples/smoke/components.json'] },
+  { task: 'slow data loading / D1 N+1 / Router cache', read: ['docs/recipes.md', 'docs/gotchas.md', 'docs/security-model.md'] },
   { task: 'TanStack Start / D1 reference', read: ['examples/smoke/STACK.md', 'examples/smoke/package.json'] },
 ] as const;
 

@@ -53,6 +53,14 @@
       ]
     },
     {
+      "task": "slow data loading / D1 N+1 / Router cache",
+      "read": [
+        "docs/recipes.md",
+        "docs/gotchas.md",
+        "docs/security-model.md"
+      ]
+    },
+    {
       "task": "TanStack Start / D1 reference",
       "read": [
         "examples/smoke/STACK.md",

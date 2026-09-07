@@ -36,6 +36,14 @@ Default is **Infisical** + Worker secrets at runtime. Bitwarden SM only with an 
 
 Do not assume Postgres features, extensions, or migration behavior. Escape to Postgres only on Stack Contract triggers.
 
+## Parallel N+1 Is Still N+1
+
+`Promise.all(rows.map(loadDetail))` still issues one or more database reads per row. On Workers/D1, this can queue subrequests and dominate page latency. Use scoped set-based reads and test query counts as fixtures grow. Fetching all history once is not server pagination. See [Diagnose slow data loading](recipes.md#diagnose-slow-data-loading).
+
+## Router Preload Is Not Query Freshness
+
+Do not copy `defaultPreloadStaleTime: 0` into a loader-only app without a reason: it can refetch data already loaded by intent preloading. That setting fits a Query-owned cache only when loaders actually use Query. Cache private data per user and invalidate it after writes; retain server authorization even when a parent route already checked the session.
+
 ## KV Is Not a Database
 
 Eventually consistent config/cache only. Relational/transactional data stays in D1 (or Postgres when chosen).

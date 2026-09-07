@@ -20,6 +20,7 @@
 - **auth / permissions / sensitive data** → docs/security-model.md, docs/agent-operating-contract.md, examples/smoke/src/lib/auth.ts
 - **test / lint / typecheck / refactor** → skills/fenod-quality/SKILL.md, examples/smoke/package.json
 - **UI / shadcn component or block** → docs/recipes.md, skills/fenod-stack/SKILL.md, examples/smoke/components.json
+- **slow data loading / D1 N+1 / Router cache** → docs/recipes.md, docs/gotchas.md, docs/security-model.md
 - **TanStack Start / D1 reference** → examples/smoke/STACK.md, examples/smoke/package.json
 
 ## Core defaults
