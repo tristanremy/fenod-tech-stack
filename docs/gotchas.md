@@ -36,6 +36,14 @@ Default is **Infisical** + Worker secrets at runtime. Bitwarden SM only with an 
 
 Do not assume Postgres features, extensions, or migration behavior. Escape to Postgres only on Stack Contract triggers.
 
+## D1 Batch Atomicity Is Not `Promise.all`
+
+`Promise.all` starts independent statements; it does not make a multi-table write atomic. Use Drizzle `db.batch` for statements that must commit or roll back together. A read performed before the batch can become stale, so recheck the invariant inside the batch. A conditional update or compare-and-set that affects zero rows does not fail the batch by itself: inspect its result when no later writes depend on it, or make a later statement fail a database constraint when the guarded write lost the race. Test a real failure after the first statement and prove that no partial rows remain.
+
+## D1 and R2 Are Not One Transaction
+
+D1 and R2 cannot commit atomically together. Persist an explicit lifecycle state in D1, write the object to an idempotent R2 key, then finalize the D1 metadata. On failure, store a non-success state and let a retry reuse the same immutable identifier instead of consuming another one. Define how stale in-progress states recover before production; never label a document issued while its required object is unavailable.
+
 ## Parallel N+1 Is Still N+1
 
 `Promise.all(rows.map(loadDetail))` still issues one or more database reads per row. On Workers/D1, this can queue subrequests and dominate page latency. Use scoped set-based reads and test query counts as fixtures grow. Fetching all history once is not server pagination. See [Diagnose slow data loading](recipes.md#diagnose-slow-data-loading).
@@ -43,6 +51,10 @@ Do not assume Postgres features, extensions, or migration behavior. Escape to Po
 ## Router Preload Is Not Query Freshness
 
 Do not copy `defaultPreloadStaleTime: 0` into a loader-only app without a reason: it can refetch data already loaded by intent preloading. That setting fits a Query-owned cache only when loaders actually use Query. Cache private data per user and invalidate it after writes; retain server authorization even when a parent route already checked the session.
+
+## Browser Stores Need a Stable SSR Snapshot
+
+With `useSyncExternalStore`, `getServerSnapshot` must produce the same initial value on the server and during browser hydration. Do not return a module-level store populated from localStorage or development fixtures in the browser while SSR sees an empty store. For browser-only data, use a stable empty snapshot for SSR/hydration, then let `getSnapshot` expose the browser state. Test hydration with populated storage; an empty-store SSR test alone can miss the bug. Do not hide the mismatch with `suppressHydrationWarning`.
 
 ## KV Is Not a Database
 
@@ -86,7 +98,7 @@ New Workers: today's date + `observability.enabled`. Do not paste `nodejs_compat
 
 ## Nub Is Not the Package Manager
 
-Optional laptop: `nub run` / `nubx`. Repo law stays **pnpm 12** (`pnpm-lock.yaml`, `packageManager`, CI). Do not `nub pm use nub`. pnpm 12 must use its official release channel; npm `latest` can select an older major.
+Optional laptop: `nub run` / `nubx`. Repo law stays **pnpm**, pinned by `packageManager` and `pnpm-lock.yaml`. Do not `nub pm use nub`. Update pnpm deliberately through its official release channel; do not assume the npm `latest` tag selects the intended major.
 
 ## Shadcn Means the Official CLI
 
@@ -123,7 +135,3 @@ Better Auth, ORPC, and Drizzle need automated dependency monitoring plus `pnpm a
 ## French Docs Are Not Second Law
 
 Translate prose only. Keep slugs, package names, commands, and contracts aligned with English source. When FR drifts, English wins.
-
-## Diagrams
-
-Mermaid: `src/diagrams/*.mmd` → `pnpm diagrams:build` → `public/diagrams/*.svg`.

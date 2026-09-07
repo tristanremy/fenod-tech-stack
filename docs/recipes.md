@@ -56,6 +56,17 @@ When an API module exists, use a feature slice:
 
 `router.ts` stays thin. `service.ts` owns business logic and Drizzle.
 
+## Make a multi-table D1 write
+
+1. Parse the server-function input from `unknown` with Zod. Keep authorization in the server service even when the route already checked the session.
+2. Read the data needed to prepare the write, but assume it can become stale.
+3. Put every required D1 statement in one Drizzle `db.batch`. Recheck eligibility inside that batch. Do not use `Promise.all` as a transaction. A conditional update that affects zero rows still succeeds, so inspect its result or make a dependent statement fail a database constraint when the guard loses a race.
+4. Reserve sequential document numbers in the same batch as the document claim. Make the losing concurrent request fail the whole batch so its reservation rolls back.
+5. Test the real service against disposable local Miniflare D1. Inject a failure after an earlier statement, race two synchronized callers, and assert rows, links, counters, and foreign keys after both outcomes.
+6. Treat R2 as a separate transaction boundary. Record `finalizing` before the object write, mark `issued` only after success, store an explicit failure state, and make retries reuse the same number and object key. Add a policy for stale `finalizing` records.
+
+This pattern uses the stack defaults. Use Wrangler’s local Miniflare runtime for D1. Test R2 through a scoped fake binding locally, then through the protected integration environment when that environment exists.
+
 ## Add auth
 
 Better Auth + D1. Server-only config. Validate session at API boundaries.

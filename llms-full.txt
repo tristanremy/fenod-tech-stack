@@ -25,7 +25,7 @@
 
 ## Core defaults
 
-Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler, Infisical+Worker secrets, Oxlint+Oxfmt, tsgo, Vitest, Playwright.
+Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler, Infisical+Worker secrets, Oxlint+Oxfmt, TypeScript 7 tsc, Vitest, Playwright.
 
 ## Verification
 
@@ -396,6 +396,14 @@ Default is **Infisical** + Worker secrets at runtime. Bitwarden SM only with an 
 
 Do not assume Postgres features, extensions, or migration behavior. Escape to Postgres only on Stack Contract triggers.
 
+## D1 Batch Atomicity Is Not `Promise.all`
+
+`Promise.all` starts independent statements; it does not make a multi-table write atomic. Use Drizzle `db.batch` for statements that must commit or roll back together. A read performed before the batch can become stale, so recheck the invariant inside the batch. A conditional update or compare-and-set that affects zero rows does not fail the batch by itself: inspect its result when no later writes depend on it, or make a later statement fail a database constraint when the guarded write lost the race. Test a real failure after the first statement and prove that no partial rows remain.
+
+## D1 and R2 Are Not One Transaction
+
+D1 and R2 cannot commit atomically together. Persist an explicit lifecycle state in D1, write the object to an idempotent R2 key, then finalize the D1 metadata. On failure, store a non-success state and let a retry reuse the same immutable identifier instead of consuming another one. Define how stale in-progress states recover before production; never label a document issued while its required object is unavailable.
+
 ## Parallel N+1 Is Still N+1
 
 `Promise.all(rows.map(loadDetail))` still issues one or more database reads per row. On Workers/D1, this can queue subrequests and dominate page latency. Use scoped set-based reads and test query counts as fixtures grow. Fetching all history once is not server pagination. See [Diagnose slow data loading](recipes.md#diagnose-slow-data-loading).
@@ -403,6 +411,10 @@ Do not assume Postgres features, extensions, or migration behavior. Escape to Po
 ## Router Preload Is Not Query Freshness
 
 Do not copy `defaultPreloadStaleTime: 0` into a loader-only app without a reason: it can refetch data already loaded by intent preloading. That setting fits a Query-owned cache only when loaders actually use Query. Cache private data per user and invalidate it after writes; retain server authorization even when a parent route already checked the session.
+
+## Browser Stores Need a Stable SSR Snapshot
+
+With `useSyncExternalStore`, `getServerSnapshot` must produce the same initial value on the server and during browser hydration. Do not return a module-level store populated from localStorage or development fixtures in the browser while SSR sees an empty store. For browser-only data, use a stable empty snapshot for SSR/hydration, then let `getSnapshot` expose the browser state. Test hydration with populated storage; an empty-store SSR test alone can miss the bug. Do not hide the mismatch with `suppressHydrationWarning`.
 
 ## KV Is Not a Database
 
@@ -446,7 +458,7 @@ New Workers: today's date + `observability.enabled`. Do not paste `nodejs_compat
 
 ## Nub Is Not the Package Manager
 
-Optional laptop: `nub run` / `nubx`. Repo law stays **pnpm 12** (`pnpm-lock.yaml`, `packageManager`, CI). Do not `nub pm use nub`. pnpm 12 must use its official release channel; npm `latest` can select an older major.
+Optional laptop: `nub run` / `nubx`. Repo law stays **pnpm**, pinned by `packageManager` and `pnpm-lock.yaml`. Do not `nub pm use nub`. Update pnpm deliberately through its official release channel; do not assume the npm `latest` tag selects the intended major.
 
 ## Shadcn Means the Official CLI
 
@@ -483,10 +495,6 @@ Better Auth, ORPC, and Drizzle need automated dependency monitoring plus `pnpm a
 ## French Docs Are Not Second Law
 
 Translate prose only. Keep slugs, package names, commands, and contracts aligned with English source. When FR drifts, English wins.
-
-## Diagrams
-
-Mermaid: `src/diagrams/*.mmd` → `pnpm diagrams:build` → `public/diagrams/*.svg`.
 
 
 ---
@@ -550,6 +558,17 @@ When an API module exists, use a feature slice:
 ```
 
 `router.ts` stays thin. `service.ts` owns business logic and Drizzle.
+
+## Make a multi-table D1 write
+
+1. Parse the server-function input from `unknown` with Zod. Keep authorization in the server service even when the route already checked the session.
+2. Read the data needed to prepare the write, but assume it can become stale.
+3. Put every required D1 statement in one Drizzle `db.batch`. Recheck eligibility inside that batch. Do not use `Promise.all` as a transaction. A conditional update that affects zero rows still succeeds, so inspect its result or make a dependent statement fail a database constraint when the guard loses a race.
+4. Reserve sequential document numbers in the same batch as the document claim. Make the losing concurrent request fail the whole batch so its reservation rolls back.
+5. Test the real service against disposable local Miniflare D1. Inject a failure after an earlier statement, race two synchronized callers, and assert rows, links, counters, and foreign keys after both outcomes.
+6. Treat R2 as a separate transaction boundary. Record `finalizing` before the object write, mark `issued` only after success, store an explicit failure state, and make retries reuse the same number and object key. Add a policy for stale `finalizing` records.
+
+This pattern uses the stack defaults. Use Wrangler’s local Miniflare runtime for D1. Test R2 through a scoped fake binding locally, then through the protected integration environment when that environment exists.
 
 ## Add auth
 
