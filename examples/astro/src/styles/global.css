@@ -1,0 +1,60 @@
+:root {
+  color-scheme: light;
+  font-family: system-ui, sans-serif;
+  color: #172b36;
+  background: #fafbf9;
+  line-height: 1.6;
+}
+body {
+  max-width: 48rem;
+  margin: auto;
+  padding: 1rem;
+}
+nav {
+  display: flex;
+  gap: 1.5rem;
+}
+a {
+  color: #075c84;
+  text-underline-offset: 0.2em;
+}
+a[aria-current="page"] {
+  font-weight: 700;
+}
+a:focus-visible {
+  outline: 3px solid #075c84;
+  outline-offset: 4px;
+}
+h1 {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  line-height: 1.2;
+}
+h1,
+p {
+  overflow-wrap: anywhere;
+}
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  background: #c8dce5;
+}
+header {
+  padding-block: 0.5rem 1.5rem;
+  border-bottom: 1px solid #c4cdd0;
+}
+footer {
+  margin-top: 2rem;
+  padding-block: 1rem;
+  border-top: 1px solid #c4cdd0;
+  font-size: 0.875rem;
+}
+.skip-link {
+  position: absolute;
+  top: -5rem;
+  background: white;
+  padding: 0.5rem;
+}
+.skip-link:focus {
+  top: 0.5rem;
+}

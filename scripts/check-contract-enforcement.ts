@@ -54,6 +54,14 @@ const requirements = [
   ['agent context routes deployment', contextText, 'deploy / Cloudflare'],
   ['agent context routes AI work', contextText, 'AI feature / coding agent'],
   ['agent context routes shadcn work', contextText, 'UI / shadcn component or block'],
+  ['agent context routes Astro work', contextText, 'Astro / content site / SEO / JSON-LD / responsive images'],
+  ['recipes link the Astro proof', recipes, 'examples/astro/README.md'],
+  ['stack skill routes Astro work', stackSkill, 'docs/astro.md'],
+  ['CI checks the standalone Astro reference', ci, 'working-directory: examples/astro'],
+  ['agent context routes loading performance', contextText, 'slow data loading / D1 N+1 / Router cache'],
+  ['performance recipe requires query-count regression tests', recipes, 'counts database reads'],
+  ['performance recipe preserves tenant isolation', recipes, 'cross-tenant exclusion'],
+  ['performance recipe distinguishes production evidence', recipes, 'A fixed query count is not a latency measurement'],
 ] as const;
 
 const unpinnedActions = [...ci.matchAll(/^\s*uses:\s+[^@\s]+@([^\s#]+)/gm)]

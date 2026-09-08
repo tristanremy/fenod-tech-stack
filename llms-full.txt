@@ -9,22 +9,25 @@
 - Agent Operating Contract: docs/agent-operating-contract.md
 - Gotchas: docs/gotchas.md
 - Recipes: docs/recipes.md
+- Astro content sites: docs/astro.md
 - Security Model: docs/security-model.md
 - Agent Factory: docs/agent-factory.md
 
 ## Route by task
 
+- **Astro / content site / SEO / JSON-LD / responsive images** → docs/astro.md, examples/astro/README.md, examples/astro/package.json
 - **new app / architecture / stack choice** → docs/stack-contract.md, skills/fenod-stack/SKILL.md, examples/smoke/STACK.md
 - **deploy / Cloudflare / secrets / D1 migration** → docs/agent-operating-contract.md, docs/security-model.md, skills/fenod-cloudflare-deploy/SKILL.md
 - **AI feature / coding agent / eval / sandbox** → docs/agent-factory.md, docs/security-model.md
 - **auth / permissions / sensitive data** → docs/security-model.md, docs/agent-operating-contract.md, examples/smoke/src/lib/auth.ts
 - **test / lint / typecheck / refactor** → skills/fenod-quality/SKILL.md, examples/smoke/package.json
 - **UI / shadcn component or block** → docs/recipes.md, skills/fenod-stack/SKILL.md, examples/smoke/components.json
+- **slow data loading / D1 N+1 / Router cache** → docs/recipes.md, docs/gotchas.md, docs/security-model.md
 - **TanStack Start / D1 reference** → examples/smoke/STACK.md, examples/smoke/package.json
 
 ## Core defaults
 
-Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler, Infisical+Worker secrets, Oxlint+Oxfmt, tsgo, Vitest, Playwright.
+Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler, Infisical+Worker secrets, Oxlint+Oxfmt, TypeScript 7 tsc, Vitest, Playwright.
 
 ## Verification
 
@@ -63,8 +66,8 @@ Do not load old Starlight pages, French translations, or `code-patterns`.
 - TanStack Start on **Cloudflare Workers**. Astro only for marketing/content sites.
 - Drizzle **0.4x** + **D1**. Better Auth. Tailwind v4 + shadcn. When asked for a shadcn component or block, install the exact official item with `pnpm dlx shadcn@latest add <item>`; do not recreate a lookalike. Customize only after installation.
 - Start server functions first. Hono + oRPC only when an API boundary needs it.
-- Oxlint + Oxfmt + tsgo. Ship gate: `pnpm lint && pnpm typecheck && pnpm test`
-- Infisical + Worker secrets. Never commit `.env` / `.dev.vars` with real values.
+- Oxlint + Oxfmt + TypeScript 7 `tsc`. Ship gate: `pnpm lint && pnpm typecheck && pnpm test`
+- Infisical + Worker secrets + Zod 4.5.x config validation. Scan staged changes; never commit `.env` / `.dev.vars` with real values.
 - Agents **push Git**. They do not `wrangler deploy` / `alchemy deploy` to staging/prod.
 - Mutation → `invalidateQueries`. No Convex. No live DO without a written multi-user trigger.
 - `wrangler types`. Dates `>= 2026-08-04` already include `nodejs_compat`. Observability on every Worker.
@@ -89,7 +92,7 @@ Report: files changed, verification run, warnings, not done, whether prod action
 ---
 title: "Stack Contract"
 description: "Law for Fenod stack defaults. Other pages explain; this page resolves conflicts."
-verified: 2026-06
+verified: 2026-09
 ---
 
 This page is **law**. If another page is longer, newer-looking, or more detailed, this page still wins unless a project `STACK.md` / repo AGENTS explicitly overrides a line.
@@ -101,7 +104,7 @@ One-liner:
 ## Authority
 
 | Rank | Source | Wins when |
-|------|--------|-----------|
+| ------ | -------- | ----------- |
 | 1 | This contract | always, unless a project override exists |
 | 2 | Project `STACK.md` / repo AGENTS | project-specific lines only |
 | 3 | Skills + recipes | how to implement law |
@@ -114,7 +117,7 @@ One-liner:
 ## Defaults
 
 | Area | Law |
-|------|-----|
+| ------ | ----- |
 | Language | TypeScript strict |
 | Local/CI runtime | **Node 24** + **pnpm** |
 | App | **TanStack Start** on **Cloudflare Workers** |
@@ -131,13 +134,13 @@ One-liner:
 | Edge cache | Workers Cache + `Cache-Control` / `Cache-Tag` for public SSR and cacheable GET APIs |
 | AI in apps | **TanStack AI** + **Cloudflare AI Gateway** (provider keys in gateway, never in the browser); bounded tools, authorization, budgets, traces, and evals |
 | Deploy | **Workers**, never new Pages. **One Worker** → Git-connect or CI `wrangler deploy`. **2+ Workers that share bindings** → **Alchemy** via GitHub Action. Agents push Git; they do not deploy. |
-| Secrets | **Infisical** + Cloudflare Worker secrets at runtime |
+| Secrets | **Infisical** → Cloudflare Worker secrets at runtime; validate config with Zod 4.5.x |
 | Observability | Workers Observability on every Worker; **Sentry** only for product / paying apps |
 | Rate limits | Cloudflare-native binding or DO — **no Redis** |
 | Lint | **Oxlint** (`pnpm lint`). React apps: plugin `react` + `correctness` (Compiler rules). Type-aware lint is not CI default until TypeScript 7 is the repo baseline. |
 | Format | **Oxfmt** (`pnpm format` / `pnpm format:check`) |
-| Types | **tsgo** for `typecheck`; keep **`typescript`** installed for editor/tooling APIs |
-| Unit/integration tests | **Vitest** |
+| Types | **TypeScript 7** `tsc` for `typecheck`; keep TypeScript 6 only when tooling still needs its compiler API |
+| Unit/integration tests | **Vitest 5** |
 | Browser tests | **Playwright** for real UI flows |
 | Bundler | **Vite 8 + Rolldown** for new projects; `rolldown-vite` only as a Vite 7 bridge |
 | Internal packages | **tsdown** when a package must build artifacts |
@@ -194,7 +197,7 @@ Add Hono only when the HTTP/API boundary needs it. Do not create `apps/web` + `a
 ### Grow only on triggers
 
 | Trigger | Then add |
-|---------|----------|
+| --------- | ---------- |
 | Second deployable or shared library across apps | monorepo + packages (+ Turborepo if orchestration hurts) |
 | Multiple API consumers or thick procedures | feature slices under `packages/api` or `src/server` |
 | 2+ Workers that share D1 / R2 / KV / Queues / domains | **Alchemy** — GitHub Action deploys the smallest unit |
@@ -217,9 +220,10 @@ No ports/adapters. No generic repository layer.
 
 ## Secrets and Cloudflare authority
 
-- **Infisical** is the default secrets manager. Bitwarden SM only with an explicit project override.
-- Commit names and placeholders only (`.env.example`, `infisical.json` without secret values).
-- Never commit `.env`, `.env.local`, or `.dev.vars` with real values.
+- **Infisical** is the default secrets manager. Sync it to Cloudflare Worker secrets; Bitwarden SM only with an explicit project override.
+- Validate runtime configuration with Zod. Commit names and placeholders only (`.env.example`, `infisical.json` without secret values).
+- Never commit `.env`, `.env.local`, or `.dev.vars` with real values. Scan staged changes and enable GitHub push protection when available.
+- Varlock is not a default. Use it only after a written trigger; its Worker deploy replaces vars and secrets absent from its schema.
 - Local Wrangler must not accidentally prefer an exported token:
 
 ```bash
@@ -265,6 +269,7 @@ This repo is agent-first: `AGENTS.md` + these `docs/*.md` + `examples/smoke`. No
 - [Agent operating contract](agent-operating-contract.md)
 - [Gotchas](gotchas.md)
 - [Recipes](recipes.md)
+- [Environment and secrets](environment-secrets.md)
 - [Security](security-model.md)
 - [Agent factory](agent-factory.md)
 - Living reference: `examples/smoke`
@@ -358,7 +363,7 @@ Add `pnpm build`, Playwright, and browser checks when risk or UI warrants it. Do
 ---
 title: "Gotchas"
 description: "High-signal traps in the Fenod stack."
-verified: 2026-06
+verified: 2026-09
 ---
 
 ## Stack Contract Wins
@@ -392,6 +397,26 @@ Default is **Infisical** + Worker secrets at runtime. Bitwarden SM only with an 
 ## D1 Is SQLite
 
 Do not assume Postgres features, extensions, or migration behavior. Escape to Postgres only on Stack Contract triggers.
+
+## D1 Batch Atomicity Is Not `Promise.all`
+
+`Promise.all` starts independent statements; it does not make a multi-table write atomic. Use Drizzle `db.batch` for statements that must commit or roll back together. A read performed before the batch can become stale, so recheck the invariant inside the batch. A conditional update or compare-and-set that affects zero rows does not fail the batch by itself: inspect its result when no later writes depend on it, or make a later statement fail a database constraint when the guarded write lost the race. Test a real failure after the first statement and prove that no partial rows remain.
+
+## D1 and R2 Are Not One Transaction
+
+D1 and R2 cannot commit atomically together. Persist an explicit lifecycle state in D1, write the object to an idempotent R2 key, then finalize the D1 metadata. On failure, store a non-success state and let a retry reuse the same immutable identifier instead of consuming another one. Define how stale in-progress states recover before production; never label a document issued while its required object is unavailable.
+
+## Parallel N+1 Is Still N+1
+
+`Promise.all(rows.map(loadDetail))` still issues one or more database reads per row. On Workers/D1, this can queue subrequests and dominate page latency. Use scoped set-based reads and test query counts as fixtures grow. Fetching all history once is not server pagination. See [Diagnose slow data loading](recipes.md#diagnose-slow-data-loading).
+
+## Router Preload Is Not Query Freshness
+
+Do not copy `defaultPreloadStaleTime: 0` into a loader-only app without a reason: it can refetch data already loaded by intent preloading. That setting fits a Query-owned cache only when loaders actually use Query. Cache private data per user and invalidate it after writes; retain server authorization even when a parent route already checked the session.
+
+## Browser Stores Need a Stable SSR Snapshot
+
+With `useSyncExternalStore`, `getServerSnapshot` must produce the same initial value on the server and during browser hydration. Do not return a module-level store populated from localStorage or development fixtures in the browser while SSR sees an empty store. For browser-only data, use a stable empty snapshot for SSR/hydration, then let `getSnapshot` expose the browser state. Test hydration with populated storage; an empty-store SSR test alone can miss the bug. Do not hide the mismatch with `suppressHydrationWarning`.
 
 ## KV Is Not a Database
 
@@ -435,7 +460,7 @@ New Workers: today's date + `observability.enabled`. Do not paste `nodejs_compat
 
 ## Nub Is Not the Package Manager
 
-Optional laptop: `nub run` / `nubx`. Repo law stays **pnpm** (`pnpm-lock.yaml`, `packageManager`, CI). Do not `nub pm use nub`.
+Optional laptop: `nub run` / `nubx`. Repo law stays **pnpm**, pinned by `packageManager` and `pnpm-lock.yaml`. Do not `nub pm use nub`. Update pnpm deliberately through its official release channel; do not assume the npm `latest` tag selects the intended major.
 
 ## Shadcn Means the Official CLI
 
@@ -445,9 +470,9 @@ When a task asks for a shadcn component or block, use `pnpm dlx shadcn@latest ad
 
 Lint is Oxlint, format is Oxfmt. Do not add ESLint, Prettier, Biome, or Ultracite beside them “for completeness.”
 
-## tsgo Does Not Replace the typescript Package
+## TypeScript 7 Needs a Tooling Check
 
-tsgo is the fast typecheck path. Keep `typescript` installed for tooling that still needs the programmatic API.
+Use stable TypeScript 7 `tsc` for typechecks. Do not retain `@typescript/native-preview` / `tsgo` by habit. TypeScript 7 does not yet expose the historical compiler API; keep the TypeScript 6 compatibility package only when a proven tool still needs it.
 
 ## Alchemy Is Not Default Deploy
 
@@ -473,10 +498,6 @@ Better Auth, ORPC, and Drizzle need automated dependency monitoring plus `pnpm a
 
 Translate prose only. Keep slugs, package names, commands, and contracts aligned with English source. When FR drifts, English wins.
 
-## Diagrams
-
-Mermaid: `src/diagrams/*.mmd` → `pnpm diagrams:build` → `public/diagrams/*.svg`.
-
 
 ---
 
@@ -485,7 +506,7 @@ Mermaid: `src/diagrams/*.mmd` → `pnpm diagrams:build` → `public/diagrams/*.s
 ---
 title: "Recipes"
 description: "Short implementation recipes for common Fenod stack tasks."
-verified: 2026-06
+verified: 2026-09
 ---
 
 Recipes implement [stack-contract.md](stack-contract.md). Keep them short.
@@ -507,6 +528,19 @@ Then align with law: **D1 not Postgres**, Oxlint + Oxfmt, Infisical, Wrangler ob
 Living reference in this repo: [`examples/smoke`](https://github.com/tristanremy/fenod-tech-stack/tree/main/examples/smoke) (`STACK.md` maps each law line).
 
 Do not create a monorepo on day one. Add Hono only when you need a dedicated HTTP/API boundary.
+
+## Start an Astro content site
+
+Use the short [Astro recipe](astro.md) and standalone [`examples/astro`](../examples/astro/README.md): safe metadata/JSON-LD, native responsive images and generated-HTML tests. No app backend or published package is required.
+
+## Configure environment and secrets
+
+```bash
+infisical run --env=dev -- pnpm dev
+infisical scan git-changes --staged
+```
+
+Use Infisical as the source of truth and sync sensitive runtime values to Cloudflare Worker secrets. Keep non-secret values in `wrangler.jsonc` `vars`; validate required runtime config with Zod 4.5.x. `.dev.vars` is local-only and ignored. Do not add Varlock unless the application meets its written trigger in [Environment and secrets](environment-secrets.md).
 
 ## Add UI components and blocks
 
@@ -530,6 +564,17 @@ When an API module exists, use a feature slice:
 ```
 
 `router.ts` stays thin. `service.ts` owns business logic and Drizzle.
+
+## Make a multi-table D1 write
+
+1. Parse the server-function input from `unknown` with Zod. Keep authorization in the server service even when the route already checked the session.
+2. Read the data needed to prepare the write, but assume it can become stale.
+3. Put every required D1 statement in one Drizzle `db.batch`. Recheck eligibility inside that batch. Do not use `Promise.all` as a transaction. A conditional update that affects zero rows still succeeds, so inspect its result or make a dependent statement fail a database constraint when the guard loses a race.
+4. Reserve sequential document numbers in the same batch as the document claim. Make the losing concurrent request fail the whole batch so its reservation rolls back.
+5. Test the real service against disposable local Miniflare D1. Inject a failure after an earlier statement, race two synchronized callers, and assert rows, links, counters, and foreign keys after both outcomes.
+6. Treat R2 as a separate transaction boundary. Record `finalizing` before the object write, mark `issued` only after success, store an explicit failure state, and make retries reuse the same number and object key. Add a policy for stale `finalizing` records.
+
+This pattern uses the stack defaults. Use Wrangler’s local Miniflare runtime for D1. Test R2 through a scoped fake binding locally, then through the protected integration environment when that environment exists.
 
 ## Add auth
 
@@ -564,6 +609,17 @@ Prefer a first-party proxy. Public site IDs are config, not secrets.
 
 Default: mutation → `invalidateQueries`. Not Convex. Not Astro islands. Durable Object room only with a written multi-user trigger (see gotchas).
 
+## Diagnose slow data loading
+
+1. Measure one authenticated screen: cold load, navigation, preload then click, and reload after a mutation. Record request count, response bytes, server duration, and D1 query count. Use representative fixtures; do not export production data or credentials.
+2. Trace Router `beforeLoad` → loader → server function → D1. Start independent reads with `Promise.all`, not consecutive `await`s. Return the checked user from `beforeLoad` as route context instead of fetching it again for the layout. Keep authorization inside every server boundary.
+3. Remove **N+1** reads: fetch the selected parents and their children with set-based, tenant-filtered queries, then group children by parent ID with a `Map`. Do not call a detail loader for every row. Bound `IN` chunks to the current D1 parameter limit, including other bound values; a join can avoid a large ID list. Preserve empty parents, order, null values, and tenant isolation.
+4. Bound the payload too: paginate lists on the server, filter by date/status there, and aggregate dashboard figures in SQL. Browser-only pagination still downloads the whole history. Load detail lines, events, PDFs, and export bodies only where needed. Use `EXPLAIN QUERY PLAN` before adding indexes.
+5. Choose one cache owner. With Router loaders alone, keep a deliberate preload freshness window; `defaultPreloadStaleTime: 0` discards preload freshness. With Query `ensureQueryData`, Router may delegate freshness to Query with that setting. Define query keys, `staleTime`, mutation invalidation, and cache clearing at logout/account change together. Never add shared caching of private data to hide slow SQL.
+6. Leave a regression test that calls the real service and counts database reads for empty, small, and larger fixtures. Assert output equivalence and cross-tenant exclusion. A fixed query count is not a latency measurement: repeat the authenticated browser measurement after the approved release before claiming a production speedup.
+
+Start with the existing Router/Query and D1 tools. Do not add Redis, a new API layer, or a generic cache service to fix avoidable database calls.
+
 ## Offline
 
 Default: TanStack Query cache/persist.  
@@ -581,6 +637,43 @@ env -u CLOUDFLARE_API_TOKEN wrangler deploy
 CI injects runtime secrets with Infisical (e.g. `infisical run --env=prod -- wrangler deploy`) behind a protected environment. Alchemy only on Stack Contract triggers.
 
 
+---
+
+# Astro content sites
+
+---
+title: "Astro content sites"
+description: "A small static reference for safe metadata, JSON-LD and native images."
+verified: 2026-09
+---
+
+Use **Astro for content/marketing**, not a full-stack app by default. Follow the [Stack Contract](stack-contract.md). Start with [`examples/astro`](../examples/astro/README.md): one private package, two static pages, no browser JavaScript. It is executable proof, not a published library or branded starter.
+
+## Build and check
+
+```bash
+cd examples/astro
+pnpm install --frozen-lockfile # Node 24
+pnpm ship                   # format check, lint, .astro diagnostics, builds, HTML tests
+portless --script preview   # optional local portless installation
+```
+
+Read the example README for its local URL and tooling compatibility notes. Root scripts do not install or run this standalone package.
+
+## Metadata and structured data
+
+- Use one `Head.astro` per page. It owns title, description, canonical and Open Graph. Interpolate titles normally (`<title>{title}</title>`), never with `set:html`.
+- Set the explicit **public origin** in `src/lib/site.ts`. Canonicals use the route pathname, not a request/preview host. This static example has no query-identified content. Define that policy locally if queries identify real content. Add language alternates only for real translations.
+- Pass typed, factual Schema.org data to `JsonLd.astro`. Only its serializer output uses `set:html`: Unicode escapes keep `</script>` inert and preserve strings after `JSON.parse`. Types do not validate CMS inputs or prove eligibility for Google rich results; validate external data at its boundary.
+- Build previews with `pnpm build:preview` and serve **`dist-preview`**, not the production artifact. Every non-production build mode emits `noindex, nofollow`; canonical/OG URLs still point to the public origin. `noindex` is not security: protected previews need [Cloudflare Access](security-model.md#cloudflare-access-previews--staging--internal-admin), as a separately approved infrastructure action.
+
+## Native media and release boundary
+
+Keep local originals in `src/assets`. Use `astro:assets` `Image`, real dimensions, a few widths and `sizes` that match the layout. Use `priority` only on the visible lead/LCP candidate; use native lazy loading elsewhere. Sharp runs at build time here. The original PNG doubles as a static OG fixture; no OG generator, blur system or remote image service is needed.
+
+Tests parse **generated HTML** on both routes and in both build modes: unique tags, public URLs, hostile text round trips, image files/dimensions/priority, and zero executable scripts/JS files. Negative controls prove failures are detected. Also check the built site in a browser on desktop/mobile, including navigation, image requests, console and overflow. Repeat builds must produce identical files in the same locked environment.
+
+New static sites target **Workers static assets** (`dist`), without an SSR adapter, DB, auth or Alchemy. This reference creates no Worker and includes no deploy command. Deployment and Access setup belong to an approved project CI/human flow. No client migration or package publication is part of this example; pilots must validate any later shared API. Do not claim ranking, GEO or field CWV gains from these technical checks.
 
 
 ---
@@ -589,7 +682,7 @@ CI injects runtime secrets with Infisical (e.g. `infisical run --env=prod -- wra
 
 ---
 title: "Security Model"
-verified: 2026-06
+verified: 2026-09
 ---
 
 Security posture for secrets, Cloudflare, AI agents, user data, and production changes.
@@ -601,7 +694,7 @@ Agents may help build and operate systems, but they should not directly hold bro
 ## Trust Boundaries
 
 | Boundary | What crosses it | Rule |
-|----------|-----------------|------|
+| ---------- | ----------------- | ------ |
 | User/browser → app | user input, files, auth state | validate server-side, sanitize output |
 | App → Cloudflare resources | D1/R2/KV/Queues/DO bindings | least-privilege bindings per environment |
 | App → AI providers | prompts, retrieved context, tool results | route through AI Gateway where possible |
@@ -612,7 +705,7 @@ Agents may help build and operate systems, but they should not directly hold bro
 
 ## Secrets
 
-Secrets live in **Infisical** (default), Cloudflare Worker secrets, and CI secret storage as needed. Bitwarden SM only with an explicit project override. They do not live in prompts, docs, issues, PRs, checked-in `.env` files, or browser bundles.
+Secrets live in **Infisical** (default), Cloudflare Worker secrets, and CI secret storage as needed. Infisical is the source of truth; sync it to Workers instead of fetching it per request. Bitwarden SM only with an explicit project override. They do not live in prompts, docs, issues, PRs, checked-in `.env` files, or browser bundles.
 
 Allowed in Git:
 
@@ -686,8 +779,6 @@ Use direct Worker secrets only for unsupported providers/workflows or local deve
 
 ## Agent Permissions
 
-
-
 Agents should get capabilities in this order:
 
 1. read-only docs/config
@@ -723,7 +814,7 @@ Defenses:
 Use the smallest dataset that proves the point.
 
 | Data type | Default handling |
-|-----------|------------------|
+| ----------- | ------------------ |
 | Production user data | avoid locally; use sampled/redacted fixtures |
 | Uploaded files | scan/size-limit; store in R2 with scoped access |
 | Logs | redact secrets, tokens, cookies, auth headers |
@@ -746,9 +837,10 @@ Production-impacting actions need at least one hard gate:
 Before shipping a project:
 
 - [ ] `.env`, `.env.*`, `.dev.vars`, dumps, and backups are ignored
-- [ ] secret scan passes
+- [ ] staged changes pass one secret scanner (`infisical scan git-changes --staged` by default)
+- [ ] GitHub push protection is enabled when available
 - [ ] CI pins GitHub Actions to full commit SHAs and uses read-only default permissions
-- [ ] CI runs dependency review and `pnpm audit --audit-level high`
+- [ ] CI runs dependency review and `pnpm audit --audit-level high`; moderate findings are tracked until fixed
 - [ ] Cloudflare deploy token is resource-scoped
 - [ ] DNS token is separate from deploy token
 - [ ] D1 migration flow has approval/backup for production
@@ -760,6 +852,7 @@ Before shipping a project:
 
 ## Related
 
+- [Environment and secrets](environment-secrets.md)
 - [stack-contract.md](stack-contract.md)
 - [agent-operating-contract.md](agent-operating-contract.md)
 

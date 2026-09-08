@@ -24,6 +24,8 @@ description: Fenod's opinionated stack for building web apps, sites, and APIs. U
 
 Pages is not sunset, but frozen. New work targets Workers. One Worker → Git-connect or CI Wrangler. Two or more Workers that share bindings → Alchemy via GitHub Action. Agents push Git; they do not deploy.
 
+For Astro / SEO / JSON-LD / responsive-image tasks, read `docs/astro.md`, then `examples/astro/README.md` and its package scripts. Use that standalone static reference, not the app scaffold below.
+
 ## Scaffolding
 
 ```bash

@@ -1,0 +1,12 @@
+---
+import { Image } from "astro:assets";
+import landscape from "../assets/landscape.png";
+import Page from "../layouts/Page.astro";
+import { pages } from "../lib/pages";
+---
+<Page {...pages.home}>
+  <Image src={landscape} alt="An original geometric landscape in blue and green" widths={[360, 720, 1200]} sizes="(min-width: 50rem) 48rem, calc(100vw - 2rem)" format="webp" priority />
+  <h2>A small technical reference</h2>
+  <p>Each page owns one title, description, canonical URL and set of Open Graph tags. Images use local originals and Astro’s build pipeline.</p>
+  <p><a href="/content/">Read the content and escaping fixture</a>.</p>
+</Page>

@@ -1,0 +1,5 @@
+dist/
+dist-preview/
+.astro/
+# Oxfmt does not support Astro templates. Check them with astro check.
+**/*.astro

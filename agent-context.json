@@ -7,6 +7,14 @@
   ],
   "routes": [
     {
+      "task": "Astro / content site / SEO / JSON-LD / responsive images",
+      "read": [
+        "docs/astro.md",
+        "examples/astro/README.md",
+        "examples/astro/package.json"
+      ]
+    },
+    {
       "task": "new app / architecture / stack choice",
       "read": [
         "docs/stack-contract.md",
@@ -53,6 +61,14 @@
       ]
     },
     {
+      "task": "slow data loading / D1 N+1 / Router cache",
+      "read": [
+        "docs/recipes.md",
+        "docs/gotchas.md",
+        "docs/security-model.md"
+      ]
+    },
+    {
       "task": "TanStack Start / D1 reference",
       "read": [
         "examples/smoke/STACK.md",
@@ -60,7 +76,7 @@
       ]
     }
   ],
-  "defaults": "Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler, Infisical+Worker secrets, Oxlint+Oxfmt, tsgo, Vitest, Playwright.",
+  "defaults": "Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler, Infisical+Worker secrets, Oxlint+Oxfmt, TypeScript 7 tsc, Vitest, Playwright.",
   "verification": [
     "pnpm lint",
     "pnpm typecheck",

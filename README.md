@@ -74,6 +74,8 @@ flowchart TD
   F -- Shared live state --> I[Consider Durable Object]
 ```
 
+For a content or marketing site, use the [Astro recipe](docs/astro.md) and [standalone Astro reference](examples/astro/README.md).
+
 ## UI rule
 
 When you want shadcn, use the real item, not a similar implementation:

@@ -1,0 +1,13 @@
+---
+import { Image } from "astro:assets";
+import landscape from "../assets/landscape.png";
+import Page from "../layouts/Page.astro";
+import { pages } from "../lib/pages";
+---
+<Page {...pages.content}>
+  <h2>Text stays text</h2>
+  <p>The title and description above are deliberate hostile-string fixtures, not executable markup. The same strings appear in the page’s JSON-LD and survive JSON parsing unchanged.</p>
+  <h2>Native image loading</h2>
+  <p>This secondary image keeps native lazy loading. Only the home page’s lead image has high fetch priority. Both reserve their dimensions and expose responsive widths.</p>
+  <Image src={landscape} alt="An original geometric landscape in blue and green" widths={[360, 720, 1200]} sizes="(min-width: 50rem) 48rem, calc(100vw - 2rem)" format="webp" loading="lazy" />
+</Page>

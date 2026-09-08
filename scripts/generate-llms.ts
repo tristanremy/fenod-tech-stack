@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 
 const coreDefaults =
-  'Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler, Infisical+Worker secrets, Oxlint+Oxfmt, tsgo, Vitest, Playwright.';
+  'Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler, Infisical+Worker secrets, Oxlint+Oxfmt, TypeScript 7 tsc, Vitest, Playwright.';
 
 const docs = [
   ['Agent entry', 'AGENTS.md'],
@@ -9,17 +9,20 @@ const docs = [
   ['Agent Operating Contract', 'docs/agent-operating-contract.md'],
   ['Gotchas', 'docs/gotchas.md'],
   ['Recipes', 'docs/recipes.md'],
+  ['Astro content sites', 'docs/astro.md'],
   ['Security Model', 'docs/security-model.md'],
   ['Agent Factory', 'docs/agent-factory.md'],
 ] as const;
 
 const routes = [
+  { task: 'Astro / content site / SEO / JSON-LD / responsive images', read: ['docs/astro.md', 'examples/astro/README.md', 'examples/astro/package.json'] },
   { task: 'new app / architecture / stack choice', read: ['docs/stack-contract.md', 'skills/fenod-stack/SKILL.md', 'examples/smoke/STACK.md'] },
   { task: 'deploy / Cloudflare / secrets / D1 migration', read: ['docs/agent-operating-contract.md', 'docs/security-model.md', 'skills/fenod-cloudflare-deploy/SKILL.md'] },
   { task: 'AI feature / coding agent / eval / sandbox', read: ['docs/agent-factory.md', 'docs/security-model.md'] },
   { task: 'auth / permissions / sensitive data', read: ['docs/security-model.md', 'docs/agent-operating-contract.md', 'examples/smoke/src/lib/auth.ts'] },
   { task: 'test / lint / typecheck / refactor', read: ['skills/fenod-quality/SKILL.md', 'examples/smoke/package.json'] },
   { task: 'UI / shadcn component or block', read: ['docs/recipes.md', 'skills/fenod-stack/SKILL.md', 'examples/smoke/components.json'] },
+  { task: 'slow data loading / D1 N+1 / Router cache', read: ['docs/recipes.md', 'docs/gotchas.md', 'docs/security-model.md'] },
   { task: 'TanStack Start / D1 reference', read: ['examples/smoke/STACK.md', 'examples/smoke/package.json'] },
 ] as const;
 

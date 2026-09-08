@@ -24,6 +24,10 @@ Living reference in this repo: [`examples/smoke`](https://github.com/tristanremy
 
 Do not create a monorepo on day one. Add Hono only when you need a dedicated HTTP/API boundary.
 
+## Start an Astro content site
+
+Use the short [Astro recipe](astro.md) and standalone [`examples/astro`](../examples/astro/README.md): safe metadata/JSON-LD, native responsive images and generated-HTML tests. No app backend or published package is required.
+
 ## Configure environment and secrets
 
 ```bash
@@ -55,6 +59,17 @@ When an API module exists, use a feature slice:
 ```
 
 `router.ts` stays thin. `service.ts` owns business logic and Drizzle.
+
+## Make a multi-table D1 write
+
+1. Parse the server-function input from `unknown` with Zod. Keep authorization in the server service even when the route already checked the session.
+2. Read the data needed to prepare the write, but assume it can become stale.
+3. Put every required D1 statement in one Drizzle `db.batch`. Recheck eligibility inside that batch. Do not use `Promise.all` as a transaction. A conditional update that affects zero rows still succeeds, so inspect its result or make a dependent statement fail a database constraint when the guard loses a race.
+4. Reserve sequential document numbers in the same batch as the document claim. Make the losing concurrent request fail the whole batch so its reservation rolls back.
+5. Test the real service against disposable local Miniflare D1. Inject a failure after an earlier statement, race two synchronized callers, and assert rows, links, counters, and foreign keys after both outcomes.
+6. Treat R2 as a separate transaction boundary. Record `finalizing` before the object write, mark `issued` only after success, store an explicit failure state, and make retries reuse the same number and object key. Add a policy for stale `finalizing` records.
+
+This pattern uses the stack defaults. Use Wrangler’s local Miniflare runtime for D1. Test R2 through a scoped fake binding locally, then through the protected integration environment when that environment exists.
 
 ## Add auth
 
@@ -88,6 +103,17 @@ Prefer a first-party proxy. Public site IDs are config, not secrets.
 ## Live queries
 
 Default: mutation → `invalidateQueries`. Not Convex. Not Astro islands. Durable Object room only with a written multi-user trigger (see gotchas).
+
+## Diagnose slow data loading
+
+1. Measure one authenticated screen: cold load, navigation, preload then click, and reload after a mutation. Record request count, response bytes, server duration, and D1 query count. Use representative fixtures; do not export production data or credentials.
+2. Trace Router `beforeLoad` → loader → server function → D1. Start independent reads with `Promise.all`, not consecutive `await`s. Return the checked user from `beforeLoad` as route context instead of fetching it again for the layout. Keep authorization inside every server boundary.
+3. Remove **N+1** reads: fetch the selected parents and their children with set-based, tenant-filtered queries, then group children by parent ID with a `Map`. Do not call a detail loader for every row. Bound `IN` chunks to the current D1 parameter limit, including other bound values; a join can avoid a large ID list. Preserve empty parents, order, null values, and tenant isolation.
+4. Bound the payload too: paginate lists on the server, filter by date/status there, and aggregate dashboard figures in SQL. Browser-only pagination still downloads the whole history. Load detail lines, events, PDFs, and export bodies only where needed. Use `EXPLAIN QUERY PLAN` before adding indexes.
+5. Choose one cache owner. With Router loaders alone, keep a deliberate preload freshness window; `defaultPreloadStaleTime: 0` discards preload freshness. With Query `ensureQueryData`, Router may delegate freshness to Query with that setting. Define query keys, `staleTime`, mutation invalidation, and cache clearing at logout/account change together. Never add shared caching of private data to hide slow SQL.
+6. Leave a regression test that calls the real service and counts database reads for empty, small, and larger fixtures. Assert output equivalence and cross-tenant exclusion. A fixed query count is not a latency measurement: repeat the authenticated browser measurement after the approved release before claiming a production speedup.
+
+Start with the existing Router/Query and D1 tools. Do not add Redis, a new API layer, or a generic cache service to fix avoidable database calls.
 
 ## Offline
 
