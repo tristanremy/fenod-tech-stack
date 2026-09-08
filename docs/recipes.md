@@ -24,6 +24,10 @@ Living reference in this repo: [`examples/smoke`](https://github.com/tristanremy
 
 Do not create a monorepo on day one. Add Hono only when you need a dedicated HTTP/API boundary.
 
+## Start an Astro content site
+
+Use the short [Astro recipe](astro.md) and standalone [`examples/astro`](../examples/astro/README.md): safe metadata/JSON-LD, native responsive images and generated-HTML tests. No app backend or published package is required.
+
 ## Configure environment and secrets
 
 ```bash

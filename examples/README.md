@@ -3,6 +3,9 @@
 | Path | Role |
 |------|------|
 | [`smoke/`](./smoke/) | **Law reference app** — single-package TanStack Start + Workers + D1 + Better Auth + Hono/oRPC + Wrangler + Oxlint/Oxfmt |
+| [`astro/`](./astro/) | **Static content reference** — standalone Astro, safe Head/JSON-LD, native images and generated-HTML tests |
+
+For static content/marketing, read the [Astro recipe](../docs/astro.md) instead of adding an app backend.
 
 ## Start a real product from smoke
 

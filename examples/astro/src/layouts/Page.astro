@@ -1,0 +1,44 @@
+---
+import type { WithContext, WebPage } from "schema-dts";
+import Head from "../components/Head.astro";
+import JsonLd from "../components/JsonLd.astro";
+import landscape from "../assets/landscape.png";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+const url = new URL(Astro.url.pathname, Astro.site).href;
+const data: WithContext<WebPage> = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": `${url}#webpage`,
+  url,
+  name: title,
+  description,
+};
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <Head title={title} description={description} image={landscape.src} />
+    <JsonLd data={data} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header>
+      <nav aria-label="Main navigation">
+        <a href="/" aria-current={Astro.url.pathname === "/" ? "page" : undefined}>Home</a>
+        <a href="/content/" aria-current={Astro.url.pathname === "/content/" ? "page" : undefined}>Content</a>
+      </nav>
+    </header>
+    <main id="main" tabindex="-1">
+      <h1>{title}</h1>
+      <p>{description}</p>
+      <slot />
+    </main>
+    <footer>Static HTML · Native Astro images · No browser JavaScript</footer>
+  </body>
+</html>

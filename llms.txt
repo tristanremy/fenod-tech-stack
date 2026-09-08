@@ -9,11 +9,13 @@
 - Agent Operating Contract: docs/agent-operating-contract.md
 - Gotchas: docs/gotchas.md
 - Recipes: docs/recipes.md
+- Astro content sites: docs/astro.md
 - Security Model: docs/security-model.md
 - Agent Factory: docs/agent-factory.md
 
 ## Route by task
 
+- **Astro / content site / SEO / JSON-LD / responsive images** → docs/astro.md, examples/astro/README.md, examples/astro/package.json
 - **new app / architecture / stack choice** → docs/stack-contract.md, skills/fenod-stack/SKILL.md, examples/smoke/STACK.md
 - **deploy / Cloudflare / secrets / D1 migration** → docs/agent-operating-contract.md, docs/security-model.md, skills/fenod-cloudflare-deploy/SKILL.md
 - **AI feature / coding agent / eval / sandbox** → docs/agent-factory.md, docs/security-model.md

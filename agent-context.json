@@ -7,6 +7,14 @@
   ],
   "routes": [
     {
+      "task": "Astro / content site / SEO / JSON-LD / responsive images",
+      "read": [
+        "docs/astro.md",
+        "examples/astro/README.md",
+        "examples/astro/package.json"
+      ]
+    },
+    {
       "task": "new app / architecture / stack choice",
       "read": [
         "docs/stack-contract.md",

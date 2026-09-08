@@ -9,11 +9,13 @@ const docs = [
   ['Agent Operating Contract', 'docs/agent-operating-contract.md'],
   ['Gotchas', 'docs/gotchas.md'],
   ['Recipes', 'docs/recipes.md'],
+  ['Astro content sites', 'docs/astro.md'],
   ['Security Model', 'docs/security-model.md'],
   ['Agent Factory', 'docs/agent-factory.md'],
 ] as const;
 
 const routes = [
+  { task: 'Astro / content site / SEO / JSON-LD / responsive images', read: ['docs/astro.md', 'examples/astro/README.md', 'examples/astro/package.json'] },
   { task: 'new app / architecture / stack choice', read: ['docs/stack-contract.md', 'skills/fenod-stack/SKILL.md', 'examples/smoke/STACK.md'] },
   { task: 'deploy / Cloudflare / secrets / D1 migration', read: ['docs/agent-operating-contract.md', 'docs/security-model.md', 'skills/fenod-cloudflare-deploy/SKILL.md'] },
   { task: 'AI feature / coding agent / eval / sandbox', read: ['docs/agent-factory.md', 'docs/security-model.md'] },

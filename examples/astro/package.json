@@ -1,0 +1,36 @@
+{
+  "name": "fenod-astro-reference",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host 127.0.0.1",
+    "preview": "astro preview --host 127.0.0.1",
+    "build": "astro build",
+    "build:preview": "astro build --mode preview --outDir dist-preview",
+    "lint": "oxlint src tests astro.config.mjs",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "typecheck": "astro check",
+    "test": "pnpm build && pnpm build:preview && vitest run",
+    "test:html": "vitest run",
+    "ship": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test"
+  },
+  "dependencies": {
+    "astro": "7.3.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@types/node": "24.10.1",
+    "cheerio": "1.2.0",
+    "oxfmt": "0.67.0",
+    "oxlint": "1.82.0",
+    "schema-dts": "1.1.5",
+    "sharp": "0.35.4",
+    "typescript": "6.0.3",
+    "vitest": "5.0.0"
+  },
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "packageManager": "pnpm@10.24.0"
+}

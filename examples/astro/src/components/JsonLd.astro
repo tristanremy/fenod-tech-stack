@@ -1,0 +1,10 @@
+---
+import type { Thing, WithContext } from "schema-dts";
+import { serializeJsonLd } from "../lib/json-ld";
+
+interface Props {
+  data: WithContext<Thing>;
+}
+const { data } = Astro.props;
+---
+<script is:inline type="application/ld+json" set:html={serializeJsonLd(data)} />
