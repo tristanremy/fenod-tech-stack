@@ -126,9 +126,11 @@ real socket connections. No ambient credential is read or forwarded.
 For each case, the real CLI loads successfully, fails for the expected reason,
 then recovers, retaining the same schema/directory/HOME between child processes:
 network rejection, the real Ky 10-second timeout, malformed JSON, invalid JSON
-shape, HTTP 401, HTTP 403 and HTTP 503. Every negative result must reach the fake
-transport, have per-key errors, return no previous values, and exit nonzero.
-A killed/timed-out test process is not counted as a passing failure case.
+shape, HTTP 401, HTTP 403, HTTP 404, HTTP 429 and HTTP 503. Every negative result
+must reach the fake transport, have per-key errors, return no previous values,
+and exit nonzero. A killed/timed-out test process is not counted as a passing
+failure case. Transient statuses (429/503) must be retried, and the timeout must
+come from the client's real timer rather than a fabricated error.
 
 This checks **fresh loader processes with `cacheTtl=false` and `@cache=disabled`**,
 not cache-enabled behavior or refresh inside an already running Worker. Plugin
