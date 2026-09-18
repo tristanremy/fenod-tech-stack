@@ -2,23 +2,27 @@
 
 | Path | Role |
 | --- | --- |
-| [`smoke/`](./smoke/) | **Experimental law reference app** — one-package TanStack Start + Workers + D1 + Better Auth + fixture-only Varlock + Wrangler + Oxlint/Oxfmt |
+| [`smoke/`](./smoke/) | **Experimental exportable app** — one-package TanStack Start + Workers/D1 + Better Auth + fixture-only Varlock + pinned CI/browser checks |
 | [`astro/`](./astro/) | **Static content reference** — standalone Astro, safe Head/JSON-LD, native images and generated-HTML tests |
 
 For static content/marketing, read the [Astro recipe](../docs/astro.md) instead of adding an app backend.
 
-## Try smoke locally
+## Export the application starter
+
+Never copy the working directory. Select an immutable commit:
 
 ```bash
-cd examples/smoke
+revision=$(git rev-parse HEAD)
+node scripts/export-starter.mjs "$revision" ../my-app
+cd ../my-app
 pnpm install --frozen-lockfile
-pnpm config:check
 pnpm cf-types
-pnpm db:local
 pnpm ship
-pnpm dev
+pnpm build
+pnpm exec playwright install chromium
+pnpm test:e2e
 ```
 
-No vault or Cloudflare account is needed. The committed `.env.schema` permits only synthetic local values. Remote migration and deployment scripts deliberately fail.
+The export contains only the committed `examples/smoke` tree plus `starter-provenance.json`; it refuses overwrite, symlinks and secret/cache paths. Local fixture mode needs no vault or Cloudflare account. Remote migration and deployment scripts deliberately fail. Read the exported `AGENTS.md`, `STACK.md` and `README.md` before changing it.
 
-Do not copy this working tree into a product yet. S3 in [plan 010](../plans/010-maintained-starter.md) will add a tracked-file export from an immutable revision and verify it outside this handbook. Hono + oRPC remain optional until a real API consumer needs them.
+Hono + oRPC remain optional until a real API consumer needs them. Production readiness still requires the separately approved vault/deployment gates in [plan 010](../plans/010-maintained-starter.md).

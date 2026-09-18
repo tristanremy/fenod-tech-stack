@@ -3,6 +3,8 @@ dist
 .wrangler
 .tanstack
 coverage
+playwright-report/
+test-results/
 lint-fixture-*/
 *.log
 .DS_Store

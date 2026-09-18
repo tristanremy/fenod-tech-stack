@@ -1,45 +1,34 @@
-# fenod-smoke — law reference app
+# Application contract
 
-Integration reference for [Fenod Stack Contract](../../docs/stack-contract.md), **experimental and not a production-safe starter**. It is the candidate base for the [maintained starter](../../plans/010-maintained-starter.md). The [September audit](../../plans/009-agent-first-audit.md) records remaining portability, deployment and operations gaps. See the [README status table](./README.md#status-experimental-not-production-ready) for verified scope.
+This experimental local reference follows the [upstream law](https://github.com/tristanremy/fenod-tech-stack/blob/UPSTREAM_REVISION/docs/stack-contract.md) except for the bounded overrides below. Read [AGENTS.md](./AGENTS.md) and [README.md](./README.md). Export provenance is recorded in `starter-provenance.json`.
 
-UI policy: `@shadcn/lint` runs inside `pnpm lint` through Oxlint. `no-restyle` allows layout at call sites; variants belong in `src/components/ui`. `src/lint-policy.test.ts` checks accepted and rejected usage.
+| Area              | Contract                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------ |
+| Runtime           | Node 24, pinned pnpm and frozen lockfile; macOS/Linux                                                  |
+| App               | One package, TanStack Start on Workers; server functions first                                         |
+| Database          | Drizzle 0.4x + local D1 binding `DB`; never a database URL                                             |
+| Auth              | Better Auth minimal + Drizzle adapter; fresh session at every item boundary                            |
+| Ownership         | Session-derived `userId` in every item read/update/delete; no client-supplied owner                    |
+| Validation        | Zod for domain inputs from `unknown`; Varlock for fixture config                                       |
+| Cache             | Query owns item data; invalidate on mutation and clear on user change                                  |
+| UI                | Tailwind v4 + shadcn Radix `new-york`; install official items with `pnpm dlx shadcn@latest add <item>` |
+| Lint              | Oxlint + `@shadcn/lint`; layout allowed, variants belong in component definitions                      |
+| Format            | Oxfmt; check does not rewrite files                                                                    |
+| Bindings          | `pnpm cf-types` uses Varlock/ Wrangler, normalizing only its random header path                        |
+| Routes            | `pnpm generate-routes` uses Start's build generator, not a competing router CLI                        |
+| Tests             | Unit tests plus Playwright against real local Workers/D1                                               |
+| Remote operations | Blocked; no agent deployment, provisioning or remote migrations                                        |
 
-| Law                      | This app                                                                                                                                                          |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Node 24 + pnpm           | `package.json` engines + pnpm                                                                                                                                     |
-| TanStack Start + Workers | Varlock-wrapped Cloudflare Vite plugin + `wrangler.jsonc`                                                                                                         |
-| One package day-one      | This directory only — no monorepo                                                                                                                                 |
-| Drizzle 0.4x + D1        | `src/db/*`, D1 binding `DB`                                                                                                                                       |
-| Better Auth              | `src/lib/auth.ts` — `better-auth/minimal`, Drizzle/D1, cookie cache, CF IP, D1 rate limits                                                                        |
-| Same-origin API          | `/api/auth/*` is a Start server route. No CORS.                                                                                                                   |
-| Server functions first   | `src/server/items.ts` owns the item flow; `item-input.ts` parses `unknown`. Add Hono + oRPC only for a real API boundary.                                         |
-| Ownership                | Every read/write filters on the authenticated session `userId`; cross-user ids return `not_found`.                                                                |
-| Tailwind v4 + shadcn     | Radix `new-york` in `components.json`; install official items with `pnpm dlx shadcn@latest add <item>`.                                                           |
-| Remote mutation          | Blocked by `scripts/local-only.mjs`; requires the S4/S5 approvals in plan 010.                                                                                    |
-| Worker types             | `pnpm cf-types` uses `varlock-wrangler types`; run before typecheck after schema/binding changes.                                                                 |
-| Configuration pilot      | `.env.schema` is the single app-config schema. It permits only synthetic `test`/loopback values, disables Varlock disk cache, and keeps `DOPPLER_TOKEN` internal. |
-| TypeScript 7 transition  | Target stable TypeScript 7 after tooling validation; current gate is pinned `tsgo`.                                                                               |
-| Ship gate                | `pnpm check && pnpm test`; build and type generation remain explicit higher-risk/preparation steps.                                                               |
+## Explicit experimental overrides
 
-## S2 local configuration override
+- **Secrets:** upstream Infisical remains the default elsewhere. This app uses only synthetic `test`/loopback Varlock fixtures. No Doppler resolver, real credential or remote config. This does not authorize adoption for real environments.
+- **Compiler:** pinned TS7 native preview (`tsgo`) plus TypeScript 5.9 for compiler-API tooling until a coherent stable-toolchain migration is verified.
+- **Unit runtime:** Vitest 3.2.x remains pinned by lockfile. Two moderate advisories are tracked for the Workers test-runtime upgrade; do not suppress high/critical audit failures.
 
-This example deliberately overrides the repository's Infisical default **only for a fixture-only Varlock experiment**:
+## Boundaries and commands
 
-```bash
-pnpm config:check
-pnpm cf-types
-pnpm db:local
-pnpm dev
-```
+`pnpm ship` verifies config, portable instructions, formatting, lint, types and unit tests. `pnpm build` checks the Worker/client bundle and canaries. `pnpm test:e2e` uses only local synthetic data. Generation and local migration are explicit preparation steps; validation must not silently repair tracked files.
 
-No local secret file or account is needed. The Doppler plugin is absent. Active `.env*` / `.dev.vars*` override files make Vite stop without deleting or printing them. Agent diagnostics use `--agent`; raw `json-full` is forbidden when values are real.
+No Hono/oRPC until an external API consumer needs that boundary. No monorepo, Postgres, Redis, organization/role system, realtime, email, billing or resource provisioning in this seed. The existing auth/owned-item feature is the example to extend, not a generic framework.
 
-This is not evidence for Doppler access, production secret resolution, target inventory or Cloudflare deployment. The root contract remains authoritative outside this bounded experiment.
-
-## Not in scope
-
-- Production/development vault values, remote D1, Worker deployment or destructive secret replacement
-- Alchemy, monorepo, Postgres, Polar, R2 uploads, Playwright, full offline
-- Hono + oRPC without a real external API consumer
-- Organizations, roles, invitations and email verification
-- Strict Oxlint on scaffold UI (law-owned paths are linted)
+Promotion requires separate vault and disposable-deployment evidence plus owner approval. No application is migrated automatically. [Release gates](https://github.com/tristanremy/fenod-tech-stack/blob/UPSTREAM_REVISION/plans/010-maintained-starter.md).

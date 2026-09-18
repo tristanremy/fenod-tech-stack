@@ -45,19 +45,23 @@ flowchart LR
 
 The living reference is intentionally one package, not a starter monorepo.
 
-**Not a production-ready template yet:** the item workflow is authenticated and owner-scoped, but there is no portable export, CI browser test or validated deployed secret/config startup. S2 now proves fixture-only Varlock injection locally; it does not prove Doppler or deployment. See the [September audit](plans/009-agent-first-audit.md) and [starter plan](plans/010-maintained-starter.md). Wait for S3 instead of copying a working tree.
+**Still experimental:** local auth/owned CRUD, fixture-only Varlock, immutable export and clean-room browser verification are implemented. Doppler, deployed secrets/recovery and production operations are not validated. See the [September audit](plans/009-agent-first-audit.md) and [starter plan](plans/010-maintained-starter.md).
+
+Export only committed files from an exact revision; never copy a working tree:
 
 ```bash
-cd examples/smoke
+revision=$(git rev-parse HEAD)
+node scripts/export-starter.mjs "$revision" ../my-app
+cd ../my-app
 pnpm install --frozen-lockfile
-pnpm config:check
 pnpm cf-types
-pnpm db:local
 pnpm ship
-pnpm dev
+pnpm build
+pnpm exec playwright install chromium
+pnpm test:e2e
 ```
 
-No vault account, credential or local env file is needed. Add Hono + oRPC only if a real API boundary is needed ([recipe](docs/recipes.md)). Remote scripts fail closed until separately approved S4/S5 work.
+The export refuses overwrite and unsafe Git entries, records commit/tree provenance and replaces upstream links with that immutable commit. It needs only Node 24, pinned pnpm, Git and standard `tar` on macOS/Linux. No vault account, Cloudflare credential or local env file is needed. Add Hono + oRPC only for a real API boundary ([recipe](docs/recipes.md)). Remote scripts fail closed until separately approved S4/S5 work.
 
 ```mermaid
 flowchart TD

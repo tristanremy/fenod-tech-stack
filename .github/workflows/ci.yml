@@ -17,34 +17,35 @@ jobs:
       contents: read
     steps:
       - name: Review dependency changes
-        uses: actions/dependency-review-action@595b5aeba73380359d98a5e087f648dbb0edce1b # v4.7.3
+        uses: actions/dependency-review-action@595b5aeba73380359d98a5e087f648dbb0edce1b
 
   secrets:
     name: Secrets scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout history for change scan
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
+          persist-credentials: false
 
-      - name: Scan tracked content
-        uses: trufflesecurity/trufflehog@709cd089144a6b6452f0915e7ea0d5e4a39d3243 # v3.88.9
-        with:
-          extra_args: --results=verified
+      - name: Scan tracked content offline
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e
 
   docs:
     name: Docs checks
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@7088e561eb65bb68695d245aa206f005ef30921d # v4.1.0
+        uses: pnpm/action-setup@7088e561eb65bb68695d245aa206f005ef30921d
 
       - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 24
           cache: pnpm
@@ -66,13 +67,15 @@ jobs:
         working-directory: examples/smoke
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@7088e561eb65bb68695d245aa206f005ef30921d # v4.1.0
+        uses: pnpm/action-setup@7088e561eb65bb68695d245aa206f005ef30921d
 
       - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 24
           cache: pnpm
@@ -84,11 +87,44 @@ jobs:
       - name: Ship gate
         run: pnpm ship
 
-      - name: Verify Worker bindings and bundle
-        run: pnpm cf-types && pnpm build
+      - name: Verify deterministic Worker bindings and bundle
+        run: |
+          pnpm cf-types
+          git diff --exit-code
+          pnpm build
+          git diff --exit-code
 
       - name: Audit dependencies
         run: pnpm audit --audit-level high
+
+  starter-export:
+    name: Exported starter clean-room gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    env:
+      CI: true
+      DO_NOT_TRACK: '1'
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - name: Checkout exact revision without reusable credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@7088e561eb65bb68695d245aa206f005ef30921d
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+
+      - name: Export and verify standalone application
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
+        run: node scripts/verify-starter.mjs "$GITHUB_SHA"
 
   astro:
     name: Astro static reference ship gate
@@ -98,13 +134,15 @@ jobs:
         working-directory: examples/astro
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@7088e561eb65bb68695d245aa206f005ef30921d # v4.1.0
+        uses: pnpm/action-setup@7088e561eb65bb68695d245aa206f005ef30921d
 
       - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 24
           cache: pnpm
