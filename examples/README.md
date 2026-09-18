@@ -1,27 +1,28 @@
 # Examples
 
 | Path | Role |
-|------|------|
-| [`smoke/`](./smoke/) | **Law reference app** — single-package TanStack Start + Workers + D1 + Better Auth + Hono/oRPC + Wrangler + Oxlint/Oxfmt |
+| --- | --- |
+| [`smoke/`](./smoke/) | **Experimental exportable app** — one-package TanStack Start + Workers/D1 + Better Auth + fixture-only Varlock + pinned CI/browser checks |
 | [`astro/`](./astro/) | **Static content reference** — standalone Astro, safe Head/JSON-LD, native images and generated-HTML tests |
 
 For static content/marketing, read the [Astro recipe](../docs/astro.md) instead of adding an app backend.
 
-## Start a real product from smoke
+## Export the application starter
+
+Never copy the working directory. Select an immutable commit:
 
 ```bash
-cp -R examples/smoke ../my-app
+revision=$(git rev-parse HEAD)
+node scripts/export-starter.mjs "$revision" ../my-app
 cd ../my-app
-rm -rf node_modules .wrangler dist
-# rename package.json name, wrangler.jsonc name
-pnpm install
-pnpm dlx wrangler d1 create my-app   # paste database_id into wrangler.jsonc
-cp .dev.vars.example .dev.vars       # or use Infisical
-pnpm db:local
+pnpm install --frozen-lockfile
+pnpm cf-types
 pnpm ship
-pnpm dev
+pnpm build
+pnpm exec playwright install chromium
+pnpm test:e2e
 ```
 
-Then delete unused `src/routes/demo/*` pages and grow feature slices only when you need an API boundary.
+The export contains only the committed `examples/smoke` tree plus `starter-provenance.json`; it refuses overwrite, symlinks and secret/cache paths. Local fixture mode needs no vault or Cloudflare account. Remote migration and deployment scripts deliberately fail. Read the exported `AGENTS.md`, `STACK.md` and `README.md` before changing it.
 
-Do not treat demo pages as product requirements. **Shape + scripts + STACK.md are the contract.**
+Hono + oRPC remain optional until a real API consumer needs them. Production readiness still requires the separately approved vault/deployment gates in [plan 010](../plans/010-maintained-starter.md).

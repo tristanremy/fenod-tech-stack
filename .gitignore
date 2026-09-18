@@ -6,10 +6,18 @@ dist
 .astro
 .obsidian
 .starlight-icons
-.pi
+.pi/*
+!.pi/release.json
+# Secrets stay out; placeholder/declaration files stay trackable.
+.env*
+.dev.vars*
+!.env.example
+!.dev.vars.example
 examples/**/node_modules
 examples/**/dist
 examples/**/.wrangler
-examples/**/.dev.vars
-examples/**/.env
-examples/**/.env.local
+examples/**/.tanstack
+examples/**/.env*
+examples/**/.dev.vars*
+!examples/**/.env.example
+!examples/**/.dev.vars.example

@@ -1,9 +1,18 @@
 node_modules
 dist
 .wrangler
-.dev.vars
-.env
-.env.local
-.DS_Store
+.tanstack
 coverage
+playwright-report/
+test-results/
+lint-fixture-*/
 *.log
+.DS_Store
+# Secrets stay out; placeholder/declaration files stay trackable.
+.env*
+.dev.vars*
+!.env.example
+!.env.schema
+!.dev.vars.example
+.varlock/
+config-fixture-*/

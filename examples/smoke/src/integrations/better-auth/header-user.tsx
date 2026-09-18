@@ -2,41 +2,26 @@ import { Link } from "@tanstack/react-router";
 
 import { authClient } from "#/lib/auth-client";
 
-export default function BetterAuthHeader() {
+/** Session mirror for the header. Sign-out lives with the data it clears. */
+export default function SessionIndicator() {
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending) {
-    return <div className="h-8 w-8 bg-neutral-100 dark:bg-neutral-800 animate-pulse" />;
+    return <div className="h-8 w-24 animate-pulse rounded-md bg-[var(--chip-bg)]" />;
   }
 
   if (session?.user) {
     return (
-      <div className="flex items-center gap-2">
-        {session.user.image ? (
-          <img src={session.user.image} alt="" className="h-8 w-8" />
-        ) : (
-          <div className="h-8 w-8 bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
-            <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
-              {session.user.name?.charAt(0).toUpperCase() || "U"}
-            </span>
-          </div>
-        )}
-        <button
-          onClick={() => {
-            void authClient.signOut();
-          }}
-          className="flex-1 h-9 px-4 text-sm font-medium bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50 border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
-        >
-          Sign out
-        </button>
-      </div>
+      <span className="max-w-40 truncate text-sm text-[var(--sea-ink-soft)]">
+        {session.user.email}
+      </span>
     );
   }
 
   return (
     <Link
-      to="/demo/better-auth"
-      className="h-9 px-4 text-sm font-medium bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50 border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors inline-flex items-center"
+      to="/"
+      className="inline-flex h-9 items-center rounded-md border border-[var(--chip-line)] bg-[var(--chip-bg)] px-4 text-sm font-medium text-[var(--sea-ink)] no-underline"
     >
       Sign in
     </Link>

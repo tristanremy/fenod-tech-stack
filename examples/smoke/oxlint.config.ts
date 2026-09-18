@@ -4,6 +4,16 @@ import { defineConfig } from "oxlint";
 // Do not set react/react-compiler — that nursery rule is gone.
 export default defineConfig({
   plugins: ["react"],
+  jsPlugins: ["@shadcn/lint"],
+  rules: {
+    "shadcn/no-restyle": ["error", { allow: ["layout"] }],
+  },
+  overrides: [
+    {
+      files: ["src/components/ui/**"],
+      rules: { "shadcn/no-restyle": "off" },
+    },
+  ],
   categories: {
     correctness: "error",
   },

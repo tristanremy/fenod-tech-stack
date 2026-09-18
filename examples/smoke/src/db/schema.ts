@@ -1,13 +1,22 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-/** App domain */
-export const todos = sqliteTable("todos", {
-  id: integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
-  title: text().notNull(),
-  createdAt: integer("created_at", { mode: "timestamp_ms" })
-    .notNull()
-    .$defaultFn(() => new Date()),
-});
+/** App domain: every row belongs to exactly one authenticated user. */
+export const items = sqliteTable(
+  "items",
+  {
+    id: integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    title: text().notNull(),
+    completed: integer({ mode: "boolean" }).notNull().default(false),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .$defaultFn(() => new Date()),
+  },
+  // Every query filters by owner; without this index each one scans the table.
+  (table) => [index("items_user_id_idx").on(table.userId)],
+);
 
 /** Better Auth (sqlite) — keep table names singular to match adapter defaults */
 export const user = sqliteTable("user", {

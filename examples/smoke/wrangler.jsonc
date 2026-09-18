@@ -18,7 +18,6 @@
       "migrations_dir": "drizzle",
     },
   ],
-  "vars": {
-    "APP_ENV": "development",
-  },
+  // S2: .env.schema owns app configuration; Varlock injects local bindings.
+  // No deployable vars/secrets here. Remote package scripts fail closed.
 }

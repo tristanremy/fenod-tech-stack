@@ -47,7 +47,22 @@ pnpm dlx shadcn@latest add <item>
 
 Examples: `button`, `dialog`, or an official sidebar block such as `sidebar-07`. Do not hand-build a visual approximation. Make product changes after installation; this preserves the upstream baseline for later updates.
 
+### Verify design-system usage
+
+Use `@shadcn/lint` with **Oxlint >=1.80**, not a second ESLint command. The smoke reference pins the plugin and tests its real CLI diagnostics. Run `pnpm --dir examples/smoke lint` from this repo, or `pnpm lint` inside a copied app.
+
+Its initial policy is `shadcn/no-restyle` with `allow: ["layout"]`: callers may position a Button with `w-full mt-4`, but must use its `size`/`variant` instead of `p-4`. Component definitions in `src/components/ui/**` are exempt from this rule so they can own those variants. Configure deliberate exceptions in `oxlint.config.ts`; do not scatter disable comments. The existing scaffold-demo exclusion remains; this does not certify those demos.
+
+Do not enable all rules blindly: raw-color, arbitrary-value, static-class and inline-style restrictions need product-specific design decisions. This is a lint policy, not an accessibility or visual test. The upstream Oxlint JS plugin API is still alpha; keep the regression test when upgrading. The plugin brings parser dependencies, but Fenod still runs only Oxlint.
+
+Sources: [setup](https://github.com/shadcn-ui/lint/blob/main/SETUP.md), [rules and Oxlint requirements](https://github.com/shadcn-ui/lint#readme).
+
 ## Add an API feature
+
+Server functions first. They already give typed input, server-only code and a single deployment. Add
+Hono + oRPC only for a real API boundary: non-UI clients, an OpenAPI contract, versioned or
+long-lived endpoints. The reference app deliberately ships without them; re-adding the old playground
+is not the pattern.
 
 When an API module exists, use a feature slice:
 

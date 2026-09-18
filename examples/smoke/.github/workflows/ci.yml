@@ -1,0 +1,47 @@
+name: Local starter checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      CI: true
+      DO_NOT_TRACK: "1"
+      WRANGLER_SEND_METRICS: "false"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm cf-types && git diff --exit-code
+      - run: pnpm ship
+      - run: pnpm build && git diff --exit-code
+      - run: pnpm audit --audit-level high
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e && git diff --exit-code
+  secrets:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      # Offline: no verification requests to credential providers.
+      - name: Scan tracked content offline
+        env:
+          GITLEAKS_DIGEST_A: c00b6bd0aeb3071cbcb79009cb16a60d
+          GITLEAKS_DIGEST_B: d9e0a7c60e2be9ab65d25e6bc8abbb7f
+        run: |
+          image="ghcr.io/gitleaks/gitleaks@sha256:${GITLEAKS_DIGEST_A}${GITLEAKS_DIGEST_B}"
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo:ro" "$image" \
+            dir --redact --no-banner --exit-code 1 /repo
