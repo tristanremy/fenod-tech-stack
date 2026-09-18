@@ -60,7 +60,7 @@ env -u CLOUDFLARE_API_TOKEN wrangler deploy --env staging
 
 ## Alchemy
 
-Only after triggers match. See `deployment.md`. Do not scaffold `alchemy.run.ts` on a one-Worker SME app.
+Only after triggers match. See `docs/stack-contract.md` and `docs/recipes.md` (handbook-root paths). Do not scaffold `alchemy.run.ts` on a one-Worker SME app.
 
 GitHub Action owns Cloudflare tokens (`staging` / `production` environments). Push `dev` deploys staging. Push `main` deploys prod behind protection. A branch preview is not staging.
 

@@ -18,20 +18,20 @@
 - **Astro / content site / SEO / JSON-LD / responsive images** → docs/astro.md, examples/astro/README.md, examples/astro/package.json
 - **new app / architecture / stack choice** → docs/stack-contract.md, skills/fenod-stack/SKILL.md, examples/smoke/STACK.md
 - **deploy / Cloudflare / secrets / D1 migration** → docs/agent-operating-contract.md, docs/security-model.md, skills/fenod-cloudflare-deploy/SKILL.md
-- **AI feature / coding agent / eval / sandbox** → docs/agent-factory.md, docs/security-model.md
+- **AI feature / coding agent / eval / sandbox** → docs/agent-factory.md, docs/agent-evals.md, docs/security-model.md
 - **auth / permissions / sensitive data** → docs/security-model.md, docs/agent-operating-contract.md, examples/smoke/src/lib/auth.ts
 - **test / lint / typecheck / refactor** → skills/fenod-quality/SKILL.md, examples/smoke/package.json
-- **UI / shadcn component or block** → docs/recipes.md, skills/fenod-stack/SKILL.md, examples/smoke/components.json
+- **UI / shadcn component or block** → docs/recipes.md, skills/fenod-stack/SKILL.md, examples/smoke/components.json, examples/smoke/oxlint.config.ts
 - **slow data loading / D1 N+1 / Router cache** → docs/recipes.md, docs/gotchas.md, docs/security-model.md
 - **TanStack Start / D1 reference** → examples/smoke/STACK.md, examples/smoke/package.json
 
 ## Core defaults
 
-Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler, Infisical+Worker secrets, Oxlint+Oxfmt, TypeScript 7 tsc, Vitest, Playwright.
+Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler, Infisical+Worker secrets, Oxlint+Oxfmt+@shadcn/lint, TypeScript 7 tsc, Vitest, Playwright.
 
 ## Verification
 
-`pnpm lint && pnpm typecheck && pnpm test` (add build/browser checks for higher risk).
+Handbook root: `pnpm check && pnpm test`. Reference apps: `pnpm --dir examples/smoke ship` and `pnpm --dir examples/astro ship`. Product repos: `pnpm lint && pnpm typecheck && pnpm test` (add build/browser checks for higher risk).
 
 
 ---
@@ -47,7 +47,7 @@ Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content
 
 **Law:** `docs/stack-contract.md`. If anything else disagrees, the contract wins unless the project `STACK.md` / this file overrides a line.
 
-**Proof:** `examples/smoke` (one-package TanStack Start + Workers + D1). Copy it. Do not invent a stack.
+**Reference:** `examples/smoke` (one-package TanStack Start + Workers + D1). Its scaffold demos are not production-safe authorization examples; do not deploy them unchanged. See `plans/009-agent-first-audit.md` for remaining gaps.
 
 ## Load
 
@@ -66,7 +66,7 @@ Do not load old Starlight pages, French translations, or `code-patterns`.
 - TanStack Start on **Cloudflare Workers**. Astro only for marketing/content sites.
 - Drizzle **0.4x** + **D1**. Better Auth. Tailwind v4 + shadcn. When asked for a shadcn component or block, install the exact official item with `pnpm dlx shadcn@latest add <item>`; do not recreate a lookalike. Customize only after installation.
 - Start server functions first. Hono + oRPC only when an API boundary needs it.
-- Oxlint + Oxfmt + TypeScript 7 `tsc`. Ship gate: `pnpm lint && pnpm typecheck && pnpm test`
+- Oxlint + Oxfmt + TypeScript 7 `tsc`. Add `@shadcn/lint` through Oxlint for Tailwind design systems; use the UI recipe's initial policy. Product ship gate: `pnpm lint && pnpm typecheck && pnpm test`
 - Infisical + Worker secrets + Zod 4.5.x config validation. Scan staged changes; never commit `.env` / `.dev.vars` with real values.
 - Agents **push Git**. They do not `wrangler deploy` / `alchemy deploy` to staging/prod.
 - Mutation → `invalidateQueries`. No Convex. No live DO without a written multi-user trigger.
@@ -78,9 +78,15 @@ npm/yarn, Nub as PM, Bun/Deno as baseline, Prisma, Postgres (until trigger), Exp
 
 ## Done
 
+For this handbook (from repo root):
+
 ```bash
-pnpm lint && pnpm typecheck && pnpm test
+pnpm check && pnpm test
+pnpm --dir examples/smoke ship
+pnpm --dir examples/astro ship
 ```
+
+`pnpm check` is read-only. After editing context sources, run `pnpm llms:build` explicitly and review generated changes. Product repos retain `pnpm lint && pnpm typecheck && pnpm test` in their own directory.
 
 Report: files changed, verification run, warnings, not done, whether prod action is still required.
 
@@ -137,7 +143,7 @@ One-liner:
 | Secrets | **Infisical** → Cloudflare Worker secrets at runtime; validate config with Zod 4.5.x |
 | Observability | Workers Observability on every Worker; **Sentry** only for product / paying apps |
 | Rate limits | Cloudflare-native binding or DO — **no Redis** |
-| Lint | **Oxlint** (`pnpm lint`). React apps: plugin `react` + `correctness` (Compiler rules). Type-aware lint is not CI default until TypeScript 7 is the repo baseline. |
+| Lint | **Oxlint** (`pnpm lint`). React apps: plugin `react` + `correctness` (Compiler rules). Tailwind design systems: **`@shadcn/lint`** through Oxlint (>=1.80), starting with `no-restyle` and layout allowed; component definitions own their variants. See the UI recipe. Type-aware lint is not CI default until TypeScript 7 is the repo baseline. |
 | Format | **Oxfmt** (`pnpm format` / `pnpm format:check`) |
 | Types | **TypeScript 7** `tsc` for `typecheck`; keep TypeScript 6 only when tooling still needs its compiler API |
 | Unit/integration tests | **Vitest 5** |
@@ -551,6 +557,16 @@ pnpm dlx shadcn@latest add <item>
 ```
 
 Examples: `button`, `dialog`, or an official sidebar block such as `sidebar-07`. Do not hand-build a visual approximation. Make product changes after installation; this preserves the upstream baseline for later updates.
+
+### Verify design-system usage
+
+Use `@shadcn/lint` with **Oxlint >=1.80**, not a second ESLint command. The smoke reference pins the plugin and tests its real CLI diagnostics. Run `pnpm --dir examples/smoke lint` from this repo, or `pnpm lint` inside a copied app.
+
+Its initial policy is `shadcn/no-restyle` with `allow: ["layout"]`: callers may position a Button with `w-full mt-4`, but must use its `size`/`variant` instead of `p-4`. Component definitions in `src/components/ui/**` are exempt from this rule so they can own those variants. Configure deliberate exceptions in `oxlint.config.ts`; do not scatter disable comments. The existing scaffold-demo exclusion remains; this does not certify those demos.
+
+Do not enable all rules blindly: raw-color, arbitrary-value, static-class and inline-style restrictions need product-specific design decisions. This is a lint policy, not an accessibility or visual test. The upstream Oxlint JS plugin API is still alpha; keep the regression test when upgrading. The plugin brings parser dependencies, but Fenod still runs only Oxlint.
+
+Sources: [setup](https://github.com/shadcn-ui/lint/blob/main/SETUP.md), [rules and Oxlint requirements](https://github.com/shadcn-ui/lint#readme).
 
 ## Add an API feature
 

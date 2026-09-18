@@ -1,6 +1,8 @@
 # fenod-smoke — law reference app
 
-Implements [Fenod Stack Contract](../../docs/stack-contract.md).
+Integration reference for [Fenod Stack Contract](../../docs/stack-contract.md), **not yet a production-safe starter**. The [September audit](../../plans/009-agent-first-audit.md) records configuration, auth, validation, dependency and portability gaps. Do not deploy the demo routes unchanged.
+
+UI policy: `@shadcn/lint` runs inside `pnpm lint` through Oxlint. `no-restyle` allows layout at call sites; variants belong in `src/components/ui`. `src/lint-policy.test.ts` checks both accepted and rejected usage.
 
 | Law                      | This app                                                                                                                                                                      |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -26,6 +28,8 @@ cp .dev.vars.example .dev.vars   # gitignored
 ```
 
 ## Remote deploy checklist
+
+CI/human-owned operation only, after the audit blockers are resolved. Agents do not run these commands.
 
 1. `pnpm dlx wrangler d1 create fenod-smoke` → set `database_id` in `wrangler.jsonc`
 2. `pnpm db:remote`

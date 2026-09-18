@@ -19,7 +19,7 @@ Opinionated defaults for building full-stack TypeScript products on Cloudflare W
 | API | Start server functions first; Hono + oRPC when a real API boundary exists |
 | Files / async work | R2 / Queues / Workflows |
 | AI | TanStack AI + Cloudflare AI Gateway |
-| Quality | Oxlint + Oxfmt + tsgo + Vitest + Playwright when needed |
+| Quality | Oxlint + @shadcn/lint + Oxfmt + TypeScript 7 + Vitest + Playwright when needed |
 | Secrets | Infisical + Worker secrets |
 | Deploy | Git push → protected CI → Workers |
 
@@ -44,6 +44,8 @@ flowchart LR
 ## Start a product
 
 Use the living reference. It is intentionally one package, not a starter monorepo.
+
+**Not a production-ready template yet:** demo mutations lack product authorization, and the smoke toolchain is behind the contract. See the [September audit and migration plan](plans/009-agent-first-audit.md). Copy only from a clean checkout, never from a working tree containing local secrets or data. Cloud resource creation below requires human approval.
 
 ```bash
 cp -R examples/smoke ../my-app
@@ -86,6 +88,8 @@ pnpm dlx shadcn@latest add <item>
 
 This applies to primitives and blocks, including the default sidebar. Customize after it is installed so future shadcn updates remain easy.
 
+The smoke reference also runs **`@shadcn/lint` through Oxlint**. Its `no-restyle` policy keeps component variants authoritative while allowing page layout. See the [UI lint recipe](docs/recipes.md#verify-design-system-usage).
+
 ## What we deliberately do not start with
 
 - no day-one monorepo or Alchemy;
@@ -104,11 +108,15 @@ Agents: start with [AGENTS.md](AGENTS.md), then use [agent-context.json](agent-c
 ## Checks
 
 ```bash
-pnpm check
-pnpm check:context
-cd examples/smoke && pnpm ship
-# Higher-risk reference changes:
-pnpm cf-types && pnpm build
+pnpm check       # read-only: fails on stale generated context
+pnpm test        # generator determinism and negative checks
+pnpm --dir examples/smoke ship
+pnpm --dir examples/astro ship
+# Higher-risk smoke changes:
+pnpm --dir examples/smoke cf-types
+pnpm --dir examples/smoke build
 ```
+
+After editing agent-context sources, run `pnpm llms:build` and review the generated diff before checking. The [audit](plans/009-agent-first-audit.md) separates verified changes from pending migrations; [agent evaluations](docs/agent-evals.md) describes the bounded Jev pilot.
 
 Law: [docs/stack-contract.md](docs/stack-contract.md). Security: [docs/security-model.md](docs/security-model.md).

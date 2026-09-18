@@ -1,6 +1,6 @@
 ---
 name: fenod-quality
-description: Fenod's quality gates and verification workflow — TDD with AI, Vitest, Playwright, Oxlint, Oxfmt, tsgo, and optional React Doctor. Use this skill whenever writing or fixing tests, setting up linting or formatting, deciding what to verify before a commit or PR, refactoring existing code, or whenever an agent is about to make code changes in a Fenod repo and needs to know which checks to run and in what order.
+description: Fenod's quality gates and verification workflow — TDD with AI, Vitest, Playwright, Oxlint, @shadcn/lint, Oxfmt, TypeScript 7, and optional React Doctor. Use this skill whenever writing or fixing tests, setting up linting or formatting, deciding what to verify before a commit or PR, refactoring existing code, or whenever an agent is about to make code changes in a Fenod repo and needs to know which checks to run and in what order.
 ---
 
 # Fenod Quality
@@ -11,7 +11,7 @@ description: Fenod's quality gates and verification workflow — TDD with AI, Vi
 
 ```bash
 pnpm lint        # oxlint .
-pnpm typecheck   # tsgo --noEmit
+pnpm typecheck   # stable TypeScript 7 tsc; respect documented tooling exceptions
 pnpm test        # Vitest
 ```
 
@@ -32,10 +32,11 @@ Do not run the entire optional toolbox on every one-line fix. Prefer repo script
 |------|------|
 | **Oxlint** | lint — React plugin + `correctness` (React Compiler rules). Never `react/react-compiler`. |
 | **Oxfmt** | format |
+| **@shadcn/lint** | Oxlint JS plugin for Tailwind design systems; start with `no-restyle`, layout allowed. See `docs/recipes.md`. |
 
 Do not add ESLint, Prettier, Biome, Ultracite, Babel, or `oxc-transform-react` beside this.
 Do not add `useMemo` / `useCallback` / `memo` unless measured or required for identity.  
-Do not remove the `typescript` package because tsgo exists — keep both until tooling APIs catch up.
+Use stable TypeScript 7 for typechecks. Keep the TypeScript 6 compatibility API only for tools that require it (including parser/framework tooling); validate before removing it. Smoke has a documented pending migration from native-preview, not a second default.
 
 ## TDD with AI
 
@@ -60,7 +61,7 @@ Low value: pure presentational UI (manual/browser often cheaper).
 
 | Tool | Status |
 |------|--------|
-| Node 24, pnpm, Vite 8, Vitest, Oxlint, Oxfmt, tsgo, Playwright | default |
+| Node 24, pnpm, Vite 8, Vitest 5, Oxlint, Oxfmt, TypeScript 7, Playwright | default |
 | `rolldown-vite` | Vite 7 bridge only |
 | `tsdown` | internal package builds |
 | React Doctor / husky | optional repo choices, not universal law |
@@ -72,9 +73,11 @@ Renovate or Dependabot + `pnpm audit --audit-level high` in product repos. Pin C
 
 ## Deep references
 
+Paths below are relative to the handbook root.
+
 | Need | Read |
 |------|------|
-| Law | `stack-contract.md` |
-| Toolchain | `tooling.md` |
-| TDD detail | `tdd-with-ai.md` |
-| Test setup depth | `testing.md` |
+| Law / toolchain | `docs/stack-contract.md` |
+| Verification scripts | `examples/smoke/package.json`, `examples/astro/package.json` |
+| D1 and performance tests | `docs/recipes.md` |
+| Agent evaluations | `docs/agent-evals.md` |
