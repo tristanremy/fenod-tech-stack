@@ -27,6 +27,10 @@ test("portable checker accepts the app and rejects broken docs, scripts, names a
       ["STACK.md", (text) => `${text}\nRun \`pnpm nonexistent-command\``],
       ["package.json", (text) => text.replace('"name": "fenod-smoke"', '"name": "wrong-name"')],
       ["worker-configuration.d.ts", (text) => text.replace("BETTER_AUTH_URL: string;", "")],
+      [
+        ".github/workflows/ci.yml",
+        (text) => text.replace("GITLEAKS_DIGEST_A: c", "GITLEAKS_DIGEST_A: z"),
+      ],
     ];
     for (const [file, mutate] of invalid) {
       const path = join(temp, file);

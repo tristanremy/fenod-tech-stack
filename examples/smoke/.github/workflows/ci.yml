@@ -37,4 +37,11 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       # Offline: no verification requests to credential providers.
-      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e
+      - name: Scan tracked content offline
+        env:
+          GITLEAKS_DIGEST_A: c00b6bd0aeb3071cbcb79009cb16a60d
+          GITLEAKS_DIGEST_B: d9e0a7c60e2be9ab65d25e6bc8abbb7f
+        run: |
+          image="ghcr.io/gitleaks/gitleaks@sha256:${GITLEAKS_DIGEST_A}${GITLEAKS_DIGEST_B}"
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo:ro" "$image" \
+            dir --redact --no-banner --exit-code 1 /repo

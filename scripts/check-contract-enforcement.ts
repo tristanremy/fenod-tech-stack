@@ -33,7 +33,7 @@ const [
 const shadcnCommand = 'pnpm dlx shadcn@latest add <item>';
 const requirements = [
   ['CI audits dependencies', ci, 'pnpm audit --audit-level high'],
-  ['CI scans secrets', ci, 'gitleaks/gitleaks-action@'],
+  ['CI scans secrets', ci, 'ghcr.io/gitleaks/gitleaks@sha256:'],
   ['CI reviews dependency changes', ci, 'actions/dependency-review-action@'],
   ['CI builds the smoke Worker', ci, 'pnpm build'],
   ['CI verifies the exported starter', ci, 'scripts/verify-starter.mjs'],

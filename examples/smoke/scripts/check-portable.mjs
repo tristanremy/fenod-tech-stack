@@ -7,6 +7,13 @@ export function checkWorkflow(text) {
   const uses = [...text.matchAll(/^\s*(?:-\s*)?uses:\s*["']?([^\s"'#]+)["']?/gm)];
   assert.ok(uses.length, "Workflow must declare pinned actions");
   for (const [, action] of uses) assert.match(action, /^[^@]+@[a-f0-9]{40}$/i, "Unpinned action");
+  if (text.includes("ghcr.io/gitleaks/gitleaks@sha256:")) {
+    const digest = [
+      text.match(/GITLEAKS_DIGEST_A: ([a-f0-9]{32})/)?.[1],
+      text.match(/GITLEAKS_DIGEST_B: ([a-f0-9]{32})/)?.[1],
+    ].join("");
+    assert.match(digest, /^[a-f0-9]{64}$/, "Unpinned Gitleaks image");
+  }
   assert.match(text, /contents: read/, "Workflow needs read-only permissions");
   assert.match(text, /persist-credentials: false/, "Checkout must not persist credentials");
   assert.doesNotMatch(
