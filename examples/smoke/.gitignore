@@ -10,4 +10,7 @@ lint-fixture-*/
 .env*
 .dev.vars*
 !.env.example
+!.env.schema
 !.dev.vars.example
+.varlock/
+config-fixture-*/

@@ -6,22 +6,23 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "vite dev --port 3000",
+    "dev": "vite dev --port 3000 --strictPort",
     "generate-routes": "tsr generate",
-    "build": "vite build",
+    "build": "vite build && node scripts/check-build-canaries.mjs",
     "preview": "vite preview",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "lint": "oxlint .",
     "typecheck": "tsgo --noEmit",
     "test": "vitest run",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck",
+    "check": "pnpm config:check && pnpm format:check && pnpm lint && pnpm typecheck",
     "ship": "pnpm check && pnpm test",
-    "cf-types": "env -u CLOUDFLARE_API_TOKEN wrangler types",
+    "config:check": "varlock load --path .env.schema --agent --format json-full",
+    "cf-types": "env -u CLOUDFLARE_API_TOKEN varlock-wrangler types && node scripts/normalize-worker-types.mjs",
     "db:generate": "drizzle-kit generate",
     "db:local": "env -u CLOUDFLARE_API_TOKEN wrangler d1 migrations apply fenod-smoke --local",
-    "db:remote": "env -u CLOUDFLARE_API_TOKEN wrangler d1 migrations apply fenod-smoke --remote",
-    "deploy": "pnpm run build && env -u CLOUDFLARE_API_TOKEN wrangler deploy"
+    "db:remote": "node scripts/local-only.mjs",
+    "deploy": "node scripts/local-only.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
@@ -55,11 +56,13 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
+    "@varlock/cloudflare-integration": "1.5.2",
     "@vitejs/plugin-react": "^6.0.1",
     "drizzle-kit": "^0.31.10",
     "oxfmt": "^0.63.0",
     "oxlint": "^1.83.0",
     "typescript": "~5.9.3",
+    "varlock": "1.19.0",
     "vite": "^8.0.0",
     "vitest": "^3.2.4",
     "wrangler": "^4.122.0"

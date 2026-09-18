@@ -18,15 +18,6 @@
       "migrations_dir": "drizzle",
     },
   ],
-  "vars": {
-    "APP_ENV": "development",
-    "BETTER_AUTH_URL": "http://localhost:3000",
-  },
-  // Declares the secrets this Worker needs. `wrangler types` uses this list
-  // instead of inferring from .dev.vars/.env/process.env, and `wrangler dev`
-  // warns when one is missing. NOTE: not inherited by named environments —
-  // repeat this block in every `env.<name>` you add.
-  "secrets": {
-    "required": ["BETTER_AUTH_SECRET"],
-  },
+  // S2: .env.schema owns app configuration; Varlock injects local bindings.
+  // No deployable vars/secrets here. Remote package scripts fail closed.
 }

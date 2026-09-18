@@ -1,27 +1,24 @@
 # Examples
 
 | Path | Role |
-|------|------|
-| [`smoke/`](./smoke/) | **Law reference app** — single-package TanStack Start + Workers + D1 + Better Auth + Hono/oRPC + Wrangler + Oxlint/Oxfmt |
+| --- | --- |
+| [`smoke/`](./smoke/) | **Experimental law reference app** — one-package TanStack Start + Workers + D1 + Better Auth + fixture-only Varlock + Wrangler + Oxlint/Oxfmt |
 | [`astro/`](./astro/) | **Static content reference** — standalone Astro, safe Head/JSON-LD, native images and generated-HTML tests |
 
 For static content/marketing, read the [Astro recipe](../docs/astro.md) instead of adding an app backend.
 
-## Start a real product from smoke
+## Try smoke locally
 
 ```bash
-cp -R examples/smoke ../my-app
-cd ../my-app
-rm -rf node_modules .wrangler dist
-# rename package.json name, wrangler.jsonc name
-pnpm install
-pnpm dlx wrangler d1 create my-app   # paste database_id into wrangler.jsonc
-cp .dev.vars.example .dev.vars       # or use Infisical
+cd examples/smoke
+pnpm install --frozen-lockfile
+pnpm config:check
+pnpm cf-types
 pnpm db:local
 pnpm ship
 pnpm dev
 ```
 
-Then delete unused `src/routes/demo/*` pages and grow feature slices only when you need an API boundary.
+No vault or Cloudflare account is needed. The committed `.env.schema` permits only synthetic local values. Remote migration and deployment scripts deliberately fail.
 
-Do not treat demo pages as product requirements. **Shape + scripts + STACK.md are the contract.**
+Do not copy this working tree into a product yet. S3 in [plan 010](../plans/010-maintained-starter.md) will add a tracked-file export from an immutable revision and verify it outside this handbook. Hono + oRPC remain optional until a real API consumer needs them.

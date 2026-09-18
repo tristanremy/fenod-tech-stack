@@ -1,9 +1,9 @@
 # Maintained application starter and secrets pilot
 
-Status: **in progress — S0 and S1 delivered, S2 onward not started**. Direction approved by the owner on 2026-09-18.
+Status: **in progress — S0 through S2 delivered locally; S3 next**. Direction approved by the owner on 2026-09-18.
 Baseline: `886a4d5`. Builds on [audit 009](009-agent-first-audit.md), not a replacement for its evidence.
 
-Progress: S0 delivered (`4ad561c`, `4895033`) — advisory repairs, self-contained secret ignores, experimental status. S1 delivered (`53452fc`) — owned-item workflow, runtime validation, auth as a Start route, Hono/oRPC removed, browser-verified two-user isolation. **Next: S2** (Varlock with fixture-only resolution). S4 and S5 still need explicit authorization.
+Progress: S0 delivered (`4ad561c`, `4895033`) — advisory repairs, self-contained secret ignores, experimental status. S1 delivered (`53452fc`) — owned-item workflow, auth as a Start route, Hono/oRPC removed, browser-verified two-user isolation. S2 delivered in the current revision — pinned Varlock, fixture-only schema, real Cloudflare Vite/Miniflare injection, redaction/internal/bundle checks and fail-closed remote scripts. **Next: S3** (portable tracked-file export and exported-app CI). S4 and S5 still need explicit authorization.
 
 The owner approved turning the pilot into a maintained starter within this repository. This plan authorizes no account provisioning, credential access, deployment, destructive cleanup or migration of existing applications. The current [Stack Contract](../docs/stack-contract.md) remains active until the pilot passes and its adoption change is reviewed.
 
@@ -90,6 +90,8 @@ One writer per checkout. Each package below is a reviewable batch of small commi
 
 **Acceptance:** local startup reads values through real Miniflare bindings; missing/malformed config fails; fixture mode performs no vault calls; secret canaries and token never appear in public bundles or diagnostics; selected public values do appear as intended. Regenerate Worker types **before** typecheck, then run tests/build. Failure leaves the candidate experimental.
 
+**Delivered evidence:** exact `varlock@1.19.0` and `@varlock/cloudflare-integration@1.5.2`; no Doppler plugin/resolver; `@cache=disabled`; agent-safe diagnostics; invalid/missing-schema and canary tests; generated Worker types without `DOPPLER_TOKEN`; credential-free build plus post-build canary scan; real Vite/Miniflare startup and a signed synthetic Better Auth session. `db:remote` and `deploy` fail before Wrangler runs. Varlock's raw graph lists the **name** of an ambient internal override in `overrideKeys`, but omits its value and the item from `config`/child env; keep this visible for the S4 plugin review.
+
 ### S3 — Make the starter portable and continuously tested
 
 **Depends on:** S2. **Scope:** example-local instructions, export recipe/script, CI and enforcement checks. Audit: AR08–AR12, AR14.
@@ -145,7 +147,7 @@ One writer per checkout. Each package below is a reviewable batch of small commi
 - [ ] Dependency/security gate passes; remaining nonblocking advisories have owners and rationale.
 - [ ] Real auth + owner-scoped D1 integration tests, malformed-input no-write, session expiry/logout and browser workflow pass.
 - [ ] Frozen exported-app bootstrap and local test mode need no secrets/accounts; Linux and Mac evidence recorded.
-- [ ] Varlock local injection, config failure cases, secret/internal exclusion and client-bundle canaries pass.
+- [x] Varlock local injection, config failure cases, secret/internal exclusion and client-bundle canaries pass (S2 fixture mode; no Doppler claim).
 - [ ] Doppler entitlement, scoped access, expiration/revocation/cache/outage behavior and rotation are demonstrated.
 - [ ] Approved disposable deployment, deletion inventory and recovery are demonstrated without unauthorized side effects.
 - [ ] Generated types/context, links, scripts, lockfiles and instructions match; checks do not silently repair tracked files.

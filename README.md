@@ -41,34 +41,30 @@ flowchart LR
   CI --> D[Workers deploy]
 ```
 
-## Start a product
+## Try the application reference
 
-Use the living reference. It is intentionally one package, not a starter monorepo.
+The living reference is intentionally one package, not a starter monorepo.
 
-**Not a production-ready template yet:** the item workflow is authenticated and owner-scoped, but there is no CI browser test, no validated deployed secret/config startup and no portable export script. See the [September audit](plans/009-agent-first-audit.md) and the [starter plan](plans/010-maintained-starter.md). Copy only from a clean checkout, never from a working tree containing local secrets or data. Cloud resource creation below requires human approval.
+**Not a production-ready template yet:** the item workflow is authenticated and owner-scoped, but there is no portable export, CI browser test or validated deployed secret/config startup. S2 now proves fixture-only Varlock injection locally; it does not prove Doppler or deployment. See the [September audit](plans/009-agent-first-audit.md) and [starter plan](plans/010-maintained-starter.md). Wait for S3 instead of copying a working tree.
 
 ```bash
-cp -R examples/smoke ../my-app
-cd ../my-app
-rm -rf node_modules .wrangler dist
-# Rename package.json and wrangler.jsonc names.
-pnpm install
-pnpm dlx wrangler d1 create my-app
-# Put the returned database_id in wrangler.jsonc.
-cp .dev.vars.example .dev.vars   # or use Infisical
+cd examples/smoke
+pnpm install --frozen-lockfile
+pnpm config:check
+pnpm cf-types
 pnpm db:local
 pnpm ship
 pnpm dev
 ```
 
-Then replace the example item feature with the product's own, and add Hono + oRPC only if a real API boundary is needed ([recipe](docs/recipes.md)). Keep the reference shape until a real trigger requires more structure.
+No vault account, credential or local env file is needed. Add Hono + oRPC only if a real API boundary is needed ([recipe](docs/recipes.md)). Remote scripts fail closed until separately approved S4/S5 work.
 
 ```mermaid
 flowchart TD
-  A[Copy examples/smoke] --> B[Configure Worker + D1]
-  B --> C[Add secrets locally]
+  A[Open examples/smoke] --> B[Validate fixture config + types]
+  B --> C[Apply local D1 migrations]
   C --> D[Run ship gate]
-  D --> E[Build product features]
+  D --> E[Exercise owned-item flow]
   E --> F{Real boundary or scale trigger?}
   F -- No --> E
   F -- API consumers --> G[Add Hono + oRPC]
