@@ -12,7 +12,7 @@ jobs:
   dependency-review:
     name: Dependency review
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
@@ -21,7 +21,7 @@ jobs:
 
   secrets:
     name: Secrets scan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout history for change scan
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -40,7 +40,7 @@ jobs:
 
   docs:
     name: Docs checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -67,7 +67,7 @@ jobs:
 
   smoke:
     name: Smoke app ship gate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: examples/smoke
@@ -105,7 +105,7 @@ jobs:
 
   starter-export:
     name: Exported starter clean-room gate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
       contents: read
@@ -134,7 +134,7 @@ jobs:
 
   astro:
     name: Astro static reference ship gate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: examples/astro
