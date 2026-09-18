@@ -6,4 +6,5 @@ dist
 .env.local
 .DS_Store
 coverage
+lint-fixture-*/
 *.log
