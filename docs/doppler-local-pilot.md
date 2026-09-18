@@ -76,6 +76,41 @@ handled interruption. Power loss/SIGKILL can leave temporary state; removal is
 not secure erasure. Plugin cache is disabled; this does not certify revocation,
 provider outage, encrypted CLI fallback behavior, or host isolation.
 
+## Owner-run token revocation check
+
+Only revoke the disposable pilot service token; do not revoke shared credentials.
+Revocation is irreversible. This script performs **no mutation**: the owner
+chooses the exact token in the dashboard and revokes it manually.
+
+After stopping coding agents, enter the token using the separate hidden prompt
+above, then run:
+
+```zsh
+(export DOPPLER_TOKEN; node scripts/doppler-revocation.mjs)
+```
+
+The script first requires HTTP 200 from Doppler's read-only
+[`GET /v3/me`](https://docs.doppler.com/reference/auth-me). It does not retrieve
+application secrets or parse the response body. Only after that positive control
+does it ask you to revoke the supplied pilot token in the dashboard. Type
+`REVOKED` in the script's prompt after the manual action. It reuses the same
+in-memory token and accepts only HTTP 401 as the post-revocation result. HTTP
+403, redirects, rate limits, server errors and network failures are inconclusive,
+not success. Each request times out after 15 seconds; the prompt after 10 minutes.
+
+Finally, whether it passes or fails:
+
+```zsh
+unset DOPPLER_TOKEN
+```
+
+No client cache, token file, new dependency or CI run is involved. This tests
+Doppler token rejection, **not** Varlock/plugin cache fallback or the validity
+of already retrieved application secrets. Revoking a service token does not
+rotate BETTER_AUTH_SECRET or erase previously retrieved values. Those remain
+separate checks. Do not replace the token mid-test or count an initially rejected
+token as successful revocation evidence.
+
 ## Evidence boundary
 
 The owner reported 7/7 for the earlier resolver harness. This is partial evidence:
@@ -83,7 +118,9 @@ key absence without a known undeclared canary does not prove filtering, and a
 nonzero exit alone does not distinguish missing-key errors from infrastructure
 failure. No S4 completion claim follows from that report.
 
-The application pilot proves its live integration only after an owner-run PASS.
+The owner reported a live app pilot PASS at `c0816f05c772be7c3dfedc8f4c515035aa63e67d`:
+schema validation, Worker types, real auth, owned CRUD, isolation and session
+revocation. Session revocation is not Doppler service-token revocation.
 Expired/revoked token, wrong config, provider outage, cleanup/rotation, isolation
 and quota/cost evidence remain separate S4 checks. Cloudflare S5 still needs
 separate authorization. Do not remove fixture mode from the maintained starter.
