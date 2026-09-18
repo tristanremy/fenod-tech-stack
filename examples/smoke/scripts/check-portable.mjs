@@ -36,6 +36,12 @@ export function checkPortable(root) {
   assert.equal(manifest.engines.node, ">=24");
   for (const doc of ["AGENTS.md", "README.md", "STACK.md"]) {
     const text = read(doc);
+    assert.match(
+      text,
+      /\/blob\/(?:UPSTREAM_REVISION|[a-f0-9]{40})\//,
+      `Missing immutable upstream link: ${doc}`,
+    );
+    assert.doesNotMatch(text, /\/blob\/(?:main|master)\//, `Moving upstream link: ${doc}`);
     for (const [, link] of text.matchAll(/\]\(([^\s)]+)\)/g)) {
       if (/^https:\/\//.test(link) || link.startsWith("#")) continue;
       const path = resolve(root, dirname(doc), link.split("#")[0]);
@@ -69,9 +75,14 @@ export function checkPortable(root) {
   for (const key of [...keys, "DB"])
     assert.match(types, new RegExp(`\\b${key}:`), `Missing Worker binding ${key}`);
   assert.doesNotMatch(types, /DOPPLER_TOKEN|varlock-types-env-/, "Internal/unstable Worker types");
-  for (const file of readdirSync(join(root, ".github/workflows"))) {
-    if (/\.ya?ml$/.test(file)) checkWorkflow(read(`.github/workflows/${file}`));
-  }
+  const workflows = readdirSync(join(root, ".github/workflows"))
+    .filter((file) => /\.ya?ml$/.test(file))
+    .map((file) => read(`.github/workflows/${file}`));
+  assert.ok(
+    workflows.some((text) => text.includes("ghcr.io/gitleaks/gitleaks@sha256:")),
+    "CI needs a digest-pinned offline secret scan",
+  );
+  for (const workflow of workflows) checkWorkflow(workflow);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

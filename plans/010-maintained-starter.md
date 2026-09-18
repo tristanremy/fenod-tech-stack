@@ -1,9 +1,9 @@
 # Maintained application starter and secrets pilot
 
-Status: **in progress — S0 through S2 delivered locally; S3 next**. Direction approved by the owner on 2026-09-18.
+Status: **in progress — S0 through S3 delivered; S4 awaits explicit authorization**. Direction approved by the owner on 2026-09-18.
 Baseline: `886a4d5`. Builds on [audit 009](009-agent-first-audit.md), not a replacement for its evidence.
 
-Progress: S0 delivered (`4ad561c`, `4895033`) — advisory repairs, self-contained secret ignores, experimental status. S1 delivered (`53452fc`) — owned-item workflow, auth as a Start route, Hono/oRPC removed, browser-verified two-user isolation. S2 delivered in the current revision — pinned Varlock, fixture-only schema, real Cloudflare Vite/Miniflare injection, redaction/internal/bundle checks and fail-closed remote scripts. **Next: S3** (portable tracked-file export and exported-app CI). S4 and S5 still need explicit authorization.
+Progress: S0 delivered (`4ad561c`, `4895033`) — advisory repairs, self-contained secret ignores, experimental status. S1 delivered (`53452fc`) — owned-item workflow, auth as a Start route, Hono/oRPC removed, browser-verified two-user isolation. S2 delivered (`2171add`) — pinned Varlock, fixture-only schema, real Cloudflare Vite/Miniflare injection, redaction/internal/bundle checks and fail-closed remote scripts. S3 delivered (`320ca1b`, CI fixes through `82f0728`) — immutable tracked-tree export, provenance, standalone instructions, pinned unprivileged CI, real browser/session isolation and clean macOS/Linux verification. GitHub Actions run `35339444662` passed all six jobs. **Next: S4**, which still requires explicit authorization; S5 requires a separate authorization.
 
 The owner approved turning the pilot into a maintained starter within this repository. This plan authorizes no account provisioning, credential access, deployment, destructive cleanup or migration of existing applications. The current [Stack Contract](../docs/stack-contract.md) remains active until the pilot passes and its adoption change is reviewed.
 
@@ -104,6 +104,8 @@ One writer per checkout. Each package below is a reviewable batch of small commi
 - Add negative checks for invalid instruction paths/commands, manifest drift, both YAML action `uses` forms and stale Worker bindings. Keep existing context checks read-only; generators are explicit preparation steps.
 
 **Acceptance:** clean exported checkout works without parent docs, previous node_modules, Wrangler state, Doppler/Cloudflare credentials or global CLIs beyond the documented Node/pnpm/Git prerequisites. Export contains no secret/cache files and identifies its source revision. Repeating setup preserves data or explicitly selects disposable state; repeating export refuses overwrite. Validation leaves tracked source unchanged.
+
+**Delivered evidence:** `scripts/export-starter.mjs` resolves an explicit revision and exports only its committed `examples/smoke` tree, validates regular safe entries, refuses overwrite and adds exact commit/tree provenance. The exported app owns its `AGENTS.md`, stack/readme links, portable contract checker, digest-pinned offline secret scan and Playwright test. `scripts/verify-starter.mjs` sanitizes the child environment, performs a frozen install in a fresh directory, verifies deterministic Worker types/source, runs `ship`, build, high-audit, repeated local migrations and real auth/CRUD/isolation/revocation E2E. It passed on macOS for `320ca1b` and on Ubuntu in Actions run `35339444662`; the root source status was unchanged. Two known moderate Vitest advisories remain below the high gate.
 
 ### S4 — Prove real Doppler development access
 

@@ -24,6 +24,7 @@ test("portable checker accepts the app and rejects broken docs, scripts, names a
     const invalid = [
       ["AGENTS.md", (text) => `${text}\n[missing](./missing.md)`],
       ["README.md", (text) => `${text}\n[parent](../../docs/stack-contract.md)`],
+      ["README.md", (text) => text.replace("UPSTREAM_REVISION", "main")],
       ["STACK.md", (text) => `${text}\nRun \`pnpm nonexistent-command\``],
       ["package.json", (text) => text.replace('"name": "fenod-smoke"', '"name": "wrong-name"')],
       ["worker-configuration.d.ts", (text) => text.replace("BETTER_AUTH_URL: string;", "")],
