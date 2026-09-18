@@ -4,6 +4,7 @@ Plans are dated evidence and proposals, not authority. Current law is [the Stack
 
 ## Current
 
+- [010 — Maintained starter and Doppler/Varlock pilot](010-maintained-starter.md): approved direction, in-place smoke evolution, local-first implementation batches, permission checkpoints, release gates and downstream maintenance. **Plan only; implementation and default-secret migration not started.**
 - [009 — Agent-first audit, September 2026](009-agent-first-audit.md): findings, source-backed dependency/platform review, Shadcn Lint integration, Jev pilot and sequenced acceptance gates. **Audit delivered; starter promotion blocked on documented gaps.**
 
 ## Historical
