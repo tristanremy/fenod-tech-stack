@@ -2,7 +2,7 @@
 
 **Law:** `docs/stack-contract.md`. If anything else disagrees, the contract wins unless the project `STACK.md` / this file overrides a line.
 
-**Reference:** `examples/smoke` (one-package TanStack Start + Workers + D1). Its scaffold demos are not production-safe authorization examples; do not deploy them unchanged. See `plans/009-agent-first-audit.md` for remaining gaps.
+**Reference:** `examples/smoke` (one-package TanStack Start + Workers + D1). It is **experimental**: server functions parse bounded input and scope every row to the signed-in user, but there is no CI browser test, no validated Worker secret/config startup on a deployed target and no portable export yet. Do not deploy it unchanged. See `plans/009-agent-first-audit.md` for the gaps and `plans/010-maintained-starter.md` for the path to a maintained starter.
 
 ## Load
 

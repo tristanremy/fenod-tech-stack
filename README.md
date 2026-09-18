@@ -45,7 +45,7 @@ flowchart LR
 
 Use the living reference. It is intentionally one package, not a starter monorepo.
 
-**Not a production-ready template yet:** demo mutations lack product authorization, and the smoke toolchain is behind the contract. See the [September audit and migration plan](plans/009-agent-first-audit.md). Copy only from a clean checkout, never from a working tree containing local secrets or data. Cloud resource creation below requires human approval.
+**Not a production-ready template yet:** the item workflow is authenticated and owner-scoped, but there is no CI browser test, no validated deployed secret/config startup and no portable export script. See the [September audit](plans/009-agent-first-audit.md) and the [starter plan](plans/010-maintained-starter.md). Copy only from a clean checkout, never from a working tree containing local secrets or data. Cloud resource creation below requires human approval.
 
 ```bash
 cp -R examples/smoke ../my-app
@@ -61,7 +61,7 @@ pnpm ship
 pnpm dev
 ```
 
-Then remove unused demo routes and build the product. Keep the reference shape until a real trigger requires more structure.
+Then replace the example item feature with the product's own, and add Hono + oRPC only if a real API boundary is needed ([recipe](docs/recipes.md)). Keep the reference shape until a real trigger requires more structure.
 
 ```mermaid
 flowchart TD

@@ -47,7 +47,7 @@ Handbook root: `pnpm check && pnpm test`. Reference apps: `pnpm --dir examples/s
 
 **Law:** `docs/stack-contract.md`. If anything else disagrees, the contract wins unless the project `STACK.md` / this file overrides a line.
 
-**Reference:** `examples/smoke` (one-package TanStack Start + Workers + D1). Its scaffold demos are not production-safe authorization examples; do not deploy them unchanged. See `plans/009-agent-first-audit.md` for remaining gaps.
+**Reference:** `examples/smoke` (one-package TanStack Start + Workers + D1). It is **experimental**: server functions parse bounded input and scope every row to the signed-in user, but there is no CI browser test, no validated Worker secret/config startup on a deployed target and no portable export yet. Do not deploy it unchanged. See `plans/009-agent-first-audit.md` for the gaps and `plans/010-maintained-starter.md` for the path to a maintained starter.
 
 ## Load
 
@@ -570,6 +570,11 @@ Sources: [setup](https://github.com/shadcn-ui/lint/blob/main/SETUP.md), [rules a
 
 ## Add an API feature
 
+Server functions first. They already give typed input, server-only code and a single deployment. Add
+Hono + oRPC only for a real API boundary: non-UI clients, an OpenAPI contract, versioned or
+long-lived endpoints. The reference app deliberately ships without them; re-adding the old playground
+is not the pattern.
+
 When an API module exists, use a feature slice:
 
 ```txt
@@ -771,7 +776,7 @@ Every product repo should use automated dependency monitoring plus an audit gate
 Security-sensitive packages require explicit review before major upgrades:
 
 - `better-auth` and `@better-auth/*`: stay on the latest stable 1.6.x line or newer security-patched stable line.
-- `@orpc/*`: keep patched for serializer/deserializer advisories.
+- `@orpc/*`: only when the API boundary is added; keep patched for serializer/deserializer advisories.
 - `drizzle-orm` / `drizzle-kit`: stay on the latest patched 0.4x stable for client work until the v1 stable migration plan is written.
 
 Patch and minor security updates should be reviewed quickly. Major version bumps to auth, RPC, ORM, or deployment tooling are never drive-by cleanups.

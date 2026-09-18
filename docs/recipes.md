@@ -59,6 +59,11 @@ Sources: [setup](https://github.com/shadcn-ui/lint/blob/main/SETUP.md), [rules a
 
 ## Add an API feature
 
+Server functions first. They already give typed input, server-only code and a single deployment. Add
+Hono + oRPC only for a real API boundary: non-UI clients, an OpenAPI contract, versioned or
+long-lived endpoints. The reference app deliberately ships without them; re-adding the old playground
+is not the pattern.
+
 When an API module exists, use a feature slice:
 
 ```txt

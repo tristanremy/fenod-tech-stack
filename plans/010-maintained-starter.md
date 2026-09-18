@@ -1,7 +1,9 @@
 # Maintained application starter and secrets pilot
 
-Status: **planned, not implemented**. Direction approved by the owner on 2026-09-18.
-Baseline: `83ad406`. Builds on [audit 009](009-agent-first-audit.md), not a replacement for its evidence.
+Status: **in progress — S0 and S1 delivered, S2 onward not started**. Direction approved by the owner on 2026-09-18.
+Baseline: `886a4d5`. Builds on [audit 009](009-agent-first-audit.md), not a replacement for its evidence.
+
+Progress: S0 delivered (`4ad561c`, `4895033`) — advisory repairs, self-contained secret ignores, experimental status. S1 delivered (`53452fc`) — owned-item workflow, runtime validation, auth as a Start route, Hono/oRPC removed, browser-verified two-user isolation. **Next: S2** (Varlock with fixture-only resolution). S4 and S5 still need explicit authorization.
 
 The owner approved turning the pilot into a maintained starter within this repository. This plan authorizes no account provisioning, credential access, deployment, destructive cleanup or migration of existing applications. The current [Stack Contract](../docs/stack-contract.md) remains active until the pilot passes and its adoption change is reviewed.
 

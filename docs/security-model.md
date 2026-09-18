@@ -73,7 +73,7 @@ Every product repo should use automated dependency monitoring plus an audit gate
 Security-sensitive packages require explicit review before major upgrades:
 
 - `better-auth` and `@better-auth/*`: stay on the latest stable 1.6.x line or newer security-patched stable line.
-- `@orpc/*`: keep patched for serializer/deserializer advisories.
+- `@orpc/*`: only when the API boundary is added; keep patched for serializer/deserializer advisories.
 - `drizzle-orm` / `drizzle-kit`: stay on the latest patched 0.4x stable for client work until the v1 stable migration plan is written.
 
 Patch and minor security updates should be reviewed quickly. Major version bumps to auth, RPC, ORM, or deployment tooling are never drive-by cleanups.
