@@ -117,7 +117,9 @@ async function run() {
     server.stderr.on('data', collect);
 
     const status = await waitForServer(server, () => output);
+    assert.equal(status, 200, `Root page returned ${status}:\n${scrub(output)}`);
     const session = await fetch(`${ORIGIN}/api/auth/get-session`);
+    assert.equal(session.status, 200, `Session endpoint returned ${session.status}`);
 
     process.stdout.write(`\nProject/config: ${project}/${config}\n`);
     process.stdout.write(`Root status: ${status}\n`);

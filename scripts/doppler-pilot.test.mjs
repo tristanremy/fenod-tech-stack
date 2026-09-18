@@ -20,6 +20,7 @@ test("pilot harness stays secret-free and fails closed", () => {
       appEnv: "dev",
       secretPresent: true,
       secretLength: 4,
+      sensitive: [],
     },
   );
   assert.deepEqual(summarize({ config: { APP_ENV: { isSensitive: true } } }), {
@@ -27,6 +28,7 @@ test("pilot harness stays secret-free and fails closed", () => {
     appEnv: null,
     secretPresent: false,
     secretLength: 0,
+    sensitive: ["APP_ENV"],
   });
 
   assert.throws(() => requireToken({}), /DOPPLER_TOKEN is not set/);
