@@ -1,141 +1,126 @@
-// App-level Doppler pilot (plan 010, S4 acceptance: "the app starts with real
-// dev resolution").
-//
-// Run from a terminal the coding agent cannot inspect:
-//
-//   read -rs 'DOPPLER_TOKEN?Token: '; printf '\n'
-//   (export DOPPLER_TOKEN; node scripts/doppler-app-pilot.mjs)
-//   unset DOPPLER_TOKEN
-//
-// The starter in examples/smoke is left untouched: this exports a disposable
-// copy of HEAD, points it at the Doppler dev config, and starts it locally.
-// No deployment, no remote D1, no Cloudflare credential.
+// Manual S4 pilot. --fixture exercises the same app path without any vault access.
+// Never run live mode in an agent session. See docs/doppler-local-pilot.md.
+import { spawn } from "node:child_process";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { homedir, tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { exportStarter } from "./export-starter.mjs";
+import { DOPPLER_PLUGIN, requireToken } from "./doppler-pilot.mjs";
 
-import assert from 'node:assert/strict';
-import { spawn, spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
-import { exportStarter } from './export-starter.mjs';
-import { DOPPLER_PLUGIN, requireToken, scrub } from './doppler-pilot.mjs';
-
-const ORIGIN = 'http://localhost:3000';
-
-export function appSchema(project, config) {
-  return `# @plugin(@varlock/doppler-plugin)
-# @initDoppler(project=${project}, config=${config}, serviceToken=$DOPPLER_TOKEN, cacheTtl=false)
+export function appSchema(fixture = false) {
+  return `${fixture ? "" : `# @plugin(@varlock/doppler-plugin)
+# @initDoppler(project=fenod-starter-pilot, config=dev, serviceToken=$DOPPLER_TOKEN, cacheTtl=false)
+`}# @defaultRequired=true
+# @defaultSensitive=true
 # @cache=disabled
 # ---
 
-# @type=dopplerServiceToken @sensitive @internal
+# @optional @sensitive @internal
 DOPPLER_TOKEN=
 
-APP_ENV=doppler()
-BETTER_AUTH_URL=doppler()
-# @sensitive
-BETTER_AUTH_SECRET=doppler()
+# @type=enum(dev) @public
+APP_ENV=${fixture ? "dev" : "doppler()"}
+# @type=enum("http://localhost:3000") @public
+BETTER_AUTH_URL=${fixture ? "http://localhost:3000" : "doppler()"}
+# @type=string(minLength=32) @sensitive
+BETTER_AUTH_SECRET=${fixture ? "test-only-local-doppler-app-pilot-fixture-not-a-real-secret" : "doppler()"}
 `;
 }
 
-export async function assertPortFree(port = 3000) {
-  const { createConnection } = await import('node:net');
-  await new Promise((done, fail) => {
-    const probe = createConnection({ port, host: '127.0.0.1' });
-    probe.on('connect', () => {
-      probe.destroy();
-      fail(new Error(`Port ${port} is already in use; stop that server first.`));
+// No captured child output is printed: heuristic redaction is not a security boundary.
+// Kill the whole child group (including Vite/workerd) before deleting its directory.
+export function runStep(cwd, env, args, label, timeout = 600_000) {
+  return new Promise((done, fail) => {
+    const child = spawn("pnpm", args, { cwd, env, detached: true, stdio: "ignore" });
+    const killGroup = (signal) => {
+      if (child.pid) {
+        try { process.kill(-child.pid, signal); } catch (error) {
+          if (error.code !== "ESRCH") throw error;
+        }
+      }
+    };
+    let interrupted = false;
+    const stop = () => { interrupted = true; killGroup("SIGKILL"); };
+    const timer = setTimeout(stop, timeout);
+    process.once("SIGINT", stop);
+    process.once("SIGTERM", stop);
+    const cleanup = () => {
+      clearTimeout(timer);
+      process.removeListener("SIGINT", stop);
+      process.removeListener("SIGTERM", stop);
+      killGroup("SIGKILL");
+    };
+    child.once("error", () => {
+      cleanup();
+      fail(new Error(`FAIL ${label}: command unavailable (output withheld).`));
     });
-    probe.on('error', () => done());
+    child.once("close", (code) => {
+      cleanup();
+      if (interrupted || code !== 0) {
+        fail(new Error(`FAIL ${label}: interrupted or nonzero exit (output withheld).`));
+      } else {
+        process.stdout.write(`PASS ${label}\n`);
+        done();
+      }
+    });
   });
 }
 
-function pnpm(cwd, args, env) {
-  const result = spawnSync('pnpm', args, { cwd, encoding: 'utf8', env });
-  return { status: result.status, stdout: result.stdout ?? '', stderr: result.stderr ?? '' };
-}
-
-async function waitForServer(child, output) {
-  const deadline = Date.now() + 90_000;
-  while (Date.now() < deadline) {
-    if (child.exitCode !== null) throw new Error(`Dev server exited early.\n${scrub(output())}`);
-    try {
-      const response = await fetch(ORIGIN, { redirect: 'manual' });
-      if (response.status > 0) return response.status;
-    } catch {
-      // Not listening yet.
-    }
-    await new Promise((done) => setTimeout(done, 500));
-  }
-  throw new Error(`Dev server did not answer within 90s.\n${scrub(output())}`);
-}
-
-async function run() {
-  const token = requireToken();
-  const project = process.env.DOPPLER_PROJECT ?? 'fenod-starter-pilot';
-  const config = process.env.DOPPLER_CONFIG ?? 'dev';
-  const root = resolve(import.meta.dirname, '..');
-  const directory = mkdtempSync(join(tmpdir(), 'fenod-doppler-app-'));
-  const app = join(directory, 'app');
-  const env = { PATH: process.env.PATH, HOME: process.env.HOME, CI: '1' };
-  let server = null;
+export async function run(fixture = false) {
+  // Deliberately do not even read an ambient token in fixture mode.
+  const token = fixture ? undefined : requireToken();
+  const directory = mkdtempSync(join(tmpdir(), "fenod-doppler-app-"));
+  const app = join(directory, "app");
+  const home = join(directory, "home");
+  mkdirSync(home, { mode: 0o700 });
+  const env = {
+    PATH: process.env.PATH,
+    HOME: home,
+    TMPDIR: directory,
+    CI: "true",
+    DO_NOT_TRACK: "1",
+    WRANGLER_SEND_METRICS: "false",
+    PLAYWRIGHT_BROWSERS_PATH: process.env.PLAYWRIGHT_BROWSERS_PATH ?? join(
+      homedir(), process.platform === "darwin" ? "Library/Caches/ms-playwright" : ".cache/ms-playwright",
+    ),
+  };
   try {
-    await assertPortFree();
-    exportStarter(root, 'HEAD', app);
-    writeFileSync(join(app, '.env.schema'), appSchema(project, config));
-
-    const manifestPath = join(app, 'package.json');
-    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-    manifest.devDependencies['@varlock/doppler-plugin'] = DOPPLER_PLUGIN;
-    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
-
-    const installed = pnpm(app, ['install', '--no-frozen-lockfile'], env);
-    assert.equal(installed.status, 0, `Install failed:\n${scrub(installed.stderr)}`);
-
-    const types = pnpm(app, ['cf-types'], { ...env, DOPPLER_TOKEN: token });
-    assert.equal(types.status, 0, `Worker type generation failed:\n${scrub(types.stderr)}`);
-    const generated = readFileSync(join(app, 'worker-configuration.d.ts'), 'utf8');
-    assert.doesNotMatch(generated, /DOPPLER_TOKEN/, 'Internal token leaked into Worker types');
-    assert.doesNotMatch(generated, /dp\.st\./, 'Service token leaked into Worker types');
-    assert.equal(
-      scrub(generated),
-      generated,
-      'Secret-like value written into generated Worker types',
-    );
-    for (const name of ['APP_ENV', 'BETTER_AUTH_URL', 'BETTER_AUTH_SECRET']) {
-      assert.match(generated, new RegExp(`\\b${name}:`), `Missing Worker binding ${name}`);
+    const revision = exportStarter(resolve(import.meta.dirname, ".."), "HEAD", app);
+    process.stdout.write(`Mode: ${fixture ? "fixture (no Doppler)" : "live dev pilot"}\nRevision: ${revision}\n`);
+    // Installation and browser downloads never receive the token.
+    await runStep(app, env, ["install", "--frozen-lockfile"], "frozen starter install");
+    if (!fixture) {
+      await runStep(app, env, ["add", "--save-dev", "--save-exact", `@varlock/doppler-plugin@${DOPPLER_PLUGIN}`], "pilot plugin install");
     }
-
-    let output = '';
-    server = spawn('pnpm', ['dev'], {
-      cwd: app,
-      env: { ...env, DOPPLER_TOKEN: token },
-      detached: true,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-    const collect = (chunk) => { output = `${output}${chunk}`.slice(-8000); };
-    server.stdout.on('data', collect);
-    server.stderr.on('data', collect);
-
-    const status = await waitForServer(server, () => output);
-    assert.equal(status, 200, `Root page returned ${status}:\n${scrub(output)}`);
-    const session = await fetch(`${ORIGIN}/api/auth/get-session`);
-    assert.equal(session.status, 200, `Session endpoint returned ${session.status}`);
-
-    process.stdout.write(`\nProject/config: ${project}/${config}\n`);
-    process.stdout.write(`Root status: ${status}\n`);
-    process.stdout.write(`Session endpoint: ${session.status}\n`);
-    process.stdout.write(`Varlock injection logged: ${/varlock/i.test(output)}\n`);
-    process.stdout.write(`Token absent from server output: ${!output.includes(token)}\n`);
-    process.stdout.write('\nPASS  app starts with real dev resolution\n');
+    await runStep(app, env, ["exec", "playwright", "install", "chromium"], "browser preparation");
+    writeFileSync(join(app, ".env.schema"), appSchema(fixture));
+    const runtime = token ? { ...env, DOPPLER_TOKEN: token } : env;
+    await runStep(app, runtime, ["config:check"], "schema validation (including real secret length)");
+    await runStep(app, runtime, ["cf-types"], "Worker type generation");
+    const generated = readFileSync(join(app, "worker-configuration.d.ts"), "utf8");
+    if (/DOPPLER_TOKEN|dp\.st\./.test(generated) || (token && generated.includes(token))) {
+      throw new Error("FAIL internal token exclusion from Worker types.");
+    }
+    // Reuse the existing real D1/auth/CRUD/two-user/revocation test. Playwright
+    // refuses to reuse an occupied server; migration runs only against local D1.
+    await runStep(app, runtime, ["test:e2e"], "real auth, owned CRUD, isolation and revocation");
+    process.stdout.write(`PASS ${fixture ? "fixture app pilot" : "Doppler dev app pilot"}\n`);
   } finally {
-    if (server?.pid) {
-      try { process.kill(-server.pid, 'SIGTERM'); } catch { /* already gone */ }
-    }
     rmSync(directory, { recursive: true, force: true });
   }
 }
 
-run().catch((error) => {
-  process.stderr.write(`\nPilot failed: ${error.message}\n`);
-  process.exitCode = 1;
-});
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const args = process.argv.slice(2);
+  if (args.length > 1 || (args.length === 1 && args[0] !== "--fixture")) {
+    process.stderr.write("Usage: node scripts/doppler-app-pilot.mjs [--fixture]\n");
+    process.exitCode = 1;
+  } else {
+    run(args[0] === "--fixture").catch(() => {
+      // Even exception objects may contain child output; never echo them.
+      process.stderr.write("FAIL pilot stopped; child diagnostics withheld. Report the last PASS step only.\n");
+      process.exitCode = 1;
+    });
+  }
+}

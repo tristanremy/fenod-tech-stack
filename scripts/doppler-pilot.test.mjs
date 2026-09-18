@@ -17,19 +17,21 @@ test("pilot harness stays secret-free and fails closed", () => {
     }),
     {
       names: ["APP_ENV", "BETTER_AUTH_SECRET"],
-      appEnv: "dev",
-      secretPresent: true,
-      secretLength: 4,
       sensitive: [],
     },
   );
   assert.deepEqual(summarize({ config: { APP_ENV: { isSensitive: true } } }), {
     names: ["APP_ENV"],
-    appEnv: null,
-    secretPresent: false,
-    secretLength: 0,
     sensitive: ["APP_ENV"],
   });
+
+  // A seven-character agent mask says nothing about the real secret length.
+  assert.deepEqual(
+    summarize({
+      config: { BETTER_AUTH_SECRET: { value: "ab▒▒▒▒▒", isSensitive: true } },
+    }),
+    { names: ["BETTER_AUTH_SECRET"], sensitive: ["BETTER_AUTH_SECRET"] },
+  );
 
   assert.throws(() => requireToken({}), /DOPPLER_TOKEN is not set/);
   assert.throws(

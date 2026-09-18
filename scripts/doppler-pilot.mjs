@@ -6,8 +6,8 @@
 //   read -rs DOPPLER_TOKEN && export DOPPLER_TOKEN
 //   node scripts/doppler-pilot.mjs
 //
-// The script never prints secret values. It reports names, presence and
-// lengths only, and refuses to run when a token is absent.
+// Agent-mode values are redacted display strings, not the resolved values.
+// Report names and sensitivity only; never infer secret length from this output.
 
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
@@ -44,9 +44,7 @@ export function summarize(report) {
   const config = report?.config ?? {};
   return {
     names: Object.keys(config).sort(),
-    appEnv: config.APP_ENV?.value ?? null,
-    secretPresent: typeof config.BETTER_AUTH_SECRET?.value === "string",
-    secretLength: config.BETTER_AUTH_SECRET?.value?.length ?? 0,
+
     // The plugin marks every doppler()-sourced item sensitive by default; the
     // pilot records this because non-secret keys must stay usable downstream.
     sensitive: Object.entries(config)
@@ -171,14 +169,6 @@ function run() {
       "internal token excluded from resolved config",
       !summary.names.includes("DOPPLER_TOKEN"),
     ]);
-    checks.push([
-      "sensitive value is non-empty",
-      summary.secretPresent && summary.secretLength > 0,
-    ]);
-    checks.push([
-      "secret is long enough for Better Auth (>=32)",
-      summary.secretLength >= 32,
-    ]);
 
     const rejected = load(
       directory,
@@ -195,9 +185,10 @@ function run() {
 
     process.stdout.write(`\nProject/config: ${project}/${config}\n`);
     process.stdout.write(`Resolved names: ${summary.names.join(", ")}\n`);
-    process.stdout.write(`Resolved APP_ENV: ${summary.appEnv}\n`);
     process.stdout.write(`Marked sensitive: ${summary.sensitive.join(", ")}\n`);
-    process.stdout.write(`Secret length: ${summary.secretLength}\n\n`);
+    process.stdout.write(
+      "Secret length: not measured (--agent redacts values)\n\n",
+    );
     let failed = 0;
     for (const [label, ok] of checks) {
       process.stdout.write(`${ok ? "PASS" : "FAIL"}  ${label}\n`);
