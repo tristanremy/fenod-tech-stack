@@ -1,6 +1,6 @@
 # fenod-smoke — law reference app
 
-Integration reference for [Fenod Stack Contract](../../docs/stack-contract.md), **not yet a production-safe starter**. The [September audit](../../plans/009-agent-first-audit.md) records configuration, auth, validation, dependency and portability gaps. Do not deploy the demo routes unchanged.
+Integration reference for [Fenod Stack Contract](../../docs/stack-contract.md), **experimental and not a production-safe starter**. It is the candidate base for the [maintained starter](../../plans/010-maintained-starter.md). The [September audit](../../plans/009-agent-first-audit.md) records configuration, auth, validation, dependency and portability gaps. Do not deploy the demo routes unchanged. See [README status table](./README.md#status-experimental-not-production-ready) for what is and is not verified.
 
 UI policy: `@shadcn/lint` runs inside `pnpm lint` through Oxlint. `no-restyle` allows layout at call sites; variants belong in `src/components/ui`. `src/lint-policy.test.ts` checks both accepted and rejected usage.
 
