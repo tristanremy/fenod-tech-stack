@@ -7,7 +7,10 @@ export async function tokenStatus(token, request = fetch) {
   try {
     const response = await request("https://api.doppler.com/v3/me", {
       method: "GET",
-      headers: { Authorization: `Bearer ${token}`, "Cache-Control": "no-store" },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-store",
+      },
       redirect: "manual",
       cache: "no-store",
       signal: AbortSignal.timeout(15_000),
@@ -26,26 +29,46 @@ export function verdict(before, after) {
   return before === "active" && after === "unauthorized";
 }
 
+export function inputError(token, isTTY) {
+  if (!token) return "STOP: DOPPLER_TOKEN is empty or was not exported.";
+  if (!token.startsWith("dp.st.") || /\s/.test(token)) {
+    return "STOP: service-token format invalid (expected dp.st. prefix, no spaces/newlines).";
+  }
+  if (!isTTY) return "STOP: stdin is not interactive. Run directly in a terminal without a pipe or redirection.";
+  return null;
+}
+
 async function main() {
   const token = process.env.DOPPLER_TOKEN;
-  if (!token?.startsWith("dp.st.") || !process.stdin.isTTY) {
-    process.stderr.write("STOP: service token and interactive terminal required.\n");
+  const error = inputError(token, process.stdin.isTTY);
+  if (error) {
+    process.stderr.write(`${error}\n`);
     process.exitCode = 1;
     return;
   }
   const before = await tokenStatus(token);
   if (before !== "active") {
-    process.stderr.write("STOP: positive control failed or inconclusive. Do not revoke anything.\n");
+    process.stderr.write(
+      "STOP: positive control failed or inconclusive. Do not revoke anything.\n",
+    );
     process.exitCode = 1;
     return;
   }
   process.stdout.write("PASS token accepted by Doppler (HTTP 200).\n");
-  process.stdout.write("In Doppler: fenod-starter-pilot > dev > Access.\nRevoke ONLY the dedicated pilot token you supplied. This is irreversible.\n");
-  const terminal = createInterface({ input: process.stdin, output: process.stdout });
+  process.stdout.write(
+    "In Doppler: fenod-starter-pilot > dev > Access.\nRevoke ONLY the dedicated pilot token you supplied. This is irreversible.\n",
+  );
+  const terminal = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
   try {
-    const confirmation = await terminal.question("After revoking it, type REVOKED then Enter (anything else cancels): ", {
-      signal: AbortSignal.timeout(600_000),
-    });
+    const confirmation = await terminal.question(
+      "After revoking it, type REVOKED then Enter (anything else cancels): ",
+      {
+        signal: AbortSignal.timeout(600_000),
+      },
+    );
     if (confirmation !== "REVOKED") {
       process.stdout.write("STOP cancelled; no post-revocation claim.\n");
       process.exitCode = 1;
@@ -54,11 +77,15 @@ async function main() {
     // Same in-memory token, no re-entry and no mutable environment lookup.
     const after = await tokenStatus(token);
     if (verdict(before, after)) {
-      process.stdout.write("PASS same token rejected by Doppler after manual revocation (HTTP 401).\nNo cache used. Varlock fallback behavior is not tested by this check.\n");
+      process.stdout.write(
+        "PASS same token rejected by Doppler after manual revocation (HTTP 401).\nNo cache used. Varlock fallback behavior is not tested by this check.\n",
+      );
     } else {
-      process.stdout.write(after === "active"
-        ? "FAIL token still accepted by Doppler.\n"
-        : "INCONCLUSIVE: response was not HTTP 401 (network, scope or provider issue possible).\n");
+      process.stdout.write(
+        after === "active"
+          ? "FAIL token still accepted by Doppler.\n"
+          : "INCONCLUSIVE: response was not HTTP 401 (network, scope or provider issue possible).\n",
+      );
       process.exitCode = 1;
     }
   } finally {
@@ -66,9 +93,14 @@ async function main() {
   }
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (
+  process.argv[1] &&
+  resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
   main().catch(() => {
-    process.stderr.write("STOP interrupted or timed out; no revocation claim.\n");
+    process.stderr.write(
+      "STOP interrupted or timed out; no revocation claim.\n",
+    );
     process.exitCode = 1;
   });
 }
