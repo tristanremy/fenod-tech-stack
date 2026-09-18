@@ -139,19 +139,43 @@ of persistent cache settings. Disabling persistent caching does not erase loaded
 values or make application credentials refresh automatically. Do not claim that
 revoking a Doppler token terminates an already running application's sessions.
 
-## Evidence boundary
+## S4 closure record (2026-09-18)
 
-The owner reported 7/7 for the earlier resolver harness. This is partial evidence:
-key absence without a known undeclared canary does not prove filtering, and a
-nonzero exit alone does not distinguish missing-key errors from infrastructure
-failure. No S4 completion claim follows from that report.
+S4 is **closed with documented limits**, not completed. The owner decided to close
+it without creating another token. No Cloudflare resource was created, changed or
+deployed. No production credential was used. Fixture mode stays in the starter.
 
-The owner reported a live app pilot PASS at `c0816f05c772be7c3dfedc8f4c515035aa63e67d`:
-schema validation, Worker types, real auth, owned CRUD, isolation and session
-revocation. Session revocation is not Doppler service-token revocation.
-The owner also reported a successful token lifecycle check: HTTP 200 before
-manual revocation, HTTP 401 afterwards with the same in-memory service token.
-Synthetic outage/recovery covers new loader processes only. Real expiry,
-wrong-config scope, cleanup/rotation, isolation and quota/cost evidence remain
-separate S4 checks. Cloudflare S5 still needs
-separate authorization. Do not remove fixture mode from the maintained starter.
+Proven:
+
+| Claim | Evidence |
+| --- | --- |
+| A real application runs on the dev config | Owner run PASS at `c0816f0`: install, plugin install, schema validation (real length inside Varlock), Worker types, real auth, owned CRUD, isolation, session revocation |
+| A revoked service token is rejected | Owner run PASS: HTTP 200 then HTTP 401 with the same in-memory token |
+| Failures do not reuse prior values on a new load | `node scripts/doppler-outage-check.mjs`: 9 cases × success → failure → recovery (27 loads) |
+| Distinct failure reasons are preserved | Same run: network, Ky timeout, invalid JSON, invalid shape, 401, 403, 404, 429, 503, each with per-key errors |
+| Invalid configuration is rejected before redaction | `node --test scripts/doppler-app-pilot.test.mjs`: short secret, missing secret, remote origin |
+| Failure output reveals nothing useful | Child stdout/stderr discarded; fixed PASS/FAIL lines only; tokenless install; sanitized child environment |
+| The internal token stays out of Worker types | App pilot asserts it after `cf-types` |
+
+Not proven, and not claimed:
+
+- **Real expiry.** Tested revocation only; expiry needs a short-lived token.
+- **Live wrong-scope access.** 403/404 are synthetic; no token was scoped wrongly.
+- **OS isolation.** Same Unix user, same machine. Temporary HOME and OrbStack are
+  not security boundaries here.
+- **Revocation effect on a running app.** Plugin 2.0.1 memoizes a successful bulk
+  response per instance; `@cache=disabled` does not erase loaded values.
+- **Quotas and cost.** Doppler plan limits, API call counts and overage are unmeasured.
+- **Rotation and cleanup.** BETTER_AUTH_SECRET rotation, token rotation and
+  secure erasure of temporary state are untested; deletion is not erasure.
+- **Provider status/outage reality.** All transport results are synthetic.
+- **Other environments.** Only `fenod-starter-pilot/dev` was involved. No staging,
+  production, or Infisical migration.
+
+Reopening any line above needs its own authorization and, for expiry or
+wrong-scope, a new disposable token. The earlier 7/7 resolver report stays
+partial: no known undeclared canary was present, and a nonzero exit alone does
+not distinguish a missing key from an infrastructure failure.
+
+Cloudflare S5 and starter promotion S6 remain unauthorized. Do not remove fixture
+mode from the maintained starter.
