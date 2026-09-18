@@ -111,6 +111,32 @@ rotate BETTER_AUTH_SECRET or erase previously retrieved values. Those remain
 separate checks. Do not replace the token mid-test or count an initially rejected
 token as successful revocation evidence.
 
+## Synthetic outage and recovery integration check
+
+```bash
+node scripts/doppler-outage-check.mjs
+```
+
+Installs Varlock 1.19.0 and Doppler plugin 2.0.1 in a temporary directory with
+an allowlisted environment and empty HOME. Package installation needs registry
+access; the actual checks do not use the network. The test preload replaces
+fetch, checks the expected API URL and synthetic authorization, and rejects
+real socket connections. No ambient credential is read or forwarded.
+
+For each case, the real CLI loads successfully, fails for the expected reason,
+then recovers, retaining the same schema/directory/HOME between child processes:
+network rejection, the real Ky 10-second timeout, malformed JSON, invalid JSON
+shape, HTTP 401, HTTP 403 and HTTP 503. Every negative result must reach the fake
+transport, have per-key errors, return no previous values, and exit nonzero.
+A killed/timed-out test process is not counted as a passing failure case.
+
+This checks **fresh loader processes with `cacheTtl=false` and `@cache=disabled`**,
+not cache-enabled behavior or refresh inside an already running Worker. Plugin
+2.0.1 still memoizes its successful bulk request within an instance, irrespective
+of persistent cache settings. Disabling persistent caching does not erase loaded
+values or make application credentials refresh automatically. Do not claim that
+revoking a Doppler token terminates an already running application's sessions.
+
 ## Evidence boundary
 
 The owner reported 7/7 for the earlier resolver harness. This is partial evidence:
@@ -121,6 +147,9 @@ failure. No S4 completion claim follows from that report.
 The owner reported a live app pilot PASS at `c0816f05c772be7c3dfedc8f4c515035aa63e67d`:
 schema validation, Worker types, real auth, owned CRUD, isolation and session
 revocation. Session revocation is not Doppler service-token revocation.
-Expired/revoked token, wrong config, provider outage, cleanup/rotation, isolation
-and quota/cost evidence remain separate S4 checks. Cloudflare S5 still needs
+The owner also reported a successful token lifecycle check: HTTP 200 before
+manual revocation, HTTP 401 afterwards with the same in-memory service token.
+Synthetic outage/recovery covers new loader processes only. Real expiry,
+wrong-config scope, cleanup/rotation, isolation and quota/cost evidence remain
+separate S4 checks. Cloudflare S5 still needs
 separate authorization. Do not remove fixture mode from the maintained starter.
