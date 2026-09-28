@@ -13,7 +13,10 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const KEY = /^([A-Z][A-Z0-9_]*)=/;
-const NAME = /^[A-Z][A-Z0-9_]*$/;
+// Leading underscores are allowed because Varlock injects its own bindings, such
+// as __VARLOCK_ENV_CHUNKS. Tolerating the name here only lets the planner report
+// them; the artifact prefix rule decides what is actually exempt.
+const NAME = /^_*[A-Z][A-Z0-9_]*$/;
 
 /** Split declared names from @internal ones, which must never be deployed. */
 export function parseSchema(text) {
@@ -114,7 +117,9 @@ function main([inventoryPath, ...rest]) {
   const report = (label, names) => {
     if (names.length) process.stdout.write(`${label}: ${names.join(", ")}\n`);
   };
-  report("Create or update", plan.create);
+  // The inventory lists secrets only, so a declared name missing here may simply
+  // be a non-sensitive var. The label must not claim a create or update.
+  report("Declared name that is not a secret (var, or missing)", plan.create);
   report("Varlock-injected binding (kept)", plan.artifacts);
   report("Approved removal", plan.remove);
   process.stdout.write(

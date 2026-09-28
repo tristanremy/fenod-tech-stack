@@ -38,6 +38,11 @@ test("only the name and type shape is accepted as an inventory", () => {
     () => parseInventory('[{"name":"app-env","type":"x"}]'),
     /Unexpected inventory name/,
   );
+  // The integration's own bindings must survive parsing, or the real inventory
+  // from a wrapper deploy fails before the planner can classify it.
+  assert.deepEqual(parseInventory('[{"name":"__VARLOCK_ENV","type":"secret_text"}]'), [
+    "__VARLOCK_ENV",
+  ]);
 });
 
 test("deploy preflight accepts additions and an exact match", () => {
@@ -124,6 +129,17 @@ test("the command prints names only and fails closed", () => {
     const clean = run(target);
     assert.equal(clean.status, 0);
     assert.match(clean.stdout, /Deploy preflight passed/);
+    // End-to-end with the shape a wrapper deploy really produces.
+    writeFileSync(
+      target,
+      inventory(["APP_ENV", "BETTER_AUTH_SECRET", "__VARLOCK_ENV", "_VARLOCK_ENV_KEY"]),
+    );
+    const wrapper = run(target);
+    assert.equal(wrapper.status, 0);
+    assert.match(
+      wrapper.stdout,
+      /Varlock-injected binding \(kept\): __VARLOCK_ENV, _VARLOCK_ENV_KEY/,
+    );
     writeFileSync(target, inventory(["APP_ENV", "BETTER_AUTH_SECRET", "LEGACY_DUMMY"]));
     const blocked = run(target);
     assert.equal(blocked.status, 1);
