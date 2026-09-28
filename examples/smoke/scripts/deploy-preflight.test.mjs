@@ -51,6 +51,26 @@ test("deploy preflight accepts additions and an exact match", () => {
   assert.deepEqual(additive.create, ["BETTER_AUTH_SECRET"]);
 });
 
+test("Varlock's own injected bindings are kept, not treated as undeclared names", () => {
+  const schema = parseSchema(SCHEMA);
+  const plan = checkPreflight({
+    ...schema,
+    target: ["APP_ENV", "BETTER_AUTH_SECRET", "__VARLOCK_ENV", "_VARLOCK_ENV_KEY"],
+  });
+  assert.deepEqual(plan.artifacts, ["__VARLOCK_ENV", "_VARLOCK_ENV_KEY"]);
+  assert.deepEqual(plan.blocked, []);
+  assert.deepEqual(plan.remove, []);
+  // Negative control: the tolerance is a fixed prefix, not a blanket allow.
+  assert.throws(
+    () =>
+      checkPreflight({
+        ...schema,
+        target: ["APP_ENV", "BETTER_AUTH_SECRET", "VARLOCK_ENV"],
+      }),
+    /explicit --allow-remove: VARLOCK_ENV/,
+  );
+});
+
 test("deploy preflight blocks unapproved removal and internal leakage", () => {
   const schema = parseSchema(SCHEMA);
   // Positive control: the same call passes once the name is declared.

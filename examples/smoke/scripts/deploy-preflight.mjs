@@ -61,15 +61,22 @@ export function parseInventory(text) {
   return parsed.map((entry) => entry.name);
 }
 
-export function planPreflight({ declared, internal, target, allowRemove = [] }) {
+// Bindings the pinned Varlock integration injects itself. They are not app
+// configuration, so they are reported and kept rather than treated as
+// undeclared names that would be deleted.
+const VARLOCK_BINDING = /^__VARLOCK_|^_VARLOCK_/;
+
+function planPreflight({ declared, internal, target, allowRemove = [] }) {
   const unwanted = target.filter((name) => !declared.includes(name));
+  const undeclared = unwanted.filter((name) => !VARLOCK_BINDING.test(name));
   return {
     leaks: internal.filter((name) => target.includes(name)),
     create: declared.filter((name) => !target.includes(name)),
     keep: declared.filter((name) => target.includes(name)),
-    remove: unwanted.filter((name) => allowRemove.includes(name)),
-    blocked: unwanted.filter((name) => !allowRemove.includes(name)),
-    unknownAllowance: allowRemove.filter((name) => !unwanted.includes(name)),
+    artifacts: unwanted.filter((name) => VARLOCK_BINDING.test(name)),
+    remove: undeclared.filter((name) => allowRemove.includes(name)),
+    blocked: undeclared.filter((name) => !allowRemove.includes(name)),
+    unknownAllowance: allowRemove.filter((name) => !undeclared.includes(name)),
   };
 }
 
@@ -108,6 +115,7 @@ function main([inventoryPath, ...rest]) {
     if (names.length) process.stdout.write(`${label}: ${names.join(", ")}\n`);
   };
   report("Create or update", plan.create);
+  report("Varlock-injected binding (kept)", plan.artifacts);
   report("Approved removal", plan.remove);
   process.stdout.write(
     `Names checked: ${declared.length} declared, ${target.length} in target, ${internal.length} internal\n`,
