@@ -90,8 +90,14 @@ For a future separately approved pilot:
 - M2 remains incomplete: pre-deploy inventory ordering and immutable adapted
   artifact provenance cannot be reconstructed from these observations.
 - Remote adversarial authorization, serialized internal-token exclusion,
-  schema-changing recovery, Access protection and fake-Wrangler command
-  construction are not established by this live pilot.
+  schema-changing recovery, Access protection and full inventory classification
+  are not established by this live pilot.
+- Command construction is now covered offline: `examples/smoke/scripts/deploy-command.test.mjs`
+  runs the pinned integration against a fake `wrangler` first on PATH (with an
+  absent config so a fall-through cannot deploy) and asserts public values travel
+  as `--var`, the sensitive value never appears in argv, `--secrets-file` receives
+  a FIFO containing the serialized `__VARLOCK_ENV` blob, and `--keep-vars=false`
+  is present. This is AR04 evidence, not a substitute for the live gaps above.
 - The generic preflight is a names-only planning check, not a deployment safety
   gate, a deletion implementation or a full inventory/classification validator.
 - No existing application was migrated. No starter release, default-secret-store
