@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, realpathSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -85,7 +85,21 @@ export function checkPortable(root) {
   for (const workflow of workflows) checkWorkflow(workflow);
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+// Compare real paths: on macOS `/tmp` and `/var` are symlinks, so a plain
+// resolve() comparison silently skips the check inside an exported copy under a
+// temporary directory, which turns a failing contract into a green no-op.
+function invokedDirectly() {
+  try {
+    return (
+      Boolean(process.argv[1]) &&
+      realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))
+    );
+  } catch {
+    return false;
+  }
+}
+
+if (invokedDirectly()) {
   checkPortable(resolve(import.meta.dirname, ".."));
   process.stdout.write("Portable starter contract passed\n");
 }

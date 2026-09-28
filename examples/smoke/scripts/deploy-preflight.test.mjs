@@ -29,8 +29,11 @@ test("only the name and type shape is accepted as an inventory", () => {
   assert.throws(() => parseInventory('{"APP_ENV":"secret-value"}'), /JSON array/);
   assert.throws(
     () => parseInventory('[{"name":"APP_ENV","type":"secret_text","value":"leaked"}]'),
-    /name and type only/,
+    /name and optional type only/,
   );
+  // Both documented shapes are accepted: with and without a type field.
+  assert.deepEqual(parseInventory('[{"name":"APP_ENV"}]'), ["APP_ENV"]);
+  assert.throws(() => parseInventory('[{"type":"secret_text"}]'), /needs a name field/);
   assert.throws(
     () => parseInventory('[{"name":"app-env","type":"x"}]'),
     /Unexpected inventory name/,

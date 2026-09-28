@@ -8,7 +8,7 @@
 // the schema deletes anything the target has and the schema does not declare.
 // Such a name must be listed explicitly, so an accidental deletion cannot pass.
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -50,10 +50,11 @@ export function parseInventory(text) {
     "Inventory must be the JSON array printed by `wrangler secret list`",
   );
   for (const entry of parsed) {
-    assert.deepEqual(
-      Object.keys(entry).sort(),
-      ["name", "type"],
-      "Inventory entries may contain name and type only; remove any value field",
+    const keys = Object.keys(entry).sort();
+    assert.ok(keys.includes("name"), "Every inventory entry needs a name field");
+    assert.ok(
+      keys.every((key) => key === "name" || key === "type"),
+      "Inventory entries may contain name and optional type only; remove any value field",
     );
     assert.match(entry.name, NAME, `Unexpected inventory name: ${entry.name}`);
   }
@@ -115,7 +116,20 @@ function main([inventoryPath, ...rest]) {
   process.stdout.write("Deploy preflight passed\n");
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+// See check-portable.mjs: real paths matter, because an exported copy often
+// lives under a symlinked temporary directory on macOS.
+function invokedDirectly() {
+  try {
+    return (
+      Boolean(process.argv[1]) &&
+      realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))
+    );
+  } catch {
+    return false;
+  }
+}
+
+if (invokedDirectly()) {
   try {
     main(process.argv.slice(2));
   } catch (error) {
