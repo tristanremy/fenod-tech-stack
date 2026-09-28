@@ -98,6 +98,17 @@ For a future separately approved pilot:
   as `--var`, the sensitive value never appears in argv, `--secrets-file` receives
   a FIFO containing the serialized `__VARLOCK_ENV` blob, and `--keep-vars=false`
   is present. This is AR04 evidence, not a substitute for the live gaps above.
+- The committed migrations and the database-level ownership rules are now covered
+  offline by `examples/smoke/scripts/migration-compat.test.mjs`: the real SQL
+  applies in order to real SQLite, the exact statement shapes from
+  `src/server/items.ts` enforce ownership and cascade, a forged owner changes
+  nothing, and a negative control fails before the migration runs. Forged owner
+  fields are also rejected at the input boundary (`.strict()` schemas).
+- **Schema-changing recovery is still unproven.** No forward migration exists
+  yet, so no artifact pair has been tested across a schema change. When the first
+  additive migration lands, repeat the same shape locally and, in a future
+  authorized pilot, verify the deployed pair. Until then, M5 covers only rollback
+  between artifacts that share one schema.
 - The generic preflight is a names-only planning check, not a deployment safety
   gate, a deletion implementation or a full inventory/classification validator.
 - No existing application was migrated. No starter release, default-secret-store
