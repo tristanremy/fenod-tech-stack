@@ -43,6 +43,15 @@ From the upstream handbook, use `node scripts/export-starter.mjs <commit> <new-d
 
 Inside an exported app, there is no dependency on parent documentation or global agent tools. CI checks the standalone directory. Upstream handbook CI additionally exports the exact commit before testing.
 
+## Remote deployment (not authorized in this starter)
+
+This repo ships no remote deploy script: `deploy` and `db:remote` fail closed, and agents push Git instead of deploying. If a human or protected job is later approved to deploy an exported app, the handbook's disposable pilot established these facts:
+
+- The built Worker needs the pinned `@varlock/cloudflare-integration` wrapper. Plain `wrangler deploy` fails because the runtime requires the serialized `__VARLOCK_ENV` blob that only the wrapper uploads.
+- Supply the real secret through trusted process input, never as a command-line argument. The wrapper passes secrets to Wrangler over a FIFO, so they do not become arguments.
+- Inventory secrets by name before and after any modifying sync. An undeclared secret is not removed automatically, and a secret inventory lists neither public vars nor bindings. Plan removals explicitly, then verify.
+- Recovery is not a database operation: Worker rollback leaves D1 untouched. Check schema compatibility locally with `node scripts/migration-compat.test.mjs`, and gate preview hosts behind Cloudflare Access before real data exists.
+
 Keep `fenod-smoke` names while verifying the baseline. For a product rename, change `package.json` name, Wrangler Worker name, D1 `database_name`, and the `db:local` script argument together, then rerun `pnpm cf-types` and all checks. Keep the `DB` binding name. The zero UUID is a local placeholder, not a provisioned resource. No remote ID is required locally.
 
 Do not automatically synchronize products. Review upstream changes against the provenance revision. [Maintenance and approval plan](https://github.com/tristanremy/fenod-tech-stack/blob/UPSTREAM_REVISION/plans/010-maintained-starter.md).

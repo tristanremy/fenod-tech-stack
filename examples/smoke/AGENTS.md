@@ -10,6 +10,8 @@ Read this file, [STACK.md](./STACK.md), then [README.md](./README.md). This is a
 - Install named official components first: `pnpm dlx shadcn@latest add <item>`. Customize after installation.
 - `.env.schema` is the fixture-only Varlock configuration. No real credentials, vault account, remote bindings or local override files. Never print raw Varlock JSON with real values.
 - Do not deploy, provision resources, send mail, run remote migrations, or add production secrets. Remote scripts deliberately fail. Approval for code changes is not approval for those operations.
+- If a human or protected job is later approved to deploy this app, these findings from the handbook's disposable pilot apply: the built Worker needs the pinned `@varlock/cloudflare-integration` wrapper, because plain `wrangler deploy` fails on the missing serialized `__VARLOCK_ENV` blob. Never pass a secret as a command-line argument; supply it through trusted process input, since the wrapper serves secrets to Wrangler over a FIFO.
+- Inventory secrets by name before and after any modifying sync. An undeclared secret is **not** removed automatically, and a secret inventory does not list public vars or bindings. Plan removals explicitly and verify afterwards. A Worker rollback does not roll back D1: check schema compatibility locally first, with `node scripts/migration-compat.test.mjs`, and gate any preview host behind Cloudflare Access before real data exists.
 - Preserve unrelated work. Use small scoped commits. Keep source checks read-only; run generators explicitly.
 
 ## Verify
