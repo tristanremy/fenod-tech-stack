@@ -132,7 +132,7 @@ No ports/adapters. No generic repository layer.
 - **Infisical** is the default secrets manager. Sync it to Cloudflare Worker secrets; Bitwarden SM only with an explicit project override.
 - Validate runtime configuration with Zod. Commit names and placeholders only (`.env.example`, `infisical.json` without secret values).
 - Never commit `.env`, `.env.local`, or `.dev.vars` with real values. Scan staged changes and enable GitHub push protection when available.
-- Varlock is not a default. Use it only after a written trigger; its Worker deploy replaces vars and secrets absent from its schema.
+- Varlock is not a default. Use it only after a written trigger. Inventory vars and secrets before deployment; do not assume undeclared secrets are removed. The pinned [S5 pilot](s5-cloudflare-pilot.md) retained an extra secret until explicitly deleted.
 - Local Wrangler must not accidentally prefer an exported token:
 
 ```bash

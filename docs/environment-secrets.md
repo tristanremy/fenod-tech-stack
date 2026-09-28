@@ -37,7 +37,7 @@ Use one local/CI scanner: `infisical scan git-changes --staged`. Enable GitHub p
 
 ## Varlock trigger
 
-Evaluate Varlock only when an application has all of these: a large typed configuration surface, several environments with complex resolution, and a demonstrated need for runtime response/log redaction beyond the scanner and app controls. Its Cloudflare integration requires `varlock-wrangler`; its deploy replaces Worker vars/secrets not in its schema.
+Evaluate Varlock only when an application has all of these: a large typed configuration surface, several environments with complex resolution, and a demonstrated need for runtime response/log redaction beyond the scanner and app controls. Its Cloudflare integration requires `varlock-wrangler`. Inventory vars and secrets separately before deployment and verify the result afterwards: do not assume schema omission removes a secret. In the [pinned S5 pilot](s5-cloudflare-pilot.md), an undeclared secret survived wrapper redeployment and required explicitly approved deletion. The pilot remains partial; it does not change the default.
 
 ## Upgrade policy
 
