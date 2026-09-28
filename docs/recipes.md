@@ -145,3 +145,5 @@ env -u CLOUDFLARE_API_TOKEN wrangler deploy
 ```
 
 CI injects runtime secrets with Infisical (e.g. `infisical run --env=prod -- wrangler deploy`) behind a protected environment. Alchemy only on Stack Contract triggers.
+
+If the app uses Varlock's Cloudflare integration, replace `wrangler deploy` with the pinned `varlock-wrangler deploy`: the built Worker needs the serialized `__VARLOCK_ENV` blob that plain Wrangler does not upload. Inventory vars and secrets around that deploy, because an undeclared secret is not removed automatically. See [Deploy findings](s5-cloudflare-pilot.md).

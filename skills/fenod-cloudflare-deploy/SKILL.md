@@ -58,6 +58,13 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm build
 env -u CLOUDFLARE_API_TOKEN wrangler deploy --env staging
 ```
 
+If the app uses Varlock's Cloudflare integration, the deploy command is
+`env -u CLOUDFLARE_API_TOKEN varlock-wrangler deploy` instead, run from the app
+root. Plain `wrangler deploy` fails there with code 10021 `initVarlockEnv failed`
+because the built Worker needs the serialized `__VARLOCK_ENV` blob that only the
+wrapper uploads. Inventory vars and secrets around that deploy: an undeclared
+secret is not removed automatically.
+
 ## Alchemy
 
 Only after triggers match. See `docs/stack-contract.md` and `docs/recipes.md` (handbook-root paths). Do not scaffold `alchemy.run.ts` on a one-Worker SME app.
@@ -67,7 +74,7 @@ GitHub Action owns Cloudflare tokens (`staging` / `production` environments). Pu
 ## Compute chooser
 
 | Workload | Use |
-|----------|-----|
+| ---------- | ----- |
 | API, SSR, static | Worker |
 | Per-tenant isolates | Dynamic Workers |
 | Heavy native/long CPU | Container (last resort) |
@@ -87,7 +94,7 @@ GitHub Action owns Cloudflare tokens (`staging` / `production` environments). Pu
 ## Deep references
 
 | Need | Read |
-|------|------|
+| ------ | ------ |
 | Law | `docs/stack-contract.md` |
 | Recipes | `docs/recipes.md` |
 | Security | `docs/security-model.md` |
