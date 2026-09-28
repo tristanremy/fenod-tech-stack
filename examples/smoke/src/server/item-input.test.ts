@@ -42,3 +42,29 @@ describe("setItemCompletedInput", () => {
     expect(setItemCompletedInput.safeParse({ id: 1 }).success).toBe(false);
   });
 });
+
+// Ownership comes from the checked session, never from the payload. These cases
+// fail closed instead of being silently stripped, so a forged owner field is a
+// visible contract violation rather than an ignored extra key.
+describe("owner fields are not part of the input contract", () => {
+  const forged = ["userId", "user_id", "ownerId", "owner_id"];
+
+  it("rejects a forged owner on every mutation input", () => {
+    for (const key of forged) {
+      expect(createItemInput.safeParse({ title: "ok", [key]: "someone-else" }).success, key).toBe(
+        false,
+      );
+      expect(itemIdInput.safeParse({ id: 1, [key]: "someone-else" }).success, key).toBe(false);
+      expect(
+        setItemCompletedInput.safeParse({ id: 1, completed: true, [key]: "someone-else" }).success,
+        key,
+      ).toBe(false);
+    }
+  });
+
+  it("still accepts the declared fields alone", () => {
+    expect(createItemInput.safeParse({ title: "ok" }).success).toBe(true);
+    expect(itemIdInput.safeParse({ id: 1 }).success).toBe(true);
+    expect(setItemCompletedInput.safeParse({ id: 1, completed: false }).success).toBe(true);
+  });
+});
