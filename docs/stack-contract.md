@@ -46,7 +46,7 @@ One-liner:
 | Secrets | **Infisical** → Cloudflare Worker secrets at runtime; validate config with Zod 4.5.x |
 | Observability | Workers Observability on every Worker; **Sentry** only for product / paying apps |
 | Rate limits | Cloudflare-native binding or DO — **no Redis** |
-| Lint | **Oxlint** (`pnpm lint`). React apps: plugin `react` + `correctness` (Compiler rules). Type-aware lint is not CI default until TypeScript 7 is the repo baseline. |
+| Lint | **Oxlint** (`pnpm lint`). React apps: plugin `react` + `correctness` (Compiler rules). Tailwind design systems: **`@shadcn/lint`** through Oxlint (>=1.80), starting with `no-restyle` and layout allowed; component definitions own their variants. See the UI recipe. Type-aware lint is not CI default until TypeScript 7 is the repo baseline. |
 | Format | **Oxfmt** (`pnpm format` / `pnpm format:check`) |
 | Types | **TypeScript 7** `tsc` for `typecheck`; keep TypeScript 6 only when tooling still needs its compiler API |
 | Unit/integration tests | **Vitest 5** |
@@ -132,7 +132,7 @@ No ports/adapters. No generic repository layer.
 - **Infisical** is the default secrets manager. Sync it to Cloudflare Worker secrets; Bitwarden SM only with an explicit project override.
 - Validate runtime configuration with Zod. Commit names and placeholders only (`.env.example`, `infisical.json` without secret values).
 - Never commit `.env`, `.env.local`, or `.dev.vars` with real values. Scan staged changes and enable GitHub push protection when available.
-- Varlock is not a default. Use it only after a written trigger; its Worker deploy replaces vars and secrets absent from its schema.
+- Varlock is not a default. Use it only after a written trigger. Inventory vars and secrets before deployment; do not assume undeclared secrets are removed. The pinned [S5 pilot](s5-cloudflare-pilot.md) retained an extra secret until explicitly deleted.
 - Local Wrangler must not accidentally prefer an exported token:
 
 ```bash

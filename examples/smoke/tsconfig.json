@@ -5,6 +5,8 @@
     "vite.config.ts",
     "vitest.config.ts",
     "drizzle.config.ts",
+    "playwright.config.ts",
+    "e2e/**/*.ts",
     "worker-configuration.d.ts"
   ],
   "exclude": ["node_modules", "dist", ".wrangler", "drizzle"],

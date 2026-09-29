@@ -5,24 +5,15 @@ import { env } from "cloudflare:workers";
 
 import { getDb } from "#/db/index";
 import * as schema from "#/db/schema";
-import { authSettings } from "./auth-settings";
-
-function requireSecret(name: keyof Cloudflare.Env, value: string | undefined) {
-  if (!value) {
-    throw new Error(
-      `${name} is missing. Set it via Infisical or untracked .dev.vars (see .env.example).`,
-    );
-  }
-  return value;
-}
+import { authSettings } from "./auth-settings.ts";
 
 export const auth = betterAuth({
   database: drizzleAdapter(getDb(), {
     provider: "sqlite",
     schema,
   }),
-  secret: requireSecret("BETTER_AUTH_SECRET", env.BETTER_AUTH_SECRET),
-  baseURL: env.BETTER_AUTH_URL ?? "http://localhost:3000",
+  secret: env.BETTER_AUTH_SECRET,
+  baseURL: env.BETTER_AUTH_URL,
   emailAndPassword: {
     enabled: true,
   },

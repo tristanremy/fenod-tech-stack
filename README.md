@@ -19,7 +19,7 @@ Opinionated defaults for building full-stack TypeScript products on Cloudflare W
 | API | Start server functions first; Hono + oRPC when a real API boundary exists |
 | Files / async work | R2 / Queues / Workflows |
 | AI | TanStack AI + Cloudflare AI Gateway |
-| Quality | Oxlint + Oxfmt + tsgo + Vitest + Playwright when needed |
+| Quality | Oxlint + @shadcn/lint + Oxfmt + TypeScript 7 + Vitest + Playwright when needed |
 | Secrets | Infisical + Worker secrets |
 | Deploy | Git push → protected CI → Workers |
 
@@ -41,32 +41,34 @@ flowchart LR
   CI --> D[Workers deploy]
 ```
 
-## Start a product
+## Try the application reference
 
-Use the living reference. It is intentionally one package, not a starter monorepo.
+The living reference is intentionally one package, not a starter monorepo.
+
+**Still experimental:** local auth/owned CRUD, fixture-only Varlock, immutable export and clean-room browser verification are implemented. Doppler, deployed secrets/recovery and production operations are not validated. See the [September audit](plans/009-agent-first-audit.md) and [starter plan](plans/010-maintained-starter.md).
+
+Export only committed files from an exact revision; never copy a working tree:
 
 ```bash
-cp -R examples/smoke ../my-app
+revision=$(git rev-parse HEAD)
+node scripts/export-starter.mjs "$revision" ../my-app
 cd ../my-app
-rm -rf node_modules .wrangler dist
-# Rename package.json and wrangler.jsonc names.
-pnpm install
-pnpm dlx wrangler d1 create my-app
-# Put the returned database_id in wrangler.jsonc.
-cp .dev.vars.example .dev.vars   # or use Infisical
-pnpm db:local
+pnpm install --frozen-lockfile
+pnpm cf-types
 pnpm ship
-pnpm dev
+pnpm build
+pnpm exec playwright install chromium
+pnpm test:e2e
 ```
 
-Then remove unused demo routes and build the product. Keep the reference shape until a real trigger requires more structure.
+The export refuses overwrite and unsafe Git entries, records commit/tree provenance and replaces upstream links with that immutable commit. It needs only Node 24, pinned pnpm, Git and standard `tar` on macOS/Linux. No vault account, Cloudflare credential or local env file is needed. Add Hono + oRPC only for a real API boundary ([recipe](docs/recipes.md)). Remote scripts fail closed until separately approved S4/S5 work.
 
 ```mermaid
 flowchart TD
-  A[Copy examples/smoke] --> B[Configure Worker + D1]
-  B --> C[Add secrets locally]
+  A[Open examples/smoke] --> B[Validate fixture config + types]
+  B --> C[Apply local D1 migrations]
   C --> D[Run ship gate]
-  D --> E[Build product features]
+  D --> E[Exercise owned-item flow]
   E --> F{Real boundary or scale trigger?}
   F -- No --> E
   F -- API consumers --> G[Add Hono + oRPC]
@@ -86,6 +88,8 @@ pnpm dlx shadcn@latest add <item>
 
 This applies to primitives and blocks, including the default sidebar. Customize after it is installed so future shadcn updates remain easy.
 
+The smoke reference also runs **`@shadcn/lint` through Oxlint**. Its `no-restyle` policy keeps component variants authoritative while allowing page layout. See the [UI lint recipe](docs/recipes.md#verify-design-system-usage).
+
 ## What we deliberately do not start with
 
 - no day-one monorepo or Alchemy;
@@ -104,11 +108,15 @@ Agents: start with [AGENTS.md](AGENTS.md), then use [agent-context.json](agent-c
 ## Checks
 
 ```bash
-pnpm check
-pnpm check:context
-cd examples/smoke && pnpm ship
-# Higher-risk reference changes:
-pnpm cf-types && pnpm build
+pnpm check       # read-only: fails on stale generated context
+pnpm test        # generator determinism and negative checks
+pnpm --dir examples/smoke ship
+pnpm --dir examples/astro ship
+# Higher-risk smoke changes:
+pnpm --dir examples/smoke cf-types
+pnpm --dir examples/smoke build
 ```
+
+After editing agent-context sources, run `pnpm llms:build` and review the generated diff before checking. The [audit](plans/009-agent-first-audit.md) separates verified changes from pending migrations; [agent evaluations](docs/agent-evals.md) describes the bounded Jev pilot.
 
 Law: [docs/stack-contract.md](docs/stack-contract.md). Security: [docs/security-model.md](docs/security-model.md).

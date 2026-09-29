@@ -5,5 +5,11 @@ allowBuilds:
   workerd: true
   better-sqlite3: true
 overrides:
-  js-yaml: 4.3.1
+  # Security patches, see plans/009-agent-first-audit.md (SEC01).
+  js-yaml: 4.3.2
   nanoid: ">=3.3.17"
+  sharp: 0.35.4
+  # ponytail: drizzle-kit pulls dead @esbuild-kit/core-utils,
+  # which pins esbuild ~0.18.20. Scoped so only that chain moves.
+  # Drop when drizzle-kit changes its dependency.
+  "@esbuild-kit/core-utils>esbuild": ">=0.25.0"

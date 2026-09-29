@@ -1,1 +1,9 @@
+node_modules
+dist
 dist-preview/
+.astro
+.DS_Store
+*.log
+# Secrets stay out; placeholder examples stay trackable.
+.env*
+!.env.example
