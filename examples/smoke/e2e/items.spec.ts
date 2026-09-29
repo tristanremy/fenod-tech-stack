@@ -91,3 +91,24 @@ test("real auth, owned CRUD, invalid input, cross-user denial and revoked sessio
   expect(await call(page, "listItems")).toEqual([]);
   expect(errors).toEqual([]);
 });
+
+test("a failed mutation shows an error, preserves the input and allows a retry", async ({
+  page,
+}) => {
+  await signup(page, `${randomUUID()}@example.test`);
+  await page.getByLabel("New item").fill("Retry item");
+
+  // Abort the write deterministically; offline emulation does not reliably
+  // reject a same-origin server-function call in this stack.
+  await page.route("**/*", (route) =>
+    route.request().method() === "POST" ? route.abort() : route.continue(),
+  );
+  await page.getByRole("button", { name: "Add", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText("The request failed");
+  await expect(page.getByLabel("New item")).toHaveValue("Retry item");
+
+  await page.unroute("**/*");
+  await page.getByRole("button", { name: "Add", exact: true }).click();
+  await expect(page.getByLabel("Retry item", { exact: true })).toBeVisible();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+});

@@ -14,14 +14,16 @@ const REASON_MESSAGE = {
   not_found: "That item no longer exists. The list has been refreshed.",
 } as const;
 
-export function ItemList({ email }: { email: string }) {
+export function ItemList({ email, userId }: { email: string; userId: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { data: items = [] } = useQuery(itemsQueryOptions);
+  const options = itemsQueryOptions(userId);
+  const { data: items = [] } = useQuery(options);
   const [title, setTitle] = useState("");
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: itemsQueryOptions.queryKey });
+  const refresh = () => queryClient.invalidateQueries({ queryKey: options.queryKey });
+  const onError = () => setActionError("The request failed. Check your connection and try again.");
 
   const settle = async (outcome: ItemOutcome<unknown>) => {
     if (outcome.ok) {
@@ -40,6 +42,7 @@ export function ItemList({ email }: { email: string }) {
 
   const create = useMutation({
     mutationFn: (nextTitle: string) => createItem({ data: { title: nextTitle } }),
+    onError,
     onSuccess: async (outcome) => {
       if (outcome.ok) {
         setTitle("");
@@ -50,11 +53,13 @@ export function ItemList({ email }: { email: string }) {
 
   const toggle = useMutation({
     mutationFn: (input: { id: number; completed: boolean }) => setItemCompleted({ data: input }),
+    onError,
     onSuccess: settle,
   });
 
   const remove = useMutation({
     mutationFn: (id: number) => deleteItem({ data: { id } }),
+    onError,
     onSuccess: settle,
   });
 
