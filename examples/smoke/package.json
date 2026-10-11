@@ -19,6 +19,7 @@
     "check:portable": "node scripts/check-portable.mjs",
     "check": "pnpm config:check && pnpm check:portable && pnpm format:check && pnpm lint && pnpm typecheck",
     "ship": "pnpm check && pnpm test",
+    "release": "pnpm ship && pnpm build && pnpm audit --audit-level high && pnpm test:e2e",
     "config:check": "varlock load --path .env.schema --agent --format json-full",
     "cf-types": "env -u CLOUDFLARE_API_TOKEN varlock-wrangler types && node scripts/normalize-worker-types.mjs",
     "db:generate": "drizzle-kit generate",

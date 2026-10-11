@@ -66,7 +66,7 @@ pnpm typecheck
 pnpm test
 ```
 
-Add `pnpm build`, Playwright, and browser checks when risk or UI warrants it. Do not run the entire optional toolbox on every one-line fix.
+Add `pnpm build`, `pnpm audit --audit-level high`, Playwright, and browser checks when risk or UI warrants it (`pnpm release` in the examples). Do not run the entire optional toolbox on every one-line fix.
 
 ## Completion report
 

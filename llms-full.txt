@@ -146,7 +146,7 @@ One-liner:
 | Cloudflare CLI | **Wrangler** project baseline. **cf** optional beta toolbox; project commands require an explicit, validated migration |
 | Deploy | **Workers**, never new Pages. Git-connect or CI **Wrangler** by default. **Alchemy 2** only after a written shared-lifecycle/stage/ownership need and pinned pilot, via protected CI. Agents push Git; they do not deploy. |
 | Secrets | **Infisical** → Cloudflare Worker secrets at runtime; validate config with Zod 4 (exact version in the lockfile) |
-| Observability | Workers Observability on every Worker; **Sentry** only for product / paying apps |
+| Observability | Workers Observability on every Worker: logs, explicit `traces` with deliberate sampling, `redact_query_string`; **Sentry** only for product / paying apps |
 | Rate limits | Cloudflare-native binding or DO — **no Redis** |
 | Lint | **Oxlint** (`pnpm lint`). React apps: plugin `react` + `correctness` (Compiler rules). Tailwind design systems: **`@shadcn/lint`** through Oxlint (>=1.80), starting with `no-restyle` and layout allowed; component definitions own their variants. See the UI recipe. Type-aware lint is not CI default until TypeScript 7 is the repo baseline. |
 | Format | **Oxfmt** (`pnpm format` / `pnpm format:check`) |
@@ -271,10 +271,13 @@ pnpm test
 
 ```bash
 pnpm build
+pnpm audit --audit-level high
 # UI flows:
 pnpm test:e2e
 # Visual changes: verify in a browser
 ```
+
+A green ship gate says nothing about dependency safety; the merge gate includes the audit. The examples expose this gate as `pnpm release`.
 
 React Doctor, full monorepo pipelines, and extra scanners are optional merge aids when a repo configures them — not universal law on every edit.
 
@@ -370,7 +373,7 @@ pnpm typecheck
 pnpm test
 ```
 
-Add `pnpm build`, Playwright, and browser checks when risk or UI warrants it. Do not run the entire optional toolbox on every one-line fix.
+Add `pnpm build`, `pnpm audit --audit-level high`, Playwright, and browser checks when risk or UI warrants it (`pnpm release` in the examples). Do not run the entire optional toolbox on every one-line fix.
 
 ## Completion report
 
@@ -489,7 +492,7 @@ Staging/admin/preview hosts: Access. Public sites: no. Better Auth still owns ap
 
 ## compatibility_date Is a Deliberate Bump
 
-New Workers: today's date + `observability.enabled`. Do not paste `nodejs_compat` onto dates `>= 2026-08-04`. Bump a live date only after `wrangler types` and the ship gate.
+New Workers: today's date + `observability.enabled`. That enables logs only; traces need `observability.traces.enabled` (see `examples/smoke/wrangler.jsonc`). Do not paste `nodejs_compat` onto dates `>= 2026-08-04`. Bump a live date only after `wrangler types` and the ship gate.
 
 ## Nub Is Not the Package Manager
 
@@ -522,6 +525,10 @@ Use KV, Workers rate limiting bindings, or Durable Objects. No external Redis fo
 ## Drizzle v1 Is Not Client Default Yet
 
 Stay on latest patched 0.4x until `drizzle-orm` latest is 1.x **and** a migration plan exists. No drive-by RC upgrades.
+
+## Stale pnpm Metadata Can Hide Security Fixes
+
+`pnpm update`, `dedupe` and even an override can keep an old in-range transitive version (2026-10: `solid-js` 1.9.14 → vulnerable `seroval`) when pnpm's cached registry metadata predates the fix. Re-audit after every upgrade. If a patched version exists but will not resolve, delete that package's file under pnpm's `metadata-*` cache directory and remove and re-add the direct dependency that pulls it in. Delete an override once the lockfile resolves the fix without it.
 
 ## Auth/RPC/ORM Security Updates Are Not Optional
 
@@ -678,6 +685,16 @@ Start with the existing Router/Query and D1 tools. Do not add Redis, a new API l
 
 Default: TanStack Query cache/persist.  
 Full offline-first only for real field/dead-zone products — design per project, not as stack scaffolding.
+
+## Keep CI cheap
+
+Private repos pay for GitHub Actions minutes, and each job is rounded up to a whole minute. Start from the exported starter workflow (`examples/smoke/.github/workflows/ci.yml`):
+
+- One job per repo, secret scan first. Run on `pull_request` and pushes to `main` only, skip drafts, and cancel superseded runs with `concurrency`.
+- Cache the pnpm store (`setup-node` `cache: pnpm`). Do not use `paths-ignore` for docs: the portable check validates documented commands.
+- Agents run `pnpm release` before pushing, so CI confirms results instead of finding them.
+- Workers Builds (Git-connect) includes build minutes on Workers Paid. Set its build command to the ship gate plus build, so a failing check fails the build before deploy (confirm on the first project). Keep the PR check and secret scan in GitHub.
+- If minutes still exceed the plan, a drop-in runner (one `runs-on:` change) is cheaper than GitHub's hosted runners. It receives client code: check the client contract first. Never put self-hosted runners on public repos.
 
 ## Deploy an app
 

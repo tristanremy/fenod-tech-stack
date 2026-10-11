@@ -1,11 +1,21 @@
 name: Local starter checks
 on:
   push:
+    branches: [main]
   pull_request:
+    # ready_for_review: drafts are skipped below, so run when one is promoted.
+    types: [opened, synchronize, reopened, ready_for_review]
 permissions:
   contents: read
+# A newer push to the same PR/branch cancels the run it supersedes.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
+  # One job: GitHub rounds each job up to a whole minute, so separate small
+  # jobs bill several minutes for one run.
   check:
+    if: github.event.pull_request.draft != true
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -16,27 +26,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
-        with:
-          node-version: 24
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm cf-types && git diff --exit-code
-      - run: pnpm ship
-      - run: pnpm build && git diff --exit-code
-      - run: pnpm audit --audit-level high
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:e2e && git diff --exit-code
-  secrets:
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-      # Offline: no verification requests to credential providers.
+      # Offline, before install so dependencies are not scanned: no
+      # verification requests to credential providers.
       - name: Scan tracked content offline
         env:
           GITLEAKS_DIGEST_A: c00b6bd0aeb3071cbcb79009cb16a60d
@@ -45,3 +36,15 @@ jobs:
           image="ghcr.io/gitleaks/gitleaks@sha256:${GITLEAKS_DIGEST_A}${GITLEAKS_DIGEST_B}"
           docker run --rm -v "$GITHUB_WORKSPACE:/repo:ro" "$image" \
             dir --redact --no-banner --exit-code 1 /repo
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm cf-types && git diff --exit-code
+      - run: pnpm ship
+      - run: pnpm build && git diff --exit-code
+      - run: pnpm audit --audit-level high
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e && git diff --exit-code

@@ -46,7 +46,7 @@ One-liner:
 | Cloudflare CLI | **Wrangler** project baseline. **cf** optional beta toolbox; project commands require an explicit, validated migration |
 | Deploy | **Workers**, never new Pages. Git-connect or CI **Wrangler** by default. **Alchemy 2** only after a written shared-lifecycle/stage/ownership need and pinned pilot, via protected CI. Agents push Git; they do not deploy. |
 | Secrets | **Infisical** → Cloudflare Worker secrets at runtime; validate config with Zod 4 (exact version in the lockfile) |
-| Observability | Workers Observability on every Worker; **Sentry** only for product / paying apps |
+| Observability | Workers Observability on every Worker: logs, explicit `traces` with deliberate sampling, `redact_query_string`; **Sentry** only for product / paying apps |
 | Rate limits | Cloudflare-native binding or DO — **no Redis** |
 | Lint | **Oxlint** (`pnpm lint`). React apps: plugin `react` + `correctness` (Compiler rules). Tailwind design systems: **`@shadcn/lint`** through Oxlint (>=1.80), starting with `no-restyle` and layout allowed; component definitions own their variants. See the UI recipe. Type-aware lint is not CI default until TypeScript 7 is the repo baseline. |
 | Format | **Oxfmt** (`pnpm format` / `pnpm format:check`) |
@@ -171,10 +171,13 @@ pnpm test
 
 ```bash
 pnpm build
+pnpm audit --audit-level high
 # UI flows:
 pnpm test:e2e
 # Visual changes: verify in a browser
 ```
+
+A green ship gate says nothing about dependency safety; the merge gate includes the audit. The examples expose this gate as `pnpm release`.
 
 React Doctor, full monorepo pipelines, and extra scanners are optional merge aids when a repo configures them — not universal law on every edit.
 

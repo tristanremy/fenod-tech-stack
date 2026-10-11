@@ -13,7 +13,8 @@
     "typecheck": "astro check",
     "test": "pnpm build && pnpm build:preview && vitest run",
     "test:html": "vitest run",
-    "ship": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test"
+    "ship": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test",
+    "release": "pnpm ship && pnpm audit --audit-level high"
   },
   "dependencies": {
     "astro": "7.3.8"

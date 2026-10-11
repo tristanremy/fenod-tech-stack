@@ -8,6 +8,11 @@
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,
+    // Query strings can carry auth/verification tokens.
+    "redact_query_string": true,
+    // Traces are off unless enabled explicitly. Logs stay at 100%; raise
+    // trace sampling only while debugging.
+    "traces": { "enabled": true, "head_sampling_rate": 0.1 },
   },
   "d1_databases": [
     {

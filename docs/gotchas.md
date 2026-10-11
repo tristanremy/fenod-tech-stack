@@ -102,7 +102,7 @@ Staging/admin/preview hosts: Access. Public sites: no. Better Auth still owns ap
 
 ## compatibility_date Is a Deliberate Bump
 
-New Workers: today's date + `observability.enabled`. Do not paste `nodejs_compat` onto dates `>= 2026-08-04`. Bump a live date only after `wrangler types` and the ship gate.
+New Workers: today's date + `observability.enabled`. That enables logs only; traces need `observability.traces.enabled` (see `examples/smoke/wrangler.jsonc`). Do not paste `nodejs_compat` onto dates `>= 2026-08-04`. Bump a live date only after `wrangler types` and the ship gate.
 
 ## Nub Is Not the Package Manager
 
@@ -135,6 +135,10 @@ Use KV, Workers rate limiting bindings, or Durable Objects. No external Redis fo
 ## Drizzle v1 Is Not Client Default Yet
 
 Stay on latest patched 0.4x until `drizzle-orm` latest is 1.x **and** a migration plan exists. No drive-by RC upgrades.
+
+## Stale pnpm Metadata Can Hide Security Fixes
+
+`pnpm update`, `dedupe` and even an override can keep an old in-range transitive version (2026-10: `solid-js` 1.9.14 → vulnerable `seroval`) when pnpm's cached registry metadata predates the fix. Re-audit after every upgrade. If a patched version exists but will not resolve, delete that package's file under pnpm's `metadata-*` cache directory and remove and re-add the direct dependency that pulls it in. Delete an override once the lockfile resolves the fix without it.
 
 ## Auth/RPC/ORM Security Updates Are Not Optional
 

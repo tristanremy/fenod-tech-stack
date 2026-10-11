@@ -141,6 +141,16 @@ Start with the existing Router/Query and D1 tools. Do not add Redis, a new API l
 Default: TanStack Query cache/persist.  
 Full offline-first only for real field/dead-zone products — design per project, not as stack scaffolding.
 
+## Keep CI cheap
+
+Private repos pay for GitHub Actions minutes, and each job is rounded up to a whole minute. Start from the exported starter workflow (`examples/smoke/.github/workflows/ci.yml`):
+
+- One job per repo, secret scan first. Run on `pull_request` and pushes to `main` only, skip drafts, and cancel superseded runs with `concurrency`.
+- Cache the pnpm store (`setup-node` `cache: pnpm`). Do not use `paths-ignore` for docs: the portable check validates documented commands.
+- Agents run `pnpm release` before pushing, so CI confirms results instead of finding them.
+- Workers Builds (Git-connect) includes build minutes on Workers Paid. Set its build command to the ship gate plus build, so a failing check fails the build before deploy (confirm on the first project). Keep the PR check and secret scan in GitHub.
+- If minutes still exceed the plan, a drop-in runner (one `runs-on:` change) is cheaper than GitHub's hosted runners. It receives client code: check the client contract first. Never put self-hosted runners on public repos.
+
 ## Deploy an app
 
 **CI or a human-owned terminal only.** Agents push Git; they do not deploy or run remote D1 migrations.
