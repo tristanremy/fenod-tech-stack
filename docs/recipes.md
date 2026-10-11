@@ -41,7 +41,7 @@ infisical run --env=dev -- pnpm dev
 infisical scan git-changes --staged
 ```
 
-Use Infisical as the source of truth and sync sensitive runtime values to Cloudflare Worker secrets. Keep non-secret values in `wrangler.jsonc` `vars`; validate required runtime config with Zod 4.5.x. `.dev.vars` is local-only and ignored. Do not add Varlock unless the application meets its written trigger in [Environment and secrets](environment-secrets.md).
+Use Infisical as the source of truth and sync sensitive runtime values to Cloudflare Worker secrets. Keep non-secret values in `wrangler.jsonc` `vars`; validate required runtime config with Zod 4. `.dev.vars` is local-only and ignored. Do not add Varlock unless the application meets its written trigger in [Environment and secrets](environment-secrets.md).
 
 ## Add UI components and blocks
 

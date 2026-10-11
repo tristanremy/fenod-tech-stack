@@ -22,7 +22,7 @@ Do not load old Starlight pages, French translations, or `code-patterns`.
 - Drizzle **0.4x** + **D1**. Better Auth. EmDash internals use their supported database/auth adapters, a bounded CMS exception. Tailwind v4 + shadcn. When asked for a shadcn component or block, install the exact official item with `pnpm dlx shadcn@latest add <item>`; do not recreate a lookalike. Customize only after installation.
 - Start server functions first. Hono + oRPC only when an API boundary needs it.
 - Oxlint + Oxfmt + TypeScript 7 `tsc`. Add `@shadcn/lint` through Oxlint for Tailwind design systems; use the UI recipe's initial policy. Product ship gate: `pnpm lint && pnpm typecheck && pnpm test`
-- Infisical + Worker secrets + Zod 4.5.x config validation. Scan staged changes; never commit `.env` / `.dev.vars` with real values.
+- Infisical + Worker secrets + Zod 4 config validation. Scan staged changes; never commit `.env` / `.dev.vars` with real values.
 - Wrangler remains the project baseline. `cf` is an optional beta toolbox; no `cf dev` / `cf build` / `cf deploy` in an unmigrated Wrangler project. Alchemy 2 requires a written infrastructure need and a pinned pilot, not a resource count (`docs/cloudflare-tooling.md`).
 - Agents **push Git**. They do not `wrangler deploy` / `cf deploy` / `alchemy deploy` to staging/prod; the same authority rules cover remote resource commands.
 - Mutation → `invalidateQueries`. No Convex. No live DO without a written multi-user trigger.

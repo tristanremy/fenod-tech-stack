@@ -22,7 +22,7 @@ This experimental local reference follows the [upstream law](https://github.com/
 ## Explicit experimental overrides
 
 - **Secrets:** upstream Infisical remains the default elsewhere. This app uses only synthetic `test`/loopback Varlock fixtures. No Doppler resolver, real credential or remote config. This does not authorize adoption for real environments.
-- **Compiler:** pinned TS7 native preview (`tsgo`) plus TypeScript 5.9 for compiler-API tooling until a coherent stable-toolchain migration is verified.
+- **Compiler:** stable TypeScript 7 `tsc` (`@typescript/native` alias). `typescript` is aliased to `@typescript/typescript6` because `@shadcn/lint` → `@typescript-eslint/parser` still needs the TS6 API.
 - **Unit runtime:** Vitest 5. One moderate advisory remains (`@tailwindcss/typography` pins `postcss-selector-parser` 6.0.10; no fixed release on that line, build-time only). Do not suppress high/critical audit failures.
 
 ## Boundaries and commands

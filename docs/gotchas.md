@@ -118,7 +118,7 @@ Lint is Oxlint, format is Oxfmt. Do not add ESLint, Prettier, Biome, or Ultracit
 
 ## TypeScript 7 Needs a Tooling Check
 
-Use stable TypeScript 7 `tsc` for typechecks. Do not retain `@typescript/native-preview` / `tsgo` by habit. TypeScript 7 does not yet expose the historical compiler API; keep the TypeScript 6 compatibility package only when a proven tool still needs it.
+Use stable TypeScript 7 `tsc` for typechecks. Do not retain `@typescript/native-preview` / `tsgo` by habit. TypeScript 7 does not yet expose the historical compiler API; keep the TypeScript 6 compatibility package only when a proven tool still needs it. Install both side by side: `"@typescript/native": "npm:typescript@^7.0.2"` provides `tsc`; `"typescript": "npm:@typescript/typescript6@^6.0.2"` keeps the API for peers such as `@typescript-eslint/parser` (pulled in by `@shadcn/lint`, which requires `<6.1`). Pointing `typescript` at 7.x breaks those tools.
 
 ## Alchemy Is Not Default Deploy
 

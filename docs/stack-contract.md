@@ -45,7 +45,7 @@ One-liner:
 | AI in apps | **TanStack AI** + **Cloudflare AI Gateway** (provider keys in gateway, never in the browser); bounded tools, authorization, budgets, traces, and evals |
 | Cloudflare CLI | **Wrangler** project baseline. **cf** optional beta toolbox; project commands require an explicit, validated migration |
 | Deploy | **Workers**, never new Pages. Git-connect or CI **Wrangler** by default. **Alchemy 2** only after a written shared-lifecycle/stage/ownership need and pinned pilot, via protected CI. Agents push Git; they do not deploy. |
-| Secrets | **Infisical** → Cloudflare Worker secrets at runtime; validate config with Zod 4.5.x |
+| Secrets | **Infisical** → Cloudflare Worker secrets at runtime; validate config with Zod 4 (exact version in the lockfile) |
 | Observability | Workers Observability on every Worker; **Sentry** only for product / paying apps |
 | Rate limits | Cloudflare-native binding or DO — **no Redis** |
 | Lint | **Oxlint** (`pnpm lint`). React apps: plugin `react` + `correctness` (Compiler rules). Tailwind design systems: **`@shadcn/lint`** through Oxlint (>=1.80), starting with `no-restyle` and layout allowed; component definitions own their variants. See the UI recipe. Type-aware lint is not CI default until TypeScript 7 is the repo baseline. |

@@ -19,7 +19,7 @@ Infisical (source of truth)
 
 ## Validation
 
-Validate runtime configuration with **Zod 4.5.x** at the boundary. Keep the schema small and explicit. Zod validates configuration; it does not store or distribute secrets.
+Validate runtime configuration with **Zod 4** at the boundary. Keep the schema small and explicit. Zod validates configuration; it does not store or distribute secrets.
 
 ## Leak prevention
 
@@ -41,8 +41,8 @@ Evaluate Varlock only when an application has all of these: a large typed config
 
 ## Upgrade policy
 
-- Keep Zod on the current 4.5.x patch.
+- Stay on stable Zod 4.x; the lockfile records the tested version. Treat a Zod major as a dedicated change.
 - Evaluate Vitest majors in a dedicated change and run its migration checks.
 - Evaluate pnpm 12 in a dedicated branch. Do not depend on npm `latest` to select its release channel.
-- Migrate from `@typescript/native-preview`/`tsgo` to stable TypeScript 7/`tsc` only after tooling validation.
+- Typecheck with stable TypeScript 7 `tsc`. Keep the TypeScript 6 API alias only while a tool still imports `typescript` (see Gotchas).
 - Treat `pnpm audit` findings as tracked work. Do not suppress the Drizzle Kit transitive esbuild finding without a verified upstream fix or tested override.

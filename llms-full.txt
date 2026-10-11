@@ -69,7 +69,7 @@ Do not load old Starlight pages, French translations, or `code-patterns`.
 - Drizzle **0.4x** + **D1**. Better Auth. EmDash internals use their supported database/auth adapters, a bounded CMS exception. Tailwind v4 + shadcn. When asked for a shadcn component or block, install the exact official item with `pnpm dlx shadcn@latest add <item>`; do not recreate a lookalike. Customize only after installation.
 - Start server functions first. Hono + oRPC only when an API boundary needs it.
 - Oxlint + Oxfmt + TypeScript 7 `tsc`. Add `@shadcn/lint` through Oxlint for Tailwind design systems; use the UI recipe's initial policy. Product ship gate: `pnpm lint && pnpm typecheck && pnpm test`
-- Infisical + Worker secrets + Zod 4.5.x config validation. Scan staged changes; never commit `.env` / `.dev.vars` with real values.
+- Infisical + Worker secrets + Zod 4 config validation. Scan staged changes; never commit `.env` / `.dev.vars` with real values.
 - Wrangler remains the project baseline. `cf` is an optional beta toolbox; no `cf dev` / `cf build` / `cf deploy` in an unmigrated Wrangler project. Alchemy 2 requires a written infrastructure need and a pinned pilot, not a resource count (`docs/cloudflare-tooling.md`).
 - Agents **push Git**. They do not `wrangler deploy` / `cf deploy` / `alchemy deploy` to staging/prod; the same authority rules cover remote resource commands.
 - Mutation → `invalidateQueries`. No Convex. No live DO without a written multi-user trigger.
@@ -145,7 +145,7 @@ One-liner:
 | AI in apps | **TanStack AI** + **Cloudflare AI Gateway** (provider keys in gateway, never in the browser); bounded tools, authorization, budgets, traces, and evals |
 | Cloudflare CLI | **Wrangler** project baseline. **cf** optional beta toolbox; project commands require an explicit, validated migration |
 | Deploy | **Workers**, never new Pages. Git-connect or CI **Wrangler** by default. **Alchemy 2** only after a written shared-lifecycle/stage/ownership need and pinned pilot, via protected CI. Agents push Git; they do not deploy. |
-| Secrets | **Infisical** → Cloudflare Worker secrets at runtime; validate config with Zod 4.5.x |
+| Secrets | **Infisical** → Cloudflare Worker secrets at runtime; validate config with Zod 4 (exact version in the lockfile) |
 | Observability | Workers Observability on every Worker; **Sentry** only for product / paying apps |
 | Rate limits | Cloudflare-native binding or DO — **no Redis** |
 | Lint | **Oxlint** (`pnpm lint`). React apps: plugin `react` + `correctness` (Compiler rules). Tailwind design systems: **`@shadcn/lint`** through Oxlint (>=1.80), starting with `no-restyle` and layout allowed; component definitions own their variants. See the UI recipe. Type-aware lint is not CI default until TypeScript 7 is the repo baseline. |
@@ -505,7 +505,7 @@ Lint is Oxlint, format is Oxfmt. Do not add ESLint, Prettier, Biome, or Ultracit
 
 ## TypeScript 7 Needs a Tooling Check
 
-Use stable TypeScript 7 `tsc` for typechecks. Do not retain `@typescript/native-preview` / `tsgo` by habit. TypeScript 7 does not yet expose the historical compiler API; keep the TypeScript 6 compatibility package only when a proven tool still needs it.
+Use stable TypeScript 7 `tsc` for typechecks. Do not retain `@typescript/native-preview` / `tsgo` by habit. TypeScript 7 does not yet expose the historical compiler API; keep the TypeScript 6 compatibility package only when a proven tool still needs it. Install both side by side: `"@typescript/native": "npm:typescript@^7.0.2"` provides `tsc`; `"typescript": "npm:@typescript/typescript6@^6.0.2"` keeps the API for peers such as `@typescript-eslint/parser` (pulled in by `@shadcn/lint`, which requires `<6.1`). Pointing `typescript` at 7.x breaks those tools.
 
 ## Alchemy Is Not Default Deploy
 
@@ -579,7 +579,7 @@ infisical run --env=dev -- pnpm dev
 infisical scan git-changes --staged
 ```
 
-Use Infisical as the source of truth and sync sensitive runtime values to Cloudflare Worker secrets. Keep non-secret values in `wrangler.jsonc` `vars`; validate required runtime config with Zod 4.5.x. `.dev.vars` is local-only and ignored. Do not add Varlock unless the application meets its written trigger in [Environment and secrets](environment-secrets.md).
+Use Infisical as the source of truth and sync sensitive runtime values to Cloudflare Worker secrets. Keep non-secret values in `wrangler.jsonc` `vars`; validate required runtime config with Zod 4. `.dev.vars` is local-only and ignored. Do not add Varlock unless the application meets its written trigger in [Environment and secrets](environment-secrets.md).
 
 ## Add UI components and blocks
 

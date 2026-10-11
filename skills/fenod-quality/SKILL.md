@@ -36,7 +36,7 @@ Do not run the entire optional toolbox on every one-line fix. Prefer repo script
 
 Do not add ESLint, Prettier, Biome, Ultracite, Babel, or `oxc-transform-react` beside this.
 Do not add `useMemo` / `useCallback` / `memo` unless measured or required for identity.  
-Use stable TypeScript 7 for typechecks. Keep the TypeScript 6 compatibility API only for tools that require it (including parser/framework tooling); validate before removing it. Smoke has a documented pending migration from native-preview, not a second default.
+Use stable TypeScript 7 for typechecks. Keep the TypeScript 6 compatibility API only for tools that require it (including parser/framework tooling); validate before removing it. Smoke uses the side-by-side alias in `docs/gotchas.md`.
 
 ## TDD with AI
 
