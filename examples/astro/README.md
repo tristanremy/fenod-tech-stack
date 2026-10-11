@@ -35,7 +35,7 @@ Build mode, not the hostname of a static server, controls indexability. Never re
 
 ## Tooling boundaries
 
-Astro **7.3.1**, `@astrojs/check` **0.9.10**, and the lockfile were resolved from the package registry, not inferred from client manifests. Astro owns its Vite dependency; do not override it to match another example.
+Astro **7.3.8**, `@astrojs/check` **0.9.10**, and the lockfile were resolved from the package registry, not inferred from client manifests. Astro owns its Vite dependency; do not override it to match another example.
 
 `pnpm typecheck` runs **`astro check`**, including `.astro` templates and TypeScript. This package keeps **TypeScript 6.0.3** as the compiler-API compatibility dependency required by the Astro/Volar checker. TypeScript 7's CLI alone does not check Astro templates. This is the contract's tooling exception, not a compiler migration elsewhere.
 

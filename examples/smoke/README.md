@@ -35,7 +35,7 @@ pnpm audit --audit-level high
 
 `pnpm test:e2e` applies local D1 migrations and uses unique synthetic users. Repeated migrations preserve local data. It never reuses an unrelated running server. Browser tests include sign-up, CRUD, logout, malformed inputs and cross-user/anonymous authorization through the real server functions. Local state stays under ignored `.wrangler`. Tests and builds need no credentials; dependency/browser installation needs network access.
 
-The post-build canary scan checks client **and** server output for the known fixture and an optional synthetic internal token. It is a regression detector, not a universal secret scanner. Two moderate Vitest 3 advisories remain: migrate the test runtime coherently before production; high/critical audit findings fail CI.
+The post-build canary scan checks client **and** server output for the known fixture and an optional synthetic internal token. It is a regression detector, not a universal secret scanner. One moderate build-time advisory remains (`postcss-selector-parser` via `@tailwindcss/typography`, no fixed release on that line); high/critical audit findings fail CI.
 
 ## Export and provenance
 
