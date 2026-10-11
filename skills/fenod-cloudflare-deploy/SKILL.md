@@ -1,6 +1,6 @@
 ---
 name: fenod-cloudflare-deploy
-description: Deploy and operate Fenod projects on Cloudflare — Wrangler-first deploys, Alchemy v2 trigger cases, environments, secrets managers, API token scoping, observability, rate limiting, and choosing between Workers, Dynamic Workers, and Containers. Use this skill whenever deploying anything, configuring wrangler.jsonc or alchemy.run.ts, handling secrets or environment variables, creating Cloudflare API tokens, setting up CI/CD, or when the user mentions deploy, staging, production, D1 migrations in prod, R2, KV, Queues, or Workers bindings.
+description: Configure and operate Fenod projects on Cloudflare with Wrangler, evaluate cf migrations or Alchemy 2 adoption, and prepare CI deployment, bindings, secrets, token scope and observability. Use for Cloudflare project configuration or deployment tooling changes; production actions follow the repository authority boundary.
 ---
 
 # Fenod Cloudflare Deploy
@@ -10,14 +10,15 @@ description: Deploy and operate Fenod projects on Cloudflare — Wrangler-first 
 ## Golden rules
 
 - **Workers everywhere**, including static assets. Pages is not sunset, but frozen — no new Pages projects.
-- **Who deploys:** agents push Git. They do not run `wrangler deploy` or `alchemy deploy` to staging/prod.
+- **Who deploys:** agents push Git. They do not run `wrangler deploy`, `cf deploy` or `alchemy deploy` to staging/prod. Remote resource commands follow the same authority boundary.
 - **One Worker:** Workers Builds Git-connect, or CI `wrangler.jsonc` + `wrangler deploy`.
-- **2+ Workers that share bindings:** Alchemy via GitHub Action. Never Git-connect those Workers — that overwrites bindings outside Alchemy state.
-- **Alchemy also when:** 4+ CF resources with shared lifecycle, 3+ stages, infra tests/OTel as code, or multiple accounts.
+- **Optional cf:** beta toolbox beside Wrangler. Separate login/account selection; data commands default remote. Do not use `cf dev` / `cf build` / `cf deploy` in an unmigrated Wrangler project. Read `docs/cloudflare-tooling.md` for a migration.
+- **Evaluate Alchemy 2:** shared resource lifecycle, repeatable stages/previews, multi-account ownership or lifecycle tests. Resource counts do not force adoption. A written need and pinned pilot must prove adoption, isolation and state recovery. Once adopted, protected CI owns deploys; never also Git-connect those Workers.
 - **Smallest Alchemy unit:** site files → site; admin → admin; API/DB/auth/bindings → core; two units or shared config → all.
-- Never use Alchemy v1 examples. Package is `alchemy`. Effect stays inside Alchemy config — not app architecture law.
+- Use current Alchemy v2 docs, not v1 examples. Package is `alchemy`. Start in IaC-only mode with conventional app handlers; integrated Effect runtime is optional.
 - Every Worker: today's `compatibility_date` + `observability.enabled = true` + an error alert. Dates `>= 2026-08-04` already include `nodejs_compat` — do not paste the flag. `nodejs_als` only for Sentry/ALS. Product apps add Sentry.
 - Staging / `*.workers.dev` previews / internal admin: **Cloudflare Access**. Public marketing/docs: no. Access ≠ Better Auth.
+- EmDash admin: supported CMS Access adapter on `/_emdash/*`, with EmDash roles and operator bootstrap; its auth/schema are a bounded CMS exception. Read `docs/astro-emdash.md` before configuring a CMS site.
 - Rate limits: Workers rate limiting binding or DO. **No Redis.**
 - Never commit secrets. **Infisical** + Worker secrets at runtime (Bitwarden SM only with project override).
 - Local Wrangler:
@@ -55,6 +56,7 @@ env -u CLOUDFLARE_API_TOKEN wrangler whoami
 ```bash
 pnpm lint && pnpm typecheck && pnpm test && pnpm build
 # secrets manager injects env, e.g. infisical run --env=staging -- wrangler deploy --env staging
+# Human OAuth terminal only; protected CI retains its injected scoped token.
 env -u CLOUDFLARE_API_TOKEN wrangler deploy --env staging
 ```
 
@@ -67,7 +69,7 @@ secret is not removed automatically.
 
 ## Alchemy
 
-Only after triggers match. See `docs/stack-contract.md` and `docs/recipes.md` (handbook-root paths). Do not scaffold `alchemy.run.ts` on a one-Worker SME app.
+Only after a written infrastructure need and pinned Alchemy 2 pilot. Read `docs/cloudflare-tooling.md` for the adoption gate and current upstream sources. Do not scaffold `alchemy.run.ts` for a resource count or for a one-Worker CMS by default.
 
 GitHub Action owns Cloudflare tokens (`staging` / `production` environments). Push `dev` deploys staging. Push `main` deploys prod behind protection. A branch preview is not staging.
 
@@ -97,5 +99,7 @@ GitHub Action owns Cloudflare tokens (`staging` / `production` environments). Pu
 | ------ | ------ |
 | Law | `docs/stack-contract.md` |
 | Recipes | `docs/recipes.md` |
+| cf / Alchemy 2 adoption | `docs/cloudflare-tooling.md` |
+| Astro + EmDash | `docs/astro-emdash.md` |
 | Security | `docs/security-model.md` |
 | Proof | `examples/smoke` |

@@ -16,15 +16,18 @@ description: Fenod's opinionated stack for building web apps, sites, and APIs. U
 | Need | Stack | Deploy |
 |------|-------|--------|
 | Full-stack app | TanStack Start (+ Hono/ORPC when API boundary needs it) + Drizzle + D1 + Better Auth | CF Workers |
-| Content + SEO | Astro | CF Workers static assets |
+| Developer-maintained content + SEO | Astro | CF Workers static assets |
+| Direct client content editing | Astro + EmDash candidate; supported CMS database/auth adapters | CF Workers SSR + D1 + R2 |
 | SPA | TanStack Start | CF Workers |
 | API only | Hono + ORPC + Drizzle + D1 | CF Workers |
 | Docs | Starlight | CF Workers static assets |
 | Second deployable / shared libs | Add monorepo (+ Turborepo if needed) | — |
 
-Pages is not sunset, but frozen. New work targets Workers. One Worker → Git-connect or CI Wrangler. Two or more Workers that share bindings → Alchemy via GitHub Action. Agents push Git; they do not deploy.
+Pages is not sunset, but frozen. New work targets Workers. Git-connect or CI Wrangler is the default. Shared infrastructure/stages are reasons to evaluate Alchemy 2; adoption requires a written need and pinned pilot. Agents push Git; they do not deploy through Wrangler, `cf` or Alchemy.
 
 For Astro / SEO / JSON-LD / responsive-image tasks, read `docs/astro.md`, then `examples/astro/README.md` and its package scripts. Use that standalone static reference, not the app scaffold below.
+
+For client editing/CMS tasks, read `docs/astro-emdash.md`. Keep the supported EmDash schema/migrations and auth as a bounded exception to app Drizzle/Better Auth defaults. Prove draft/publish permissions and full recovery before client production; the handbook has no validated CMS reference yet.
 
 ## Scaffolding
 
@@ -32,7 +35,7 @@ For Astro / SEO / JSON-LD / responsive-image tasks, read `docs/astro.md`, then `
 pnpm dlx @tanstack/cli@latest create my-app \
   --package-manager pnpm \
   --deployment cloudflare \
-  --add-ons oRPC,drizzle,better-auth,shadcn,tanstack-query \
+  --add-ons drizzle,better-auth,shadcn,tanstack-query \
   --yes --non-interactive --no-git --no-toolchain
 ```
 
@@ -48,7 +51,7 @@ pnpm dlx @tanstack/cli@latest create my-app \
 - Validate env with **Zod**. Secrets via **Infisical**. Never commit real `.env` / `.dev.vars`.
 - UI: **Tailwind v4 + shadcn/ui**. When requested, install the exact official component/block with `pnpm dlx shadcn@latest add <item>` before customizing it. Never recreate a shadcn lookalike.
 - AI: **TanStack AI + AI Gateway**. Bounded/authorized tools, budgets, traces, and evals. Uploads: R2 (+ D1 metadata).
-- Deploy: **Workers**. Wrangler / Git-connect for one Worker. Alchemy via GitHub Action when 2+ Workers share bindings.
+- Deploy: **Workers**. Wrangler / Git-connect baseline; optional `cf` beta toolbox, project commands only after migration. Alchemy 2 via protected CI only after its adoption gate. Read `docs/cloudflare-tooling.md` for either tooling change.
 
 ## Grow on triggers only
 
@@ -57,8 +60,7 @@ pnpm dlx @tanstack/cli@latest create my-app \
 | API boundary / non-UI clients | Hono + ORPC |
 | Thick feature API | slices: `router.ts` thin, `service.ts` + Drizzle direct |
 | Second deployable / shared package | monorepo |
-| 2+ Workers share D1/R2/KV/queues | Alchemy + smallest-unit Action |
-| 4+ CF resources shared lifecycle, 3+ stages, multi-account | Alchemy |
+| Shared resource lifecycle, repeatable stages/previews, multi-account ownership | Evaluate Alchemy 2; written need + pinned pilot before adoption |
 | Reporting / Postgres mandate / D1 ceiling | Postgres (+ Hyperdrive on CF) |
 | Real field offline | project design; Query persist first |
 
@@ -91,6 +93,8 @@ Resolve `docs/<slug>.md` in this repo.
 | Agent entry | `AGENTS.md` |
 | Gotchas | `docs/gotchas.md` |
 | Recipes | `docs/recipes.md` |
+| cf / Alchemy 2 | `docs/cloudflare-tooling.md` |
+| Astro / client CMS | `docs/astro.md`, then `docs/astro-emdash.md` when clients edit |
 | Security | `docs/security-model.md` |
 | AI and coding agents | `docs/agent-factory.md` |
 | Proof | `examples/smoke` |

@@ -1,10 +1,19 @@
 ---
 title: "Astro content sites"
 description: "A small static reference for safe metadata, JSON-LD and native images."
-verified: 2026-09
+verified: 2026-10-11
 ---
 
 Use **Astro for content/marketing**, not a full-stack app by default. Follow the [Stack Contract](stack-contract.md). Start with [`examples/astro`](../examples/astro/README.md): one private package, two static pages, no browser JavaScript. It is executable proof, not a published library or branded starter.
+
+## Choose how content changes
+
+| Content owner | Path |
+| --- | --- |
+| Developer updates in Git | Static Astro on Workers static assets; use this reference |
+| Client edits/publishes directly | Prefer the [Astro + EmDash candidate](astro-emdash.md): SSR Worker + D1 + R2, supported CMS auth and a client handoff/recovery gate |
+
+The CMS recipe has no validated Fenod reference yet. Its admin requires JavaScript, request-time content and protected editorial routes. Keep this static example as the executable proof for the Git-managed path; adding a CMS is a project decision.
 
 ## Build and check
 

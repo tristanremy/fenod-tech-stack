@@ -13,6 +13,7 @@ Opinionated defaults for building full-stack TypeScript products on Cloudflare W
 | Need | Default |
 | --- | --- |
 | App | TanStack Start on Cloudflare Workers |
+| Website content | Static Astro for developer updates; Astro + EmDash candidate for direct client editing |
 | Data | Drizzle + D1 |
 | Auth | Better Auth |
 | UI | Tailwind v4 + shadcn/ui; install requested official components/blocks with `pnpm dlx shadcn@latest add <item>` |
@@ -22,6 +23,7 @@ Opinionated defaults for building full-stack TypeScript products on Cloudflare W
 | Quality | Oxlint + @shadcn/lint + Oxfmt + TypeScript 7 + Vitest + Playwright when needed |
 | Secrets | Infisical + Worker secrets |
 | Deploy | Git push → protected CI → Workers |
+| Cloudflare tooling | Wrangler baseline; optional `cf` beta; Alchemy 2 after a written need and pinned pilot |
 
 ## How the pieces fit
 
@@ -72,11 +74,13 @@ flowchart TD
   E --> F{Real boundary or scale trigger?}
   F -- No --> E
   F -- API consumers --> G[Add Hono + oRPC]
-  F -- Shared deployables --> H[Add monorepo / Alchemy]
+  F -- Shared deployables --> H[Add monorepo and evaluate Alchemy 2]
   F -- Shared live state --> I[Consider Durable Object]
 ```
 
-For a content or marketing site, use the [Astro recipe](docs/astro.md) and [standalone Astro reference](examples/astro/README.md).
+For a content or marketing site, use the [Astro recipe](docs/astro.md) and [standalone static reference](examples/astro/README.md). When clients need direct editing, prefer the [Astro + EmDash candidate](docs/astro-emdash.md): one SSR Worker, D1 content, R2 media and supported CMS auth. Its client editing/recovery pilot is still pending.
+
+The [Cloudflare tooling recipe](docs/cloudflare-tooling.md) explains using `cf` alongside Wrangler, deliberately migrating project commands, and adopting Alchemy 2 for shared lifecycle/stage needs. Both tools remain beta; resource counts alone do not force adoption.
 
 ## UI rule
 

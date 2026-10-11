@@ -16,6 +16,8 @@
 ## Route by task
 
 - **Astro / content site / SEO / JSON-LD / responsive images** → docs/astro.md, examples/astro/README.md, examples/astro/package.json
+- **client content editing / CMS / EmDash / draft preview / publishing** → docs/astro-emdash.md, docs/astro.md, docs/security-model.md
+- **Cloudflare CLI / cf migration / Alchemy 2 / infrastructure lifecycle** → docs/cloudflare-tooling.md, docs/agent-operating-contract.md, skills/fenod-cloudflare-deploy/SKILL.md
 - **new app / architecture / stack choice** → docs/stack-contract.md, skills/fenod-stack/SKILL.md, examples/smoke/STACK.md
 - **deploy / Cloudflare / secrets / D1 migration** → docs/agent-operating-contract.md, docs/security-model.md, skills/fenod-cloudflare-deploy/SKILL.md
 - **AI feature / coding agent / eval / sandbox** → docs/agent-factory.md, docs/agent-evals.md, docs/security-model.md
@@ -27,7 +29,7 @@
 
 ## Core defaults
 
-Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler, Infisical+Worker secrets, Oxlint+Oxfmt+@shadcn/lint, TypeScript 7 tsc, Vitest, Playwright.
+Node 24, pnpm, TanStack Start on Cloudflare Workers, static Astro for developer-maintained marketing/content; Astro+EmDash candidate for client editing with a bounded CMS database/auth exception and pilot gate, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler baseline; optional cf beta toolbox and conditional Alchemy 2 pinned pilot, Infisical+Worker secrets, Oxlint+Oxfmt+@shadcn/lint, TypeScript 7 tsc, Vitest, Playwright.
 
 ## Verification
 
@@ -63,12 +65,13 @@ Do not load old Starlight pages, French translations, or `code-patterns`.
 ## Enforce
 
 - Node 24 + **pnpm** (not npm/yarn; Nub is not the lockfile)
-- TanStack Start on **Cloudflare Workers**. Astro only for marketing/content sites.
-- Drizzle **0.4x** + **D1**. Better Auth. Tailwind v4 + shadcn. When asked for a shadcn component or block, install the exact official item with `pnpm dlx shadcn@latest add <item>`; do not recreate a lookalike. Customize only after installation.
+- TanStack Start on **Cloudflare Workers**. Astro for marketing/content: static for developer edits; **Astro + EmDash** is the preferred candidate for direct client editing, subject to its pilot/handoff gate (`docs/astro-emdash.md`).
+- Drizzle **0.4x** + **D1**. Better Auth. EmDash internals use their supported database/auth adapters, a bounded CMS exception. Tailwind v4 + shadcn. When asked for a shadcn component or block, install the exact official item with `pnpm dlx shadcn@latest add <item>`; do not recreate a lookalike. Customize only after installation.
 - Start server functions first. Hono + oRPC only when an API boundary needs it.
 - Oxlint + Oxfmt + TypeScript 7 `tsc`. Add `@shadcn/lint` through Oxlint for Tailwind design systems; use the UI recipe's initial policy. Product ship gate: `pnpm lint && pnpm typecheck && pnpm test`
 - Infisical + Worker secrets + Zod 4.5.x config validation. Scan staged changes; never commit `.env` / `.dev.vars` with real values.
-- Agents **push Git**. They do not `wrangler deploy` / `alchemy deploy` to staging/prod.
+- Wrangler remains the project baseline. `cf` is an optional beta toolbox; no `cf dev` / `cf build` / `cf deploy` in an unmigrated Wrangler project. Alchemy 2 requires a written infrastructure need and a pinned pilot, not a resource count (`docs/cloudflare-tooling.md`).
+- Agents **push Git**. They do not `wrangler deploy` / `cf deploy` / `alchemy deploy` to staging/prod; the same authority rules cover remote resource commands.
 - Mutation → `invalidateQueries`. No Convex. No live DO without a written multi-user trigger.
 - `wrangler types`. Dates `>= 2026-08-04` already include `nodejs_compat`. Observability on every Worker.
 
@@ -98,7 +101,7 @@ Report: files changed, verification run, warnings, not done, whether prod action
 ---
 title: "Stack Contract"
 description: "Law for Fenod stack defaults. Other pages explain; this page resolves conflicts."
-verified: 2026-09
+verified: 2026-10-11
 ---
 
 This page is **law**. If another page is longer, newer-looking, or more detailed, this page still wins unless a project `STACK.md` / repo AGENTS explicitly overrides a line.
@@ -127,10 +130,11 @@ One-liner:
 | Language | TypeScript strict |
 | Local/CI runtime | **Node 24** + **pnpm** |
 | App | **TanStack Start** on **Cloudflare Workers** |
-| Content / docs / marketing | **Astro** (Starlight for docs) on Workers static assets |
+| Content / docs / marketing | **Astro** (Starlight for docs) on Workers static assets for developer-maintained content |
+| Direct client content editing | **Astro + EmDash** preferred candidate on a Workers SSR app + D1 + R2; validate the CMS pilot/handoff gate before client production |
 | API | Start server functions first. **Hono + ORPC** only when you need a real API boundary or non-UI clients |
-| Data | **Drizzle** latest patched **0.4x** + **D1** |
-| Auth | **Better Auth** latest patched stable line (review majors; ship security patches fast) |
+| Data | **Drizzle** latest patched **0.4x** + **D1** for applications; EmDash internals use the supported CMS database adapter/schema |
+| Auth | **Better Auth** latest patched stable line for applications (review majors; ship security patches fast); EmDash uses its supported CMS auth/Access adapter |
 | UI | **Tailwind v4 + shadcn/ui**. Install requested official components and blocks with `pnpm dlx shadcn@latest add <item>`; do not recreate lookalikes. |
 | Client data | **TanStack Query + Router** (Form/Table when needed) |
 | Files | **R2** + metadata in D1 |
@@ -139,7 +143,8 @@ One-liner:
 | Stateful coordination | **Durable Objects** only when needed |
 | Edge cache | Workers Cache + `Cache-Control` / `Cache-Tag` for public SSR and cacheable GET APIs |
 | AI in apps | **TanStack AI** + **Cloudflare AI Gateway** (provider keys in gateway, never in the browser); bounded tools, authorization, budgets, traces, and evals |
-| Deploy | **Workers**, never new Pages. **One Worker** → Git-connect or CI `wrangler deploy`. **2+ Workers that share bindings** → **Alchemy** via GitHub Action. Agents push Git; they do not deploy. |
+| Cloudflare CLI | **Wrangler** project baseline. **cf** optional beta toolbox; project commands require an explicit, validated migration |
+| Deploy | **Workers**, never new Pages. Git-connect or CI **Wrangler** by default. **Alchemy 2** only after a written shared-lifecycle/stage/ownership need and pinned pilot, via protected CI. Agents push Git; they do not deploy. |
 | Secrets | **Infisical** → Cloudflare Worker secrets at runtime; validate config with Zod 4.5.x |
 | Observability | Workers Observability on every Worker; **Sentry** only for product / paying apps |
 | Rate limits | Cloudflare-native binding or DO — **no Redis** |
@@ -166,7 +171,8 @@ One-liner:
 - Alchemy as day-one deploy for a one-Worker app
 - Cloudflare Pages for new projects
 - Git-connecting each Worker in an Alchemy monorepo
-- `wrangler deploy` / `alchemy deploy` from an agent session to staging or prod
+- `wrangler deploy` / `cf deploy` / `alchemy deploy` from an agent session to staging or prod; remote resource commands retain the same authority boundary
+- `cf dev` / `cf build` / `cf deploy` in an unmigrated Wrangler project
 - Redis
 - Global API Key or broad account-scoped deploy tokens
 - plaintext secrets in Git, prompts, issues, or client bundles
@@ -192,13 +198,21 @@ Scaffold:
 pnpm dlx @tanstack/cli@latest create my-app \
   --package-manager pnpm \
   --deployment cloudflare \
-  --add-ons oRPC,drizzle,better-auth,shadcn,tanstack-query \
+  --add-ons drizzle,better-auth,shadcn,tanstack-query \
   --yes --non-interactive --no-git --no-toolchain
 ```
 
 Convert scaffold Postgres defaults to **D1**. Living reference: `examples/smoke` in the handbook repo.
 
-Add Hono only when the HTTP/API boundary needs it. Do not create `apps/web` + `apps/server` + four packages on day one.
+Add Hono + oRPC only when the HTTP/API boundary needs it. Do not create `apps/web` + `apps/server` + four packages on day one.
+
+### Content sites and client editing
+
+Use [static Astro](astro.md) when content stays in Git and developers own updates. When clients need direct editing, prefer [Astro + EmDash](astro-emdash.md) with an SSR Worker, D1 and R2. This is a candidate recipe, not a validated Fenod CMS starter.
+
+Keep EmDash's own schema/migrations and supported auth as a **bounded CMS exception**; app features still follow Drizzle/Better Auth defaults. For protected admin, use the supported Access adapter on `/_emdash/*`, with CMS roles for clients and a public website. Request-time published content avoids code rebuilds; prerendered routes and caches need their own update policy.
+
+Before client production, prove edit → draft preview → publish → anonymous page, permission boundaries and recovery of database + media + key rotation list. The [CMS recipe](astro-emdash.md) defines the handoff gate. D1/R2 bindings alone do not justify Alchemy.
 
 ### Grow only on triggers
 
@@ -206,12 +220,13 @@ Add Hono only when the HTTP/API boundary needs it. Do not create `apps/web` + `a
 | --------- | ---------- |
 | Second deployable or shared library across apps | monorepo + packages (+ Turborepo if orchestration hurts) |
 | Multiple API consumers or thick procedures | feature slices under `packages/api` or `src/server` |
-| 2+ Workers that share D1 / R2 / KV / Queues / domains | **Alchemy** — GitHub Action deploys the smallest unit |
-| 4+ Cloudflare resources with shared lifecycle, 3+ real stages, multi-account, or infra-as-code tests | **Alchemy** |
-| One Worker (Astro site, one-package Start/Hono app) | **Workers Builds Git-connect** or CI `wrangler deploy` |
+| Shared resources across Workers, repeatable stages/previews, multi-account ownership, or lifecycle tests | **Evaluate Alchemy 2**; adopt only when a written need and pinned pilot justify the operational cost |
+| One Worker (static Astro, Astro + EmDash, one-package Start/Hono app) | **Workers Builds Git-connect** or CI `wrangler deploy`; no automatic Alchemy |
 | Reporting needs, client Postgres mandate, or D1 limits hit | **Postgres** (+ Hyperdrive if staying on Cloudflare) |
 | Users regularly work offline in the field | project-specific offline design — Query persist is enough otherwise |
 | Existing docs/static site already on Pages and switching costs more than it saves | keep **Pages** for that site only |
+
+Resource counts are evaluation prompts, not automatic adoption rules. For Alchemy 2, first validate Node 24/pnpm, resource adoption without replacement, stage isolation, state backup/recovery and deployment ownership. IaC-only mode can keep a conventional app handler; integrated Effect runtime is optional. See [Cloudflare tooling](cloudflare-tooling.md) for both beta tooling pilots.
 
 ### Feature slices (when an API package exists)
 
@@ -237,7 +252,7 @@ env -u CLOUDFLARE_API_TOKEN wrangler whoami
 ```
 
 - Production deploys, D1 migrations, DNS, and destroys go through CI / broker / explicit human approval.
-- **Who deploys:** the agent never talks to Cloudflare for staging/prod. Push Git. Cloudflare Workers Builds deploys a one-Worker repo. A GitHub Action runs Alchemy for a multi-Worker repo. Do not Git-connect Workers that Alchemy owns — that overwrites bindings outside Alchemy state.
+- **Who deploys:** agents push Git. Staging/prod mutations use protected CI / broker / operator flow, whether the command is Wrangler, `cf` or Alchemy. Workers Builds or CI Wrangler remains the default; CI runs Alchemy only after adoption. Do not Git-connect Workers that Alchemy owns — that overwrites bindings outside Alchemy state.
 - **Smallest Alchemy unit:** site-only files → site app; admin-only → admin; API/DB/auth/bindings → core; two or more units or shared config → all.
 - Pages is not sunset, but it is frozen. New Fenod work is Workers. Do not start new Pages projects.
 - AI provider keys: AI Gateway stored keys / BYOK in production.
@@ -275,6 +290,8 @@ This repo is agent-first: `AGENTS.md` + these `docs/*.md` + `examples/smoke`. No
 - [Agent operating contract](agent-operating-contract.md)
 - [Gotchas](gotchas.md)
 - [Recipes](recipes.md)
+- [Cloudflare tooling: cf and Alchemy 2](cloudflare-tooling.md)
+- [Astro + EmDash client content](astro-emdash.md)
 - [Environment and secrets](environment-secrets.md)
 - [Security](security-model.md)
 - [Agent factory](agent-factory.md)
@@ -288,7 +305,7 @@ This repo is agent-first: `AGENTS.md` + these `docs/*.md` + `examples/smoke`. No
 ---
 title: "Agent Operating Contract"
 description: "Rules for AI agents working inside Fenod projects."
-verified: 2026-06
+verified: 2026-10-11
 ---
 
 How agents operate in Fenod repos. Stack defaults live in [stack-contract.md](stack-contract.md); this page is behavior and authority.
@@ -328,7 +345,9 @@ How agents operate in Fenod repos. Stack defaults live in [stack-contract.md](st
 env -u CLOUDFLARE_API_TOKEN wrangler whoami
 ```
 
-Production deploys go through GitHub Actions, Workers Builds, a deploy broker, or another path with resource-scoped credentials and approval gates. Agents push Git; they do not run `wrangler deploy` or `alchemy deploy` to staging/prod. Prefer Workers. One Worker may Git-connect. Alchemy monorepos must not Git-connect each Worker. Pages only for already-connected legacy static/docs projects.
+Production deploys go through GitHub Actions, Workers Builds, a deploy broker, or another path with resource-scoped credentials and approval gates. Agents push Git; they do not run `wrangler deploy`, `cf deploy` or `alchemy deploy` to staging/prod. The boundary also covers remote resource mutations through any CLI. Prefer Workers. One Worker may Git-connect. Alchemy-owned Workers must not also Git-connect. Pages only for already-connected legacy static/docs projects.
+
+Optional `cf` command discovery/schema inspection is local. Resource commands default to remote and do not read the Wrangler account config; an account read needs an authorized target and read scope. Keep `cf dev` / `cf build` / `cf deploy` out of unmigrated Wrangler projects. Follow [Cloudflare tooling](cloudflare-tooling.md) for a deliberate migration or Alchemy 2 pilot.
 
 ## External content
 
@@ -369,7 +388,7 @@ Add `pnpm build`, Playwright, and browser checks when risk or UI warrants it. Do
 ---
 title: "Gotchas"
 description: "High-signal traps in the Fenod stack."
-verified: 2026-09
+verified: 2026-10-11
 ---
 
 ## Stack Contract Wins
@@ -391,6 +410,14 @@ If `CLOUDFLARE_API_TOKEN` is exported locally, Wrangler may use it instead of OA
 ```bash
 env -u CLOUDFLARE_API_TOKEN wrangler ...
 ```
+
+## cf Is Not a Drop-in Project Command
+
+Optional `cf` beta resource commands can coexist with Wrangler, but use separate login/account selection and default to **remote** data. They do not read the Wrangler account config. Local command discovery/schema inspection needs no credentials. Do not run `cf dev`, `cf build` or `cf deploy` before a deliberate project migration: automatic config can replace entry points/bindings and rewrite scripts. See [Cloudflare tooling](cloudflare-tooling.md).
+
+## Client Editing Changes the Astro Runtime
+
+Static Astro remains the default for developer-maintained content. For direct client edits, prefer the [Astro + EmDash candidate](astro-emdash.md) with SSR, D1 and R2; it still needs a Fenod pilot. CMS internals keep their supported database/auth adapters. Access auth protects `/_emdash/*`, including the API, and is an exclusive production login mode; CMS roles still apply. SSR publishing avoids rebuilds only when the page reads published content at request time and caches follow the update policy. Prerendered routes still need a rebuild.
 
 ## Cloudflare Token Scope
 
@@ -482,7 +509,7 @@ Use stable TypeScript 7 `tsc` for typechecks. Do not retain `@typescript/native-
 
 ## Alchemy Is Not Default Deploy
 
-Default is Wrangler or Workers Builds Git-connect for **one Worker**. Use Alchemy when **two or more Workers share bindings**, or on the other contract triggers. Package is `alchemy`; v1 examples are dead. Effect samples are Alchemy-only, not app architecture law.
+Default is Wrangler or Workers Builds Git-connect. Shared resources, stages/previews and ownership needs are reasons to **evaluate Alchemy 2**, not automatic adoption thresholds. It is still beta: pin a pilot and prove adoption, isolation and state recovery before client production. One CMS Worker + D1/R2 does not force Alchemy. Package is `alchemy`; use current v2 docs. IaC mode supports ordinary app handlers; integrated Effect runtime is optional. See [Cloudflare tooling](cloudflare-tooling.md).
 
 Do not Git-connect Workers that Alchemy owns. Cloudflare would deploy one script and skip Alchemy state/bindings.
 
@@ -512,7 +539,7 @@ Translate prose only. Keep slugs, package names, commands, and contracts aligned
 ---
 title: "Recipes"
 description: "Short implementation recipes for common Fenod stack tasks."
-verified: 2026-09
+verified: 2026-10-11
 ---
 
 Recipes implement [stack-contract.md](stack-contract.md). Keep them short.
@@ -525,7 +552,7 @@ One package on Workers:
 pnpm dlx @tanstack/cli@latest create my-app \
   --package-manager pnpm \
   --deployment cloudflare \
-  --add-ons oRPC,drizzle,better-auth,shadcn,tanstack-query \
+  --add-ons drizzle,better-auth,shadcn,tanstack-query \
   --yes --non-interactive --no-git --no-toolchain
 ```
 
@@ -533,11 +560,17 @@ Then align with law: **D1 not Postgres**, Oxlint + Oxfmt, Infisical, Wrangler ob
 
 Living reference in this repo: [`examples/smoke`](https://github.com/tristanremy/fenod-tech-stack/tree/main/examples/smoke) (`STACK.md` maps each law line).
 
-Do not create a monorepo on day one. Add Hono only when you need a dedicated HTTP/API boundary.
+Do not create a monorepo on day one. Add Hono + oRPC only when you need a dedicated HTTP/API boundary.
 
 ## Start an Astro content site
 
 Use the short [Astro recipe](astro.md) and standalone [`examples/astro`](../examples/astro/README.md): safe metadata/JSON-LD, native responsive images and generated-HTML tests. No app backend or published package is required.
+
+When clients need direct edits, use the [Astro + EmDash candidate recipe](astro-emdash.md). It covers the SSR Worker/D1/R2 shape, supported Access auth, editorial roles, publishing/cache behavior and the required recovery rehearsal. It is not yet a validated Fenod CMS starter.
+
+## Choose Cloudflare tooling
+
+Keep Wrangler for existing project scripts. Use optional `cf` beta for local command discovery and explicitly scoped account/resource work; project commands require migration. Adopt Alchemy 2 only for a written infrastructure need after a pinned pilot. Follow [Cloudflare tooling](cloudflare-tooling.md) for examples and acceptance criteria. Resource counts alone do not force a change.
 
 ## Configure environment and secrets
 
@@ -599,7 +632,7 @@ This pattern uses the stack defaults. Use Wrangler’s local Miniflare runtime f
 
 ## Add auth
 
-Better Auth + D1. Server-only config. Validate session at API boundaries.
+Application auth: Better Auth + D1. Server-only config. Validate session at API boundaries. EmDash internals use their supported CMS auth/Access adapter; see the [bounded CMS exception](astro-emdash.md).
 
 ## Add AI chat
 
@@ -655,7 +688,7 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm build
 env -u CLOUDFLARE_API_TOKEN wrangler deploy
 ```
 
-CI injects runtime secrets with Infisical (e.g. `infisical run --env=prod -- wrangler deploy`) behind a protected environment. Alchemy only on Stack Contract triggers.
+CI injects runtime secrets with Infisical (e.g. `infisical run --env=prod -- wrangler deploy`) behind a protected environment and retains its scoped API token. The `env -u` example above is for a human using local OAuth. Alchemy 2 only after the Stack Contract adoption gate; a `cf` migration does not change who deploys.
 
 If the app uses Varlock's Cloudflare integration, replace `wrangler deploy` with the pinned `varlock-wrangler deploy`: the built Worker needs the serialized `__VARLOCK_ENV` blob that plain Wrangler does not upload. Inventory vars and secrets around that deploy, because an undeclared secret is not removed automatically. See [Deploy findings](s5-cloudflare-pilot.md).
 
@@ -667,10 +700,19 @@ If the app uses Varlock's Cloudflare integration, replace `wrangler deploy` with
 ---
 title: "Astro content sites"
 description: "A small static reference for safe metadata, JSON-LD and native images."
-verified: 2026-09
+verified: 2026-10-11
 ---
 
 Use **Astro for content/marketing**, not a full-stack app by default. Follow the [Stack Contract](stack-contract.md). Start with [`examples/astro`](../examples/astro/README.md): one private package, two static pages, no browser JavaScript. It is executable proof, not a published library or branded starter.
+
+## Choose how content changes
+
+| Content owner | Path |
+| --- | --- |
+| Developer updates in Git | Static Astro on Workers static assets; use this reference |
+| Client edits/publishes directly | Prefer the [Astro + EmDash candidate](astro-emdash.md): SSR Worker + D1 + R2, supported CMS auth and a client handoff/recovery gate |
+
+The CMS recipe has no validated Fenod reference yet. Its admin requires JavaScript, request-time content and protected editorial routes. Keep this static example as the executable proof for the Git-managed path; adding a CMS is a project decision.
 
 ## Build and check
 
@@ -705,7 +747,7 @@ New static sites target **Workers static assets** (`dist`), without an SSR adapt
 
 ---
 title: "Security Model"
-verified: 2026-09
+verified: 2026-10-11
 ---
 
 Security posture for secrets, Cloudflare, AI agents, user data, and production changes.
@@ -760,6 +802,8 @@ Rules:
 - require human approval for production D1 migrations, DNS edits, Worker route changes, and destructive data operations
 - prefer GitHub Actions or a deploy broker for production mutations
 
+These rules apply to Wrangler, `cf`, Alchemy and direct API calls. Optional `cf` is not a broader agent grant: account/resource commands default to remote and must use an explicitly selected account and authorized scope. See [Cloudflare tooling](cloudflare-tooling.md).
+
 Use resource-scoped API tokens. Never the Global API Key.
 
 ## Cloudflare Access (previews / staging / internal admin)
@@ -768,8 +812,12 @@ Put **Cloudflare Access** in front of preview URLs, staging, and internal admin.
 
 - Public marketing/docs sites: no Access.
 - Staging, `*.workers.dev` previews, admin SPAs: Access (Google/one-time PIN, one policy per host).
-- App users still go through Better Auth. Access ≠ session ≠ `requirePermission`.
+- Application users still go through Better Auth. Access ≠ session ≠ `requirePermission`.
 - Do not invent a second IdP or basic-auth Worker for this.
+
+**EmDash CMS exception:** use its supported Access authentication adapter for protected CMS admin, with a policy covering `/_emdash/*` (UI and REST API), expected team domain/audience and EmDash's JWT validation. The website remains public. Protect or disable alternate Worker/preview entry points too. Bootstrap the initial Admin as the operator before client access, then assign editorial roles and choose the role-sync owner. Access is an exclusive production CMS auth mode; native logins/invitations are unavailable there. EmDash retains local roles and disabled-user checks. Do not add Better Auth to CMS internals. [Supported integration](https://docs.emdashcms.com/guides/authentication/), [CMS recipe](astro-emdash.md).
+
+CMS recovery needs a full database recovery point plus matching R2 media, application artifact and encryption-key rotation list. D1 Time Travel or a content-only JSON export is insufficient alone. Public media delivery must exclude automatic archives under `backups/`. Use the supported backup/restore procedure and prove recovery in an isolated environment before client production. [Recovery guide](https://docs.emdashcms.com/guides/backups/), [storage boundary](https://docs.emdashcms.com/deployment/storage/#public-access).
 
 ## Dependency Security
 

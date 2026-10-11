@@ -1,7 +1,7 @@
 ---
 title: "Gotchas"
 description: "High-signal traps in the Fenod stack."
-verified: 2026-09
+verified: 2026-10-11
 ---
 
 ## Stack Contract Wins
@@ -23,6 +23,14 @@ If `CLOUDFLARE_API_TOKEN` is exported locally, Wrangler may use it instead of OA
 ```bash
 env -u CLOUDFLARE_API_TOKEN wrangler ...
 ```
+
+## cf Is Not a Drop-in Project Command
+
+Optional `cf` beta resource commands can coexist with Wrangler, but use separate login/account selection and default to **remote** data. They do not read the Wrangler account config. Local command discovery/schema inspection needs no credentials. Do not run `cf dev`, `cf build` or `cf deploy` before a deliberate project migration: automatic config can replace entry points/bindings and rewrite scripts. See [Cloudflare tooling](cloudflare-tooling.md).
+
+## Client Editing Changes the Astro Runtime
+
+Static Astro remains the default for developer-maintained content. For direct client edits, prefer the [Astro + EmDash candidate](astro-emdash.md) with SSR, D1 and R2; it still needs a Fenod pilot. CMS internals keep their supported database/auth adapters. Access auth protects `/_emdash/*`, including the API, and is an exclusive production login mode; CMS roles still apply. SSR publishing avoids rebuilds only when the page reads published content at request time and caches follow the update policy. Prerendered routes still need a rebuild.
 
 ## Cloudflare Token Scope
 
@@ -114,7 +122,7 @@ Use stable TypeScript 7 `tsc` for typechecks. Do not retain `@typescript/native-
 
 ## Alchemy Is Not Default Deploy
 
-Default is Wrangler or Workers Builds Git-connect for **one Worker**. Use Alchemy when **two or more Workers share bindings**, or on the other contract triggers. Package is `alchemy`; v1 examples are dead. Effect samples are Alchemy-only, not app architecture law.
+Default is Wrangler or Workers Builds Git-connect. Shared resources, stages/previews and ownership needs are reasons to **evaluate Alchemy 2**, not automatic adoption thresholds. It is still beta: pin a pilot and prove adoption, isolation and state recovery before client production. One CMS Worker + D1/R2 does not force Alchemy. Package is `alchemy`; use current v2 docs. IaC mode supports ordinary app handlers; integrated Effect runtime is optional. See [Cloudflare tooling](cloudflare-tooling.md).
 
 Do not Git-connect Workers that Alchemy owns. Cloudflare would deploy one script and skip Alchemy state/bindings.
 

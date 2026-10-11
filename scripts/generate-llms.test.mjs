@@ -42,10 +42,14 @@ test('context generation is deterministic; checking detects drift and never repa
     assert.equal(existsSync(join(cwd, 'llms.txt')), false);
     assert.equal(run().status, 0);
 
-    rmSync(join(cwd, 'examples/smoke/package.json'));
-    const before = snapshot();
-    assert.equal(run('--check').status, 1);
-    assert.deepEqual(snapshot(), before);
+    for (const path of ['examples/smoke/package.json', 'docs/astro-emdash.md', 'docs/cloudflare-tooling.md']) {
+      rmSync(join(cwd, path));
+      const before = snapshot();
+      assert.equal(run('--check').status, 1);
+      assert.deepEqual(snapshot(), before);
+      cpSync(join(root, path), join(cwd, path));
+      assert.equal(run('--check').status, 0);
+    }
   } finally {
     rmSync(cwd, { recursive: true, force: true });
   }

@@ -1,6 +1,6 @@
 ---
 title: "Security Model"
-verified: 2026-09
+verified: 2026-10-11
 ---
 
 Security posture for secrets, Cloudflare, AI agents, user data, and production changes.
@@ -55,6 +55,8 @@ Rules:
 - require human approval for production D1 migrations, DNS edits, Worker route changes, and destructive data operations
 - prefer GitHub Actions or a deploy broker for production mutations
 
+These rules apply to Wrangler, `cf`, Alchemy and direct API calls. Optional `cf` is not a broader agent grant: account/resource commands default to remote and must use an explicitly selected account and authorized scope. See [Cloudflare tooling](cloudflare-tooling.md).
+
 Use resource-scoped API tokens. Never the Global API Key.
 
 ## Cloudflare Access (previews / staging / internal admin)
@@ -63,8 +65,12 @@ Put **Cloudflare Access** in front of preview URLs, staging, and internal admin.
 
 - Public marketing/docs sites: no Access.
 - Staging, `*.workers.dev` previews, admin SPAs: Access (Google/one-time PIN, one policy per host).
-- App users still go through Better Auth. Access ≠ session ≠ `requirePermission`.
+- Application users still go through Better Auth. Access ≠ session ≠ `requirePermission`.
 - Do not invent a second IdP or basic-auth Worker for this.
+
+**EmDash CMS exception:** use its supported Access authentication adapter for protected CMS admin, with a policy covering `/_emdash/*` (UI and REST API), expected team domain/audience and EmDash's JWT validation. The website remains public. Protect or disable alternate Worker/preview entry points too. Bootstrap the initial Admin as the operator before client access, then assign editorial roles and choose the role-sync owner. Access is an exclusive production CMS auth mode; native logins/invitations are unavailable there. EmDash retains local roles and disabled-user checks. Do not add Better Auth to CMS internals. [Supported integration](https://docs.emdashcms.com/guides/authentication/), [CMS recipe](astro-emdash.md).
+
+CMS recovery needs a full database recovery point plus matching R2 media, application artifact and encryption-key rotation list. D1 Time Travel or a content-only JSON export is insufficient alone. Public media delivery must exclude automatic archives under `backups/`. Use the supported backup/restore procedure and prove recovery in an isolated environment before client production. [Recovery guide](https://docs.emdashcms.com/guides/backups/), [storage boundary](https://docs.emdashcms.com/deployment/storage/#public-access).
 
 ## Dependency Security
 

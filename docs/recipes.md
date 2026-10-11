@@ -1,7 +1,7 @@
 ---
 title: "Recipes"
 description: "Short implementation recipes for common Fenod stack tasks."
-verified: 2026-09
+verified: 2026-10-11
 ---
 
 Recipes implement [stack-contract.md](stack-contract.md). Keep them short.
@@ -14,7 +14,7 @@ One package on Workers:
 pnpm dlx @tanstack/cli@latest create my-app \
   --package-manager pnpm \
   --deployment cloudflare \
-  --add-ons oRPC,drizzle,better-auth,shadcn,tanstack-query \
+  --add-ons drizzle,better-auth,shadcn,tanstack-query \
   --yes --non-interactive --no-git --no-toolchain
 ```
 
@@ -22,11 +22,17 @@ Then align with law: **D1 not Postgres**, Oxlint + Oxfmt, Infisical, Wrangler ob
 
 Living reference in this repo: [`examples/smoke`](https://github.com/tristanremy/fenod-tech-stack/tree/main/examples/smoke) (`STACK.md` maps each law line).
 
-Do not create a monorepo on day one. Add Hono only when you need a dedicated HTTP/API boundary.
+Do not create a monorepo on day one. Add Hono + oRPC only when you need a dedicated HTTP/API boundary.
 
 ## Start an Astro content site
 
 Use the short [Astro recipe](astro.md) and standalone [`examples/astro`](../examples/astro/README.md): safe metadata/JSON-LD, native responsive images and generated-HTML tests. No app backend or published package is required.
+
+When clients need direct edits, use the [Astro + EmDash candidate recipe](astro-emdash.md). It covers the SSR Worker/D1/R2 shape, supported Access auth, editorial roles, publishing/cache behavior and the required recovery rehearsal. It is not yet a validated Fenod CMS starter.
+
+## Choose Cloudflare tooling
+
+Keep Wrangler for existing project scripts. Use optional `cf` beta for local command discovery and explicitly scoped account/resource work; project commands require migration. Adopt Alchemy 2 only for a written infrastructure need after a pinned pilot. Follow [Cloudflare tooling](cloudflare-tooling.md) for examples and acceptance criteria. Resource counts alone do not force a change.
 
 ## Configure environment and secrets
 
@@ -88,7 +94,7 @@ This pattern uses the stack defaults. Use Wrangler’s local Miniflare runtime f
 
 ## Add auth
 
-Better Auth + D1. Server-only config. Validate session at API boundaries.
+Application auth: Better Auth + D1. Server-only config. Validate session at API boundaries. EmDash internals use their supported CMS auth/Access adapter; see the [bounded CMS exception](astro-emdash.md).
 
 ## Add AI chat
 
@@ -144,6 +150,6 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm build
 env -u CLOUDFLARE_API_TOKEN wrangler deploy
 ```
 
-CI injects runtime secrets with Infisical (e.g. `infisical run --env=prod -- wrangler deploy`) behind a protected environment. Alchemy only on Stack Contract triggers.
+CI injects runtime secrets with Infisical (e.g. `infisical run --env=prod -- wrangler deploy`) behind a protected environment and retains its scoped API token. The `env -u` example above is for a human using local OAuth. Alchemy 2 only after the Stack Contract adoption gate; a `cf` migration does not change who deploys.
 
 If the app uses Varlock's Cloudflare integration, replace `wrangler deploy` with the pinned `varlock-wrangler deploy`: the built Worker needs the serialized `__VARLOCK_ENV` blob that plain Wrangler does not upload. Inventory vars and secrets around that deploy, because an undeclared secret is not removed automatically. See [Deploy findings](s5-cloudflare-pilot.md).

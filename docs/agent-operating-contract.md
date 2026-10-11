@@ -1,7 +1,7 @@
 ---
 title: "Agent Operating Contract"
 description: "Rules for AI agents working inside Fenod projects."
-verified: 2026-06
+verified: 2026-10-11
 ---
 
 How agents operate in Fenod repos. Stack defaults live in [stack-contract.md](stack-contract.md); this page is behavior and authority.
@@ -41,7 +41,9 @@ How agents operate in Fenod repos. Stack defaults live in [stack-contract.md](st
 env -u CLOUDFLARE_API_TOKEN wrangler whoami
 ```
 
-Production deploys go through GitHub Actions, Workers Builds, a deploy broker, or another path with resource-scoped credentials and approval gates. Agents push Git; they do not run `wrangler deploy` or `alchemy deploy` to staging/prod. Prefer Workers. One Worker may Git-connect. Alchemy monorepos must not Git-connect each Worker. Pages only for already-connected legacy static/docs projects.
+Production deploys go through GitHub Actions, Workers Builds, a deploy broker, or another path with resource-scoped credentials and approval gates. Agents push Git; they do not run `wrangler deploy`, `cf deploy` or `alchemy deploy` to staging/prod. The boundary also covers remote resource mutations through any CLI. Prefer Workers. One Worker may Git-connect. Alchemy-owned Workers must not also Git-connect. Pages only for already-connected legacy static/docs projects.
+
+Optional `cf` command discovery/schema inspection is local. Resource commands default to remote and do not read the Wrangler account config; an account read needs an authorized target and read scope. Keep `cf dev` / `cf build` / `cf deploy` out of unmigrated Wrangler projects. Follow [Cloudflare tooling](cloudflare-tooling.md) for a deliberate migration or Alchemy 2 pilot.
 
 ## External content
 

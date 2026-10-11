@@ -4,7 +4,7 @@ import process from 'node:process';
 const checkOnly = process.argv.includes('--check');
 
 const coreDefaults =
-  'Node 24, pnpm, TanStack Start on Cloudflare Workers, Astro for marketing/content sites only, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler, Infisical+Worker secrets, Oxlint+Oxfmt+@shadcn/lint, TypeScript 7 tsc, Vitest, Playwright.';
+  'Node 24, pnpm, TanStack Start on Cloudflare Workers, static Astro for developer-maintained marketing/content; Astro+EmDash candidate for client editing with a bounded CMS database/auth exception and pilot gate, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler baseline; optional cf beta toolbox and conditional Alchemy 2 pinned pilot, Infisical+Worker secrets, Oxlint+Oxfmt+@shadcn/lint, TypeScript 7 tsc, Vitest, Playwright.';
 
 const docs = [
   ['Agent entry', 'AGENTS.md'],
@@ -19,6 +19,8 @@ const docs = [
 
 const routes = [
   { task: 'Astro / content site / SEO / JSON-LD / responsive images', read: ['docs/astro.md', 'examples/astro/README.md', 'examples/astro/package.json'] },
+  { task: 'client content editing / CMS / EmDash / draft preview / publishing', read: ['docs/astro-emdash.md', 'docs/astro.md', 'docs/security-model.md'] },
+  { task: 'Cloudflare CLI / cf migration / Alchemy 2 / infrastructure lifecycle', read: ['docs/cloudflare-tooling.md', 'docs/agent-operating-contract.md', 'skills/fenod-cloudflare-deploy/SKILL.md'] },
   { task: 'new app / architecture / stack choice', read: ['docs/stack-contract.md', 'skills/fenod-stack/SKILL.md', 'examples/smoke/STACK.md'] },
   { task: 'deploy / Cloudflare / secrets / D1 migration', read: ['docs/agent-operating-contract.md', 'docs/security-model.md', 'skills/fenod-cloudflare-deploy/SKILL.md'] },
   { task: 'AI feature / coding agent / eval / sandbox', read: ['docs/agent-factory.md', 'docs/agent-evals.md', 'docs/security-model.md'] },
