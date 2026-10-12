@@ -13,6 +13,7 @@ const docs = [
   ['Gotchas', 'docs/gotchas.md'],
   ['Recipes', 'docs/recipes.md'],
   ['Astro content sites', 'docs/astro.md'],
+  ['New project', 'docs/new-project.md'],
   ['Security Model', 'docs/security-model.md'],
   ['Agent Factory', 'docs/agent-factory.md'],
 ] as const;
@@ -21,6 +22,7 @@ const routes = [
   { task: 'Astro / content site / SEO / JSON-LD / responsive images', read: ['docs/astro.md', 'examples/astro/README.md', 'examples/astro/package.json'] },
   { task: 'client content editing / CMS / EmDash / draft preview / publishing', read: ['docs/astro-emdash.md', 'docs/astro.md', 'docs/security-model.md'] },
   { task: 'Cloudflare CLI / cf migration / Alchemy 2 / infrastructure lifecycle', read: ['docs/cloudflare-tooling.md', 'docs/agent-operating-contract.md', 'skills/fenod-cloudflare-deploy/SKILL.md'] },
+  { task: 'new project / getting started / first deploy / repo and Cloudflare setup', read: ['docs/new-project.md', 'examples/smoke/README.md', 'docs/environment-secrets.md'] },
   { task: 'new app / architecture / stack choice', read: ['docs/stack-contract.md', 'skills/fenod-stack/SKILL.md', 'examples/smoke/STACK.md'] },
   { task: 'deploy / Cloudflare / secrets / D1 migration', read: ['docs/agent-operating-contract.md', 'docs/security-model.md', 'skills/fenod-cloudflare-deploy/SKILL.md'] },
   { task: 'AI feature / coding agent / eval / sandbox', read: ['docs/agent-factory.md', 'docs/agent-evals.md', 'docs/security-model.md'] },

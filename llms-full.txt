@@ -10,6 +10,7 @@
 - Gotchas: docs/gotchas.md
 - Recipes: docs/recipes.md
 - Astro content sites: docs/astro.md
+- New project: docs/new-project.md
 - Security Model: docs/security-model.md
 - Agent Factory: docs/agent-factory.md
 
@@ -18,6 +19,7 @@
 - **Astro / content site / SEO / JSON-LD / responsive images** → docs/astro.md, examples/astro/README.md, examples/astro/package.json
 - **client content editing / CMS / EmDash / draft preview / publishing** → docs/astro-emdash.md, docs/astro.md, docs/security-model.md
 - **Cloudflare CLI / cf migration / Alchemy 2 / infrastructure lifecycle** → docs/cloudflare-tooling.md, docs/agent-operating-contract.md, skills/fenod-cloudflare-deploy/SKILL.md
+- **new project / getting started / first deploy / repo and Cloudflare setup** → docs/new-project.md, examples/smoke/README.md, docs/environment-secrets.md
 - **new app / architecture / stack choice** → docs/stack-contract.md, skills/fenod-stack/SKILL.md, examples/smoke/STACK.md
 - **deploy / Cloudflare / secrets / D1 migration** → docs/agent-operating-contract.md, docs/security-model.md, skills/fenod-cloudflare-deploy/SKILL.md
 - **AI feature / coding agent / eval / sandbox** → docs/agent-factory.md, docs/agent-evals.md, docs/security-model.md
@@ -59,6 +61,7 @@ Handbook root: `pnpm check && pnpm test`. Reference apps: `pnpm --dir examples/s
 4. `docs/gotchas.md`
 5. `docs/recipes.md`
 6. `docs/security-model.md` when touching auth, secrets, Cloudflare, or email
+7. `docs/new-project.md` when starting or setting up a client project
 
 Do not load old Starlight pages, French translations, or `code-patterns`.
 
@@ -553,7 +556,7 @@ Recipes implement [stack-contract.md](stack-contract.md). Keep them short.
 
 ## Start a full-stack app
 
-One package on Workers:
+For a client project, export the starter and follow [Start a new project](new-project.md). The command below is how the starter was generated, kept for reference:
 
 ```bash
 pnpm dlx @tanstack/cli@latest create my-app \
@@ -757,6 +760,77 @@ Keep local originals in `src/assets`. Use `astro:assets` `Image`, real dimension
 Tests parse **generated HTML** on both routes and in both build modes: unique tags, public URLs, hostile text round trips, image files/dimensions/priority, and zero executable scripts/JS files. Negative controls prove failures are detected. Also check the built site in a browser on desktop/mobile, including navigation, image requests, console and overflow. Repeat builds must produce identical files in the same locked environment.
 
 New static sites target **Workers static assets** (`dist`), without an SSR adapter, DB, auth or Alchemy. This reference creates no Worker and includes no deploy command. Deployment and Access setup belong to an approved project CI/human flow. No client migration or package publication is part of this example; pilots must validate any later shared API. Do not claim ranking, GEO or field CWV gains from these technical checks.
+
+
+---
+
+# New project
+
+---
+title: "Start a new project"
+description: "Day 0 to first deploy for a Fenod client project: who does each step, in order."
+verified: 2026-10
+---
+
+**Agent** steps need only the repo. **Human** steps need a GitHub or Cloudflare account. Agents never create remote resources, set secrets or deploy ([operating contract](agent-operating-contract.md)).
+
+## 1. Pick the type
+
+| Project | Path |
+| --- | --- |
+| App (auth, data, server logic) | This page |
+| Website, developer-maintained content | [Astro recipe](astro.md) + [`examples/astro`](../examples/astro/README.md). Follow steps 4–5 below with `pnpm install --frozen-lockfile && pnpm ship` as the build command |
+| Website, client edits content | [Astro + EmDash](astro-emdash.md). Candidate only: its handoff/recovery pilot comes first |
+
+## 2. Create from the starter (agent)
+
+Export the committed starter from an exact handbook revision. Never copy a working tree or scaffold from scratch: the export already carries CI, lint, owner-scoped data, migrations and browser tests.
+
+```bash
+cd fenod-tech-stack && git pull
+node scripts/export-starter.mjs "$(git rev-parse HEAD)" ../client-app
+cd ../client-app && git init -b main
+```
+
+Rename together, then rerun `pnpm cf-types`: `package.json` `name`, Wrangler `name`, D1 `database_name`, the `db:local` script argument, and the app name in `src/components/Header.tsx` / `Footer.tsx`. Keep the `DB` binding.
+
+## 3. Verify locally (agent)
+
+```bash
+pnpm install --frozen-lockfile
+pnpm exec playwright install chromium
+pnpm release   # ship + build + audit + e2e
+git add -A && git commit -m "chore: start from Fenod starter"
+```
+
+## 4. GitHub (human)
+
+1. Create a **private** repo and push `main`.
+2. Install the [Renovate app](https://github.com/apps/renovate) on it; `renovate.json` is already included.
+3. After step 5: require the Workers Builds check and `secrets` on `main` (needs a paid GitHub plan for private repos).
+
+The included workflow runs the secret scan on PRs, and the full check on PRs until Workers Builds is connected.
+
+## 5. Cloudflare (human)
+
+1. `wrangler d1 create <database_name>`; an agent commits the returned `database_id` to `wrangler.jsonc`.
+2. Connect Workers Builds and set the `WORKERS_BUILDS` repo variable: [starter README → CI](../examples/smoke/README.md#ci). Build minutes are included in the Cloudflare plan.
+3. Put [Cloudflare Access](security-model.md#cloudflare-access-previews--staging--internal-admin) on preview URLs and `*.workers.dev`.
+4. Attach the custom domain when going live.
+
+## 6. Before the first production deploy (gate)
+
+The starter is **fixture-only**: `.env.schema` accepts only test values, and `deploy` / `db:remote` fail on purpose. Going live is a project task, and the first production project is a pilot:
+
+- Replace the fixture config with the default secrets path: Infisical → Worker secrets, Zod validation ([environment and secrets](environment-secrets.md)). Keeping Varlock instead requires its written trigger and the [pilot findings](s5-cloudflare-pilot.md) (wrapper deploy, secret inventory).
+- Set `BETTER_AUTH_URL` to the real origin and generate a fresh `BETTER_AUTH_SECRET` as a Worker secret.
+- Choose who runs remote migrations (human terminal or the Workers Builds deploy command). Migrations must stay compatible with the previous Worker: `node scripts/migration-compat.test.mjs`.
+- Replace the fail-closed `deploy` / `db:remote` scripts, and the matching assertion in `scripts/check-portable.mjs`, only together with the steps above.
+- Rehearse a rollback: Worker rollback does not roll back D1.
+
+## 7. Day to day (agent)
+
+Branch → change → `pnpm release` → push → PR. Workers Builds checks the branch and posts a preview; Actions scans for secrets. A human merges; `main` deploys through Workers Builds. Follow the triggers in the [Stack Contract](stack-contract.md) before adding Hono/oRPC, a monorepo, Alchemy or Durable Objects.
 
 
 ---

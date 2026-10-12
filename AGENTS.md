@@ -12,6 +12,7 @@
 4. `docs/gotchas.md`
 5. `docs/recipes.md`
 6. `docs/security-model.md` when touching auth, secrets, Cloudflare, or email
+7. `docs/new-project.md` when starting or setting up a client project
 
 Do not load old Starlight pages, French translations, or `code-patterns`.
 

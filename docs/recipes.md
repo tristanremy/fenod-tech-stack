@@ -8,7 +8,7 @@ Recipes implement [stack-contract.md](stack-contract.md). Keep them short.
 
 ## Start a full-stack app
 
-One package on Workers:
+For a client project, export the starter and follow [Start a new project](new-project.md). The command below is how the starter was generated, kept for reference:
 
 ```bash
 pnpm dlx @tanstack/cli@latest create my-app \

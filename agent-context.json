@@ -31,6 +31,14 @@
       ]
     },
     {
+      "task": "new project / getting started / first deploy / repo and Cloudflare setup",
+      "read": [
+        "docs/new-project.md",
+        "examples/smoke/README.md",
+        "docs/environment-secrets.md"
+      ]
+    },
+    {
       "task": "new app / architecture / stack choice",
       "read": [
         "docs/stack-contract.md",

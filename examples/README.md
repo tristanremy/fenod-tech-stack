@@ -9,6 +9,8 @@ For static content/marketing, read the [Astro recipe](../docs/astro.md) instead 
 
 ## Export the application starter
 
+For a real client project, follow [Start a new project](../docs/new-project.md); it includes this export plus the GitHub, Cloudflare and go-live steps.
+
 Never copy the working directory. Select an immutable commit:
 
 ```bash

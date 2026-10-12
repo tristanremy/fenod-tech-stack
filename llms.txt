@@ -10,6 +10,7 @@
 - Gotchas: docs/gotchas.md
 - Recipes: docs/recipes.md
 - Astro content sites: docs/astro.md
+- New project: docs/new-project.md
 - Security Model: docs/security-model.md
 - Agent Factory: docs/agent-factory.md
 
@@ -18,6 +19,7 @@
 - **Astro / content site / SEO / JSON-LD / responsive images** → docs/astro.md, examples/astro/README.md, examples/astro/package.json
 - **client content editing / CMS / EmDash / draft preview / publishing** → docs/astro-emdash.md, docs/astro.md, docs/security-model.md
 - **Cloudflare CLI / cf migration / Alchemy 2 / infrastructure lifecycle** → docs/cloudflare-tooling.md, docs/agent-operating-contract.md, skills/fenod-cloudflare-deploy/SKILL.md
+- **new project / getting started / first deploy / repo and Cloudflare setup** → docs/new-project.md, examples/smoke/README.md, docs/environment-secrets.md
 - **new app / architecture / stack choice** → docs/stack-contract.md, skills/fenod-stack/SKILL.md, examples/smoke/STACK.md
 - **deploy / Cloudflare / secrets / D1 migration** → docs/agent-operating-contract.md, docs/security-model.md, skills/fenod-cloudflare-deploy/SKILL.md
 - **AI feature / coding agent / eval / sandbox** → docs/agent-factory.md, docs/agent-evals.md, docs/security-model.md

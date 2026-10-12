@@ -31,6 +31,8 @@ For client editing/CMS tasks, read `docs/astro-emdash.md`. Keep the supported Em
 
 ## Scaffolding
 
+New client app: export the starter, then follow `docs/new-project.md` (agent vs human steps, GitHub and Cloudflare setup, go-live gate). Do not scaffold from scratch; the export already carries CI, lint, owner-scoped data and tests. For reference only, the starter was generated with:
+
 ```bash
 pnpm dlx @tanstack/cli@latest create my-app \
   --package-manager pnpm \

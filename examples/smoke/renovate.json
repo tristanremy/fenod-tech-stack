@@ -1,0 +1,47 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommits"],
+  "labels": ["dependencies"],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"]
+  },
+  "vulnerabilityAlerts": {
+    "labels": ["dependencies", "security"],
+    "schedule": ["at any time"]
+  },
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": false
+    },
+    {
+      "groupName": "Cloudflare tooling",
+      "matchPackageNames": ["wrangler", "miniflare", "/^@cloudflare\\//"]
+    },
+    {
+      "groupName": "TanStack",
+      "matchPackageNames": ["/^@tanstack\\//"]
+    },
+    {
+      "groupName": "Oxc lint/format",
+      "matchPackageNames": ["oxlint", "oxfmt", "@shadcn/lint"]
+    },
+    {
+      "matchPackageNames": [
+        "better-auth",
+        "/^@better-auth\\//",
+        "@orpc/client",
+        "@orpc/server",
+        "drizzle-orm",
+        "drizzle-kit"
+      ],
+      "labels": ["dependencies", "security-sensitive"],
+      "automerge": false
+    },
+    {
+      "matchPackageNames": ["drizzle-orm", "drizzle-kit"],
+      "allowedVersions": "<1.0.0"
+    }
+  ]
+}

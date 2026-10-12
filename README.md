@@ -8,6 +8,8 @@ Opinionated defaults for building full-stack TypeScript products on Cloudflare W
 
 **Start small. Keep the platform boring. Give agents context, not production authority.**
 
+**New client project?** Follow [Start a new project](docs/new-project.md): every step from export to first deploy, marked agent or human.
+
 ## The short version
 
 | Need | Default |
@@ -105,7 +107,7 @@ Grow only when the trigger is real. See [the Stack Contract](docs/stack-contract
 
 ## Humans and agents
 
-Humans: start with this README, then [examples/README.md](examples/README.md) and [examples/smoke/STACK.md](examples/smoke/STACK.md).
+Humans: start with this README and [Start a new project](docs/new-project.md), then [examples/README.md](examples/README.md) and [examples/smoke/STACK.md](examples/smoke/STACK.md).
 
 Agents: start with [AGENTS.md](AGENTS.md), then use [agent-context.json](agent-context.json) or [llms.txt](llms.txt) to route by task. Read [llms-full.txt](llms-full.txt) only when deeper context is needed. Agent operation rules live in [docs/agent-factory.md](docs/agent-factory.md).
 
