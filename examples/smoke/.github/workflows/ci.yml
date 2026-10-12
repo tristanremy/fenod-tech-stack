@@ -5,6 +5,7 @@ on:
   pull_request:
     # ready_for_review: drafts are skipped below, so run when one is promoted.
     types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
 permissions:
   contents: read
 # A newer push to the same PR/branch cancels the run it supersedes.
@@ -12,10 +13,30 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  # One job: GitHub rounds each job up to a whole minute, so separate small
-  # jobs bill several minutes for one run.
-  check:
+  secrets:
     if: github.event.pull_request.draft != true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      # Offline: no verification requests to credential providers.
+      - name: Scan tracked content offline
+        env:
+          GITLEAKS_DIGEST_A: c00b6bd0aeb3071cbcb79009cb16a60d
+          GITLEAKS_DIGEST_B: d9e0a7c60e2be9ab65d25e6bc8abbb7f
+        run: |
+          image="ghcr.io/gitleaks/gitleaks@sha256:${GITLEAKS_DIGEST_A}${GITLEAKS_DIGEST_B}"
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo:ro" "$image" \
+            dir --redact --no-banner --exit-code 1 /repo
+
+  # Once Workers Builds runs `pnpm workers-build` on every branch (repo
+  # variable WORKERS_BUILDS=true), PRs skip this job; main still runs it.
+  check:
+    if: >-
+      github.event_name != 'pull_request' ||
+      (vars.WORKERS_BUILDS != 'true' && github.event.pull_request.draft != true)
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -26,16 +47,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-      # Offline, before install so dependencies are not scanned: no
-      # verification requests to credential providers.
-      - name: Scan tracked content offline
-        env:
-          GITLEAKS_DIGEST_A: c00b6bd0aeb3071cbcb79009cb16a60d
-          GITLEAKS_DIGEST_B: d9e0a7c60e2be9ab65d25e6bc8abbb7f
-        run: |
-          image="ghcr.io/gitleaks/gitleaks@sha256:${GITLEAKS_DIGEST_A}${GITLEAKS_DIGEST_B}"
-          docker run --rm -v "$GITHUB_WORKSPACE:/repo:ro" "$image" \
-            dir --redact --no-banner --exit-code 1 /repo
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:

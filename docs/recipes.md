@@ -141,15 +141,16 @@ Start with the existing Router/Query and D1 tools. Do not add Redis, a new API l
 Default: TanStack Query cache/persist.  
 Full offline-first only for real field/dead-zone products — design per project, not as stack scaffolding.
 
-## Keep CI cheap
+## CI for product repos
 
-Private repos pay for GitHub Actions minutes, and each job is rounded up to a whole minute. Start from the exported starter workflow (`examples/smoke/.github/workflows/ci.yml`):
+Workers Builds runs the checks; GitHub Actions keeps only what it must. Build minutes are included in the Cloudflare plan (Paid: 6,000/month, 4 vCPU). Private repos pay for every Actions minute, rounded up per job.
 
-- One job per repo, secret scan first. Run on `pull_request` and pushes to `main` only, skip drafts, and cancel superseded runs with `concurrency`.
-- Cache the pnpm store (`setup-node` `cache: pnpm`). Do not use `paths-ignore` for docs: the portable check validates documented commands.
+- **Workers Builds** (every branch): build command `pnpm install --frozen-lockfile && pnpm workers-build` (ship gate + build), with `SKIP_DEPENDENCY_INSTALL=1` and `PNPM_VERSION` set. A failing check fails the build before deploy. It posts a GitHub check and PR comment.
+- **GitHub Actions**: secret scan on PRs and `main`; the full check (types, build determinism, audit, Playwright) on `main` only. Before the Worker is connected, PRs run the full check. The repo variable `WORKERS_BUILDS=true` switches PRs to scan-only.
+- Skip drafts and cancel superseded runs (`concurrency`). Cache the pnpm store. Do not `paths-ignore` docs: the portable check validates documented commands.
 - Agents run `pnpm release` before pushing, so CI confirms results instead of finding them.
-- Workers Builds (Git-connect) includes build minutes on Workers Paid. Set its build command to the ship gate plus build, so a failing check fails the build before deploy (confirm on the first project). Keep the PR check and secret scan in GitHub.
-- If minutes still exceed the plan, a drop-in runner (one `runs-on:` change) is cheaper than GitHub's hosted runners. It receives client code: check the client contract first. Never put self-hosted runners on public repos.
+
+Setup steps: the starter README's CI section (`examples/smoke/README.md`). Static Astro sites use the same split with `pnpm ship` as the build command. If minutes still exceed the plan, a drop-in runner (one `runs-on:` change) is cheaper than GitHub's hosted runners. It receives client code: check the client contract first. Never put self-hosted runners on public repos.
 
 ## Deploy an app
 

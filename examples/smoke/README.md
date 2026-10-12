@@ -37,6 +37,21 @@ pnpm audit --audit-level high
 
 The post-build canary scan checks client **and** server output for the known fixture and an optional synthetic internal token. It is a regression detector, not a universal secret scanner. One moderate build-time advisory remains (`postcss-selector-parser` via `@tailwindcss/typography`, no fixed release on that line); high/critical audit findings fail CI.
 
+## CI
+
+GitHub Actions runs the secret scan on every non-draft PR and push to `main`. Until Workers Builds is connected, it also runs the full check (types, ship, build, audit, e2e) on PRs. Pushes to `main` always run the full check.
+
+Once a product is approved to deploy (see below), let Workers Builds run the checks instead. Its build minutes are included in the Cloudflare plan:
+
+1. Cloudflare dashboard → the Worker → **Settings → Builds → Connect** the repository. Production branch `main`; enable non-production branch builds.
+2. Build variables: `PNPM_VERSION` = the `packageManager` version in `package.json`, and `SKIP_DEPENDENCY_INSTALL=1`.
+3. Build command: `pnpm install --frozen-lockfile && pnpm workers-build`. A failing check fails the build, so nothing deploys.
+4. Deploy and preview commands: the approved deploy path below (this starter uses the Varlock wrapper, not plain `wrangler`).
+5. GitHub → **Settings → Secrets and variables → Actions → Variables**: `WORKERS_BUILDS=true`. PRs then run only the secret scan in Actions.
+6. Require the Workers Builds check and `secrets` before merging. Branch protection on private repos needs a paid GitHub plan.
+
+Check on the first project: push a branch with a deliberate lint error and confirm a red check and no new version.
+
 ## Export and provenance
 
 From the upstream handbook, use `node scripts/export-starter.mjs <commit> <new-destination>`. It exports only the committed application tree, refuses an existing destination and unsafe entries, and writes `starter-provenance.json`. No working-tree secrets, dependencies, caches or database state are copied. Requirements: Node 24, pnpm, Git and standard `tar` (macOS/Linux).

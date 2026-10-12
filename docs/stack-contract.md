@@ -121,7 +121,7 @@ Before client production, prove edit → draft preview → publish → anonymous
 | Second deployable or shared library across apps | monorepo + packages (+ Turborepo if orchestration hurts) |
 | Multiple API consumers or thick procedures | feature slices under `packages/api` or `src/server` |
 | Shared resources across Workers, repeatable stages/previews, multi-account ownership, or lifecycle tests | **Evaluate Alchemy 2**; adopt only when a written need and pinned pilot justify the operational cost |
-| One Worker (static Astro, Astro + EmDash, one-package Start/Hono app) | **Workers Builds Git-connect** or CI `wrangler deploy`; no automatic Alchemy |
+| One Worker (static Astro, Astro + EmDash, one-package Start/Hono app) | **Workers Builds Git-connect** (build command runs the ship gate; GitHub Actions keeps secret scan + `main` e2e, see [CI recipe](recipes.md#ci-for-product-repos)) or CI `wrangler deploy`; no automatic Alchemy |
 | Reporting needs, client Postgres mandate, or D1 limits hit | **Postgres** (+ Hyperdrive if staying on Cloudflare) |
 | Users regularly work offline in the field | project-specific offline design — Query persist is enough otherwise |
 | Existing docs/static site already on Pages and switching costs more than it saves | keep **Pages** for that site only |
