@@ -100,6 +100,27 @@
         "examples/smoke/STACK.md",
         "examples/smoke/package.json"
       ]
+    },
+    {
+      "task": "errors / error messages / HTTP status / retry",
+      "read": [
+        "docs/errors.md"
+      ]
+    },
+    {
+      "task": "PR / review packet / completion report",
+      "read": [
+        "docs/review-guide.md",
+        "docs/agent-operating-contract.md"
+      ]
+    },
+    {
+      "task": "Effect lane (project STACK.md says Lane: effect)",
+      "read": [
+        "docs/effect-lane.md",
+        "docs/errors.md",
+        "docs/review-guide.md"
+      ]
     }
   ],
   "defaults": "Node 24, pnpm, TanStack Start on Cloudflare Workers, static Astro for developer-maintained marketing/content; Astro+EmDash candidate for client editing with a bounded CMS database/auth exception and pilot gate, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler baseline; optional cf beta toolbox and conditional Alchemy 2 pinned pilot, Infisical+Worker secrets, Oxlint+Oxfmt+@shadcn/lint, TypeScript 7 tsc, Vitest, Playwright.",

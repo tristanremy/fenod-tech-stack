@@ -1,7 +1,7 @@
 ---
 title: "Stack Contract"
 description: "Law for Fenod stack defaults. Other pages explain; this page resolves conflicts."
-verified: 2026-10-11
+verified: 2026-10-14
 ---
 
 This page is **law**. If another page is longer, newer-looking, or more detailed, this page still wins unless a project `STACK.md` / repo AGENTS explicitly overrides a line.
@@ -55,6 +55,9 @@ One-liner:
 | Browser tests | **Playwright** for real UI flows |
 | Bundler | **Vite 8 + Rolldown** for new projects; `rolldown-vite` only as a Vite 7 bridge |
 | Internal packages | **tsdown** when a package must build artifacts |
+| Errors | Typed, explicit translation, one public envelope with `requestId` and truthful `retryable`: [errors.md](errors.md) |
+| Review | Agents write a review packet in every PR: [review-guide.md](review-guide.md) |
+| Effect | Not default. Opt-in **Effect lane** for own-product backends only, via `Lane: effect` in project `STACK.md`: [effect-lane.md](effect-lane.md) (pilot, plan 011) |
 
 ### Do not use by default
 
@@ -78,6 +81,7 @@ One-liner:
 - plaintext secrets in Git, prompts, issues, or client bundles
 - Drizzle v1 RC on client work before a written migration plan
 - unreviewed major upgrades of auth / RPC / ORM
+- Effect in client deliverables, or anywhere outside the opt-in Effect lane
 
 ## Shape
 

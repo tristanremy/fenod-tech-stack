@@ -119,6 +119,25 @@ const requirements = [
     recipes,
     "A fixed query count is not a latency measurement",
   ],
+  ["agent entry links error design", agents, "docs/errors.md"],
+  ["agent entry requires the review packet", agents, "docs/review-guide.md"],
+  ["agent entry gates the Effect lane", agents, "Lane: effect"],
+  [
+    "stack contract keeps Effect out of client work",
+    stack,
+    "Effect in client deliverables",
+  ],
+  [
+    "agent context routes error work",
+    contextText,
+    "errors / error messages / HTTP status / retry",
+  ],
+  [
+    "agent context routes review work",
+    contextText,
+    "PR / review packet / completion report",
+  ],
+  ["agent context routes the Effect lane", contextText, "docs/effect-lane.md"],
 ] as const;
 
 const unpinnedActions = [...ci.matchAll(/^\s*uses:\s+[^@\s]+@([^\s#]+)/gm)]

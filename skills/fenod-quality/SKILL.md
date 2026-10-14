@@ -78,6 +78,9 @@ Paths below are relative to the handbook root.
 | Need | Read |
 | ------ | ------ |
 | Law / toolchain | `docs/stack-contract.md` |
+| Errors, messages, retry | `docs/errors.md` |
+| PR review packet | `docs/review-guide.md` |
+| Effect lane (opt-in) | `docs/effect-lane.md` |
 | Verification scripts | `examples/smoke/package.json`, `examples/astro/package.json` |
 | D1 and performance tests | `docs/recipes.md` |
 | Agent evaluations | `docs/agent-evals.md` |

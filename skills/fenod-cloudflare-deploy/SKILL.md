@@ -15,7 +15,7 @@ description: Configure and operate Fenod projects on Cloudflare with Wrangler, e
 - **Optional cf:** beta toolbox beside Wrangler. Separate login/account selection; data commands default remote. Do not use `cf dev` / `cf build` / `cf deploy` in an unmigrated Wrangler project. Read `docs/cloudflare-tooling.md` for a migration.
 - **Evaluate Alchemy 2:** shared resource lifecycle, repeatable stages/previews, multi-account ownership or lifecycle tests. Resource counts do not force adoption. A written need and pinned pilot must prove adoption, isolation and state recovery. Once adopted, protected CI owns deploys; never also Git-connect those Workers.
 - **Smallest Alchemy unit:** site files → site; admin → admin; API/DB/auth/bindings → core; two units or shared config → all.
-- Use current Alchemy v2 docs, not v1 examples. Package is `alchemy`. Start in IaC-only mode with conventional app handlers; integrated Effect runtime is optional.
+- Use current Alchemy v2 docs, not v1 examples. Package is `alchemy`. Start in IaC-only mode with conventional app handlers; integrated Effect runtime is optional. Effect application code only in the opt-in Effect lane (`docs/effect-lane.md`).
 - Every Worker: today's `compatibility_date` + `observability.enabled = true` + an error alert. Dates `>= 2026-08-04` already include `nodejs_compat` — do not paste the flag. `nodejs_als` only for Sentry/ALS. Product apps add Sentry.
 - Staging / `*.workers.dev` previews / internal admin: **Cloudflare Access**. Public marketing/docs: no. Access ≠ Better Auth.
 - EmDash admin: supported CMS Access adapter on `/_emdash/*`, with EmDash roles and operator bootstrap; its auth/schema are a bounded CMS exception. Read `docs/astro-emdash.md` before configuring a CMS site.

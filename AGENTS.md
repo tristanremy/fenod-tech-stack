@@ -13,6 +13,9 @@
 5. `docs/recipes.md`
 6. `docs/security-model.md` when touching auth, secrets, Cloudflare, or email
 7. `docs/new-project.md` when starting or setting up a client project
+8. `docs/errors.md` before adding or changing errors, error messages, HTTP statuses, or retry logic
+9. `docs/review-guide.md` before opening a PR
+10. `docs/effect-lane.md` only when the project `STACK.md` says `Lane: effect`
 
 Do not load old Starlight pages, French translations, or `code-patterns`.
 
@@ -28,10 +31,12 @@ Do not load old Starlight pages, French translations, or `code-patterns`.
 - Agents **push Git**. They do not `wrangler deploy` / `cf deploy` / `alchemy deploy` to staging/prod; the same authority rules cover remote resource commands.
 - Mutation → `invalidateQueries`. No Convex. No live DO without a written multi-user trigger.
 - `wrangler types`. Dates `>= 2026-08-04` already include `nodejs_compat`. Observability on every Worker.
+- Fast-moving libraries (TanStack Start, ORPC, Better Auth, Alchemy v2, Effect) drift from training data: read the installed types/source in `node_modules` before using an API you are not sure of.
+- No `as` casts (except `as const`), no `any`, no non-null `!` without a stated reason in the review packet. Parse unknown input once at its boundary.
 
 ## Do not
 
-npm/yarn, Nub as PM, Bun/Deno as baseline, Prisma, Postgres (until trigger), Express, tRPC, Redis, ESLint/Prettier/Biome/Ultracite, Drizzle v1 RC, new Pages projects, day-one Alchemy, day-one monorepo.
+npm/yarn, Nub as PM, Bun/Deno as baseline, Prisma, Postgres (until trigger), Express, tRPC, Redis, ESLint/Prettier/Biome/Ultracite, Drizzle v1 RC, new Pages projects, day-one Alchemy, day-one monorepo, Effect outside the opt-in Effect lane, Effect in client deliverables.
 
 ## Done
 
@@ -45,4 +50,4 @@ pnpm --dir examples/astro ship
 
 `pnpm check` is read-only. After editing context sources, run `pnpm llms:build` explicitly and review generated changes. Product repos retain `pnpm lint && pnpm typecheck && pnpm test` in their own directory.
 
-Report: files changed, verification run, warnings, not done, whether prod action is still required.
+Report: files changed, verification run, warnings, not done, whether prod action is still required. In a PR, write the full review packet from `docs/review-guide.md`.

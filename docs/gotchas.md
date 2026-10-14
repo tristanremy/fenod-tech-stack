@@ -122,7 +122,7 @@ Use stable TypeScript 7 `tsc` for typechecks. Do not retain `@typescript/native-
 
 ## Alchemy Is Not Default Deploy
 
-Default is Wrangler or Workers Builds Git-connect. Shared resources, stages/previews and ownership needs are reasons to **evaluate Alchemy 2**, not automatic adoption thresholds. It is still beta: pin a pilot and prove adoption, isolation and state recovery before client production. One CMS Worker + D1/R2 does not force Alchemy. Package is `alchemy`; use current v2 docs. IaC mode supports ordinary app handlers; integrated Effect runtime is optional. See [Cloudflare tooling](cloudflare-tooling.md).
+Default is Wrangler or Workers Builds Git-connect. Shared resources, stages/previews and ownership needs are reasons to **evaluate Alchemy 2**, not automatic adoption thresholds. It is still beta: pin a pilot and prove adoption, isolation and state recovery before client production. One CMS Worker + D1/R2 does not force Alchemy. Package is `alchemy`; use current v2 docs. IaC mode supports ordinary app handlers; integrated Effect runtime is optional. Effect application code belongs only in the opt-in [Effect lane](effect-lane.md). See [Cloudflare tooling](cloudflare-tooling.md).
 
 Do not Git-connect Workers that Alchemy owns. Cloudflare would deploy one script and skip Alchemy state/bindings.
 

@@ -75,3 +75,5 @@ Add `pnpm build`, `pnpm audit --audit-level high`, Playwright, and browser check
 - known warnings
 - anything not done
 - whether production action is still required
+
+When the work lands as a PR, the description carries the full review packet from [review-guide.md](review-guide.md), including what was not verified.

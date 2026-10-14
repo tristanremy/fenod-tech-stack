@@ -107,7 +107,7 @@ Grow only when the trigger is real. See [the Stack Contract](docs/stack-contract
 
 ## Humans and agents
 
-Humans: start with this README and [Start a new project](docs/new-project.md), then [examples/README.md](examples/README.md) and [examples/smoke/STACK.md](examples/smoke/STACK.md).
+Humans: start with this README and [Start a new project](docs/new-project.md), then [examples/README.md](examples/README.md) and [examples/smoke/STACK.md](examples/smoke/STACK.md). Reviewing agent PRs: [docs/review-guide.md](docs/review-guide.md).
 
 Agents: start with [AGENTS.md](AGENTS.md), then use [agent-context.json](agent-context.json) or [llms.txt](llms.txt) to route by task. Read [llms-full.txt](llms-full.txt) only when deeper context is needed. Agent operation rules live in [docs/agent-factory.md](docs/agent-factory.md).
 

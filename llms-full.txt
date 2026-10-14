@@ -13,6 +13,8 @@
 - New project: docs/new-project.md
 - Security Model: docs/security-model.md
 - Agent Factory: docs/agent-factory.md
+- Error Design: docs/errors.md
+- Review Guide: docs/review-guide.md
 
 ## Route by task
 
@@ -28,6 +30,9 @@
 - **UI / shadcn component or block** → docs/recipes.md, skills/fenod-stack/SKILL.md, examples/smoke/components.json, examples/smoke/oxlint.config.ts
 - **slow data loading / D1 N+1 / Router cache** → docs/recipes.md, docs/gotchas.md, docs/security-model.md
 - **TanStack Start / D1 reference** → examples/smoke/STACK.md, examples/smoke/package.json
+- **errors / error messages / HTTP status / retry** → docs/errors.md
+- **PR / review packet / completion report** → docs/review-guide.md, docs/agent-operating-contract.md
+- **Effect lane (project STACK.md says Lane: effect)** → docs/effect-lane.md, docs/errors.md, docs/review-guide.md
 
 ## Core defaults
 
@@ -62,6 +67,9 @@ Handbook root: `pnpm check && pnpm test`. Reference apps: `pnpm --dir examples/s
 5. `docs/recipes.md`
 6. `docs/security-model.md` when touching auth, secrets, Cloudflare, or email
 7. `docs/new-project.md` when starting or setting up a client project
+8. `docs/errors.md` before adding or changing errors, error messages, HTTP statuses, or retry logic
+9. `docs/review-guide.md` before opening a PR
+10. `docs/effect-lane.md` only when the project `STACK.md` says `Lane: effect`
 
 Do not load old Starlight pages, French translations, or `code-patterns`.
 
@@ -77,10 +85,12 @@ Do not load old Starlight pages, French translations, or `code-patterns`.
 - Agents **push Git**. They do not `wrangler deploy` / `cf deploy` / `alchemy deploy` to staging/prod; the same authority rules cover remote resource commands.
 - Mutation → `invalidateQueries`. No Convex. No live DO without a written multi-user trigger.
 - `wrangler types`. Dates `>= 2026-08-04` already include `nodejs_compat`. Observability on every Worker.
+- Fast-moving libraries (TanStack Start, ORPC, Better Auth, Alchemy v2, Effect) drift from training data: read the installed types/source in `node_modules` before using an API you are not sure of.
+- No `as` casts (except `as const`), no `any`, no non-null `!` without a stated reason in the review packet. Parse unknown input once at its boundary.
 
 ## Do not
 
-npm/yarn, Nub as PM, Bun/Deno as baseline, Prisma, Postgres (until trigger), Express, tRPC, Redis, ESLint/Prettier/Biome/Ultracite, Drizzle v1 RC, new Pages projects, day-one Alchemy, day-one monorepo.
+npm/yarn, Nub as PM, Bun/Deno as baseline, Prisma, Postgres (until trigger), Express, tRPC, Redis, ESLint/Prettier/Biome/Ultracite, Drizzle v1 RC, new Pages projects, day-one Alchemy, day-one monorepo, Effect outside the opt-in Effect lane, Effect in client deliverables.
 
 ## Done
 
@@ -94,7 +104,7 @@ pnpm --dir examples/astro ship
 
 `pnpm check` is read-only. After editing context sources, run `pnpm llms:build` explicitly and review generated changes. Product repos retain `pnpm lint && pnpm typecheck && pnpm test` in their own directory.
 
-Report: files changed, verification run, warnings, not done, whether prod action is still required.
+Report: files changed, verification run, warnings, not done, whether prod action is still required. In a PR, write the full review packet from `docs/review-guide.md`.
 
 
 ---
@@ -104,7 +114,7 @@ Report: files changed, verification run, warnings, not done, whether prod action
 ---
 title: "Stack Contract"
 description: "Law for Fenod stack defaults. Other pages explain; this page resolves conflicts."
-verified: 2026-10-11
+verified: 2026-10-14
 ---
 
 This page is **law**. If another page is longer, newer-looking, or more detailed, this page still wins unless a project `STACK.md` / repo AGENTS explicitly overrides a line.
@@ -158,6 +168,9 @@ One-liner:
 | Browser tests | **Playwright** for real UI flows |
 | Bundler | **Vite 8 + Rolldown** for new projects; `rolldown-vite` only as a Vite 7 bridge |
 | Internal packages | **tsdown** when a package must build artifacts |
+| Errors | Typed, explicit translation, one public envelope with `requestId` and truthful `retryable`: [errors.md](errors.md) |
+| Review | Agents write a review packet in every PR: [review-guide.md](review-guide.md) |
+| Effect | Not default. Opt-in **Effect lane** for own-product backends only, via `Lane: effect` in project `STACK.md`: [effect-lane.md](effect-lane.md) (pilot, plan 011) |
 
 ### Do not use by default
 
@@ -181,6 +194,7 @@ One-liner:
 - plaintext secrets in Git, prompts, issues, or client bundles
 - Drizzle v1 RC on client work before a written migration plan
 - unreviewed major upgrades of auth / RPC / ORM
+- Effect in client deliverables, or anywhere outside the opt-in Effect lane
 
 ## Shape
 
@@ -386,6 +400,8 @@ Add `pnpm build`, `pnpm audit --audit-level high`, Playwright, and browser check
 - anything not done
 - whether production action is still required
 
+When the work lands as a PR, the description carries the full review packet from [review-guide.md](review-guide.md), including what was not verified.
+
 
 ---
 
@@ -515,7 +531,7 @@ Use stable TypeScript 7 `tsc` for typechecks. Do not retain `@typescript/native-
 
 ## Alchemy Is Not Default Deploy
 
-Default is Wrangler or Workers Builds Git-connect. Shared resources, stages/previews and ownership needs are reasons to **evaluate Alchemy 2**, not automatic adoption thresholds. It is still beta: pin a pilot and prove adoption, isolation and state recovery before client production. One CMS Worker + D1/R2 does not force Alchemy. Package is `alchemy`; use current v2 docs. IaC mode supports ordinary app handlers; integrated Effect runtime is optional. See [Cloudflare tooling](cloudflare-tooling.md).
+Default is Wrangler or Workers Builds Git-connect. Shared resources, stages/previews and ownership needs are reasons to **evaluate Alchemy 2**, not automatic adoption thresholds. It is still beta: pin a pilot and prove adoption, isolation and state recovery before client production. One CMS Worker + D1/R2 does not force Alchemy. Package is `alchemy`; use current v2 docs. IaC mode supports ordinary app handlers; integrated Effect runtime is optional. Effect application code belongs only in the opt-in [Effect lane](effect-lane.md). See [Cloudflare tooling](cloudflare-tooling.md).
 
 Do not Git-connect Workers that Alchemy owns. Cloudflare would deploy one script and skip Alchemy state/bindings.
 
@@ -1078,3 +1094,184 @@ Use DeepSec for high-risk change reviews, not every edit. Its local scan phase i
 3. Schedule a full scan only for security-sensitive repositories or monthly maintenance.
 
 Never expose model/gateway credentials to fork PR code. If CI is later enabled, split untrusted analysis from any PR-comment/write job and gate secret-bearing runs to trusted contributors or an explicit maintainer label.
+
+
+---
+
+# Error Design
+
+---
+title: "Error Design"
+description: "How Fenod code names, carries, translates, and shows failures. Applies to every lane."
+verified: 2026-10
+---
+
+Errors are part of the product interface and of observability. A good error lets a person or an agent understand what happened, decide what to do next, and find the matching trace, without leaking internals.
+
+Adapted from Dillon Mulroy's [`cf-workflow-pool/docs/errors.md`](https://github.com/dmmulroy/cf-workflow-pool/blob/main/docs/errors.md). Applies to the default lane (Start server functions, Hono + ORPC) and to the opt-in [Effect lane](effect-lane.md).
+
+## Messages
+
+Every error message does three things:
+
+1. **Says what failed.** Name the operation and the most specific safe reason known. Never `Something went wrong` when the cause is classified.
+2. **Says what to do next.** One of: fix the input and retry; retry the same operation (only when that is safe); check or reconcile the named resource when the outcome is unknown; contact support with the `requestId`.
+3. **Only reassures when it can prove it.** Say "nothing was charged" only if the failed operation could not have charged. Across non-atomic steps, say the outcome is unknown and point to the resource to check.
+
+Tone is calm and direct. No jokes, no blame, no stack traces, no SQL, no vendor names, no internal service names in public messages.
+
+```text
+Good: Booking bk_… was not found. Check the booking link and try again.
+Bad:  Something went wrong.
+Bad:  D1_ERROR: no such row in bookings
+```
+
+## Language
+
+- `code` and server-side `message` are English: stable, searchable in the source, readable by agents and API consumers.
+- The UI never shows a raw server `message` to end users. It maps `code` to French copy (or the client's locale). Unknown codes fall back to one generic French message that includes the `requestId`.
+
+## Retry
+
+`retryable` is true only when repeating the **same logical operation** cannot create a second one: idempotent by design, or protected by an idempotency key. If the operation may have partly happened, `retryable` is false and the message says what to check.
+
+## Context carried by an error
+
+Typed fields, not prose to parse:
+
+- stable code (or Effect `_tag`)
+- operation that failed
+- safe domain IDs (`bookingId`, `invoiceId`)
+- classified `reason` as a literal union
+- field violations and accepted constraints for input errors
+- `retryable`
+- `requestId` at public boundaries
+
+Details are typed per code. No free-form `Record<string, unknown>` that lets a code and its details disagree.
+
+## Public envelope
+
+Every public failure has the same shape:
+
+```json
+{
+  "code": "BookingNotFound",
+  "message": "Booking bk_123 was not found. Check the booking link and try again.",
+  "details": { "bookingId": "bk_123" },
+  "requestId": "8c1f2a9e4b7d6c3a",
+  "retryable": false
+}
+```
+
+Over ORPC the error JSON is `{ defined, code, status, message, data }`. Put `details`, `requestId` and `retryable` inside `data`, typed per code.
+
+## requestId
+
+One per request. Use the `cf-ray` header when present, else `crypto.randomUUID()`. Put it on every structured log line (Workers Observability), on Sentry events when Sentry is enabled, and in every public error.
+
+## HTTP status
+
+Pick the status from what the caller sees, not from what broke inside:
+
+| Status | Meaning |
+|---|---|
+| 400 | caller can fix the request data |
+| 401 | not authenticated |
+| 403 | authenticated, not allowed |
+| 404 | valid ID, unknown resource |
+| 409 | current state conflicts with the operation |
+| 429 | rate limited; include when to retry |
+| 500 | internal invariant or non-transient internal failure |
+| 503 | a dependency is temporarily unavailable |
+
+## Never in public output
+
+Credentials, tokens, JWT claims, session data, raw request bodies, SQL, stack traces, vendor response bodies, schema parse issues that echo input. Redaction keeps the operation and the requested ID.
+
+## Translate explicitly
+
+Every **expected** failure gets a deliberate decision: code, status, message, details, `retryable`. A new failure type must force that decision instead of falling into a generic bucket.
+
+**Default lane**
+
+- Start server functions (the default): return a typed outcome for expected failures, `{ ok: true; value: T } | { ok: false; reason: <literal union> }`, as `ItemOutcome` in `examples/smoke/src/server/items.ts`. Throw only for defects.
+- ORPC, only when the app has an API boundary: declare expected failures with `.errors({ BookingNotFound: { status: 404, data: z.object({...}) } })` and throw `errors.BookingNotFound({ message, data })`. Clients branch with `isDefinedError`.
+- One outermost handler (Hono `onError`, ORPC interceptor) turns **unexpected** throws into `500 InternalError` with a `requestId` and logs the cause. That handler never maps an unknown throw to a specific domain code.
+
+**Effect lane**
+
+Each failure is a `Schema.TaggedError`. Translate with `Effect.catchTag` / `Effect.catchTags`, listing each tag. No catch-all: an unhandled tag stays in the error type until someone decides how to translate it. See [effect-lane.md](effect-lane.md).
+
+Before writing against ORPC or Effect error APIs, read the installed types in `node_modules`. Both move faster than training data.
+
+## Review checklist
+
+1. Does it name the operation and the most specific safe reason?
+2. Does it carry typed context instead of prose?
+3. Does it tell the caller how to fix, retry, check, or escalate?
+4. Are reassurance and `retryable` provably true?
+5. Is the tone calm, without blame or internal jargon?
+6. Can the code or message be found with one search in the source?
+7. Does the public error carry a `requestId` that matches a log line?
+8. Are secrets, private causes, and raw external data kept out?
+9. Was every boundary translated on purpose, with no generic catch-all for expected failures?
+
+
+---
+
+# Review Guide
+
+---
+title: "Review Guide"
+description: "Agents write the code, the maintainer reviews it. What agents put in every PR, and how the maintainer reads it."
+verified: 2026-10
+---
+
+Fenod code is written by agents and reviewed by the maintainer. Review time is the bottleneck, so agents hand over a **review packet** and the maintainer reads in a fixed order, from cheapest to most expensive. Applies to every lane.
+
+## Review packet (agent, in every PR description)
+
+Short, factual, no marketing. Sections with nothing to report say `none`.
+
+1. **Intent.** One or two sentences: what changes for the user or the system.
+2. **Public surface.** Every new or changed exported signature, schema, route, ORPC procedure, or Effect service interface, copied as code.
+3. **Boundaries.** Where unknown data is now parsed (`file:line`) and with which schema.
+4. **Errors.** New or changed codes / tags: status, `retryable`, where translated. Checked against [errors.md](errors.md).
+5. **Assertions and suppressions.** Every `as` (other than `as const`), `SAFETY` block, `oxlint-disable`, `@ts-expect-error`, with its reason. Target: none.
+6. **Dependencies.** Added or upgraded packages, new bindings, new secrets names, new Layers (Effect lane).
+7. **Tests.** Test names added or changed, and the behavior each one pins.
+8. **Verification run.** Commands and results.
+9. **Not verified.** What the agent could not check and why: the riskiest assumption, stated plainly. "Everything verified" is only allowed when it is literally true.
+10. **Production action.** Migrations, secrets, DNS, deploys still needed by a human.
+
+## Reading order (maintainer)
+
+Stop as soon as something is wrong and send it back.
+
+1. **Packet.** If it is missing, vague, or contradicts the diff, request changes without reading code.
+2. **CI.** Red CI means no review.
+3. **Types and schemas.** Read only signatures, schemas, error definitions. Do they say what the intent says?
+4. **Error translation sites.** Explicit per code or tag, no catch-all for expected failures.
+5. **Test names.** Do they cover the intent and the "not verified" item?
+6. **Bodies, only where needed.** The "not verified" item, anything section 5 of the packet lists, and the always-read list below.
+
+## Always read in full
+
+- auth, sessions, permissions, multi-tenant filters
+- payments, invoices, anything with money
+- data deletion, D1 migrations, backfills
+- secrets handling, AI tools that act (send, delete, pay), prompt-injection exposure
+- anything the packet marks as uncertain
+
+## Send back without discussion
+
+- a cast, `any`, or `!` without a `SAFETY` block (Effect lane) or a stated reason (default lane)
+- a catch-all that turns expected failures into one generic error
+- parsing the same value twice, or untyped data passed past its boundary
+- a new dependency, stack choice, or architecture shape not asked for
+- tests that only restate a schema or only assert that a mock was called
+- a public error message with internals, or a `retryable: true` that is not provably safe
+
+## Keeping review cheap over time
+
+When the same comment appears twice, turn it into a lint rule, a type, or a line in the matching doc. Prose is for judgment calls. Anything mechanical belongs in Oxlint or TypeScript.

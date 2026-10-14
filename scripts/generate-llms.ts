@@ -16,6 +16,8 @@ const docs = [
   ["New project", "docs/new-project.md"],
   ["Security Model", "docs/security-model.md"],
   ["Agent Factory", "docs/agent-factory.md"],
+  ["Error Design", "docs/errors.md"],
+  ["Review Guide", "docs/review-guide.md"],
 ] as const;
 
 const routes = [
@@ -103,6 +105,18 @@ const routes = [
   {
     task: "TanStack Start / D1 reference",
     read: ["examples/smoke/STACK.md", "examples/smoke/package.json"],
+  },
+  {
+    task: "errors / error messages / HTTP status / retry",
+    read: ["docs/errors.md"],
+  },
+  {
+    task: "PR / review packet / completion report",
+    read: ["docs/review-guide.md", "docs/agent-operating-contract.md"],
+  },
+  {
+    task: "Effect lane (project STACK.md says Lane: effect)",
+    read: ["docs/effect-lane.md", "docs/errors.md", "docs/review-guide.md"],
   },
 ] as const;
 
