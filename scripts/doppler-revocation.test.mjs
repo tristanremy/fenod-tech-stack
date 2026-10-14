@@ -8,22 +8,38 @@ test("input diagnostics distinguish missing token, malformed token and non-TTY w
   assert.match(inputError(undefined, true), /DOPPLER_TOKEN is empty/);
   assert.match(inputError("", true), /DOPPLER_TOKEN is empty/);
   assert.match(inputError("wrong-private-value", true), /service-token format/);
-  assert.match(inputError(" dp.st.dev.synthetic", true), /service-token format/);
-  assert.match(inputError("dp.st.dev.synthetic\n", true), /service-token format/);
-  assert.match(inputError("dp.st.dev.synthetic", undefined), /stdin is not interactive/);
+  assert.match(
+    inputError(" dp.st.dev.synthetic", true),
+    /service-token format/,
+  );
+  assert.match(
+    inputError("dp.st.dev.synthetic\n", true),
+    /service-token format/,
+  );
+  assert.match(
+    inputError("dp.st.dev.synthetic", undefined),
+    /stdin is not interactive/,
+  );
   assert.equal(inputError("dp.st.dev.synthetic", true), null);
-  assert.doesNotMatch(inputError("wrong-private-value", true), /wrong-private-value/);
+  assert.doesNotMatch(
+    inputError("wrong-private-value", true),
+    /wrong-private-value/,
+  );
 });
 
 test("CLI reports the exact local preflight failure without contacting Doppler", () => {
-  const script = fileURLToPath(new URL("./doppler-revocation.mjs", import.meta.url));
+  const script = fileURLToPath(
+    new URL("./doppler-revocation.mjs", import.meta.url),
+  );
   for (const [token, expected] of [
     ["", /DOPPLER_TOKEN is empty/],
     ["synthetic-wrong-value", /service-token format/],
     ["dp.st.dev.synthetic-test-only", /stdin is not interactive/],
   ]) {
     const result = spawnSync(process.execPath, [script], {
-      env: { DOPPLER_TOKEN: token }, encoding: "utf8", timeout: 5000,
+      env: { DOPPLER_TOKEN: token },
+      encoding: "utf8",
+      timeout: 5000,
     });
     assert.equal(result.status, 1);
     assert.equal(result.stdout, "");

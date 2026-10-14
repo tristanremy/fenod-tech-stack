@@ -29,7 +29,7 @@ Do not run the entire optional toolbox on every one-line fix. Prefer repo script
 ## Lint / format law
 
 | Tool | Role |
-|------|------|
+| ------ | ------ |
 | **Oxlint** | lint — React plugin + `correctness` (React Compiler rules). Never `react/react-compiler`. |
 | **Oxfmt** | format |
 | **@shadcn/lint** | Oxlint JS plugin for Tailwind design systems; start with `no-restyle`, layout allowed. See `docs/recipes.md`. |
@@ -60,7 +60,7 @@ Low value: pure presentational UI (manual/browser often cheaper).
 ## Tooling posture
 
 | Tool | Status |
-|------|--------|
+| ------ | -------- |
 | Node 24, pnpm, Vite 8, Vitest 5, Oxlint, Oxfmt, TypeScript 7, Playwright | default |
 | `rolldown-vite` | Vite 7 bridge only |
 | `tsdown` | internal package builds |
@@ -76,7 +76,7 @@ Renovate or Dependabot + `pnpm audit --audit-level high` in product repos. Pin C
 Paths below are relative to the handbook root.
 
 | Need | Read |
-|------|------|
+| ------ | ------ |
 | Law / toolchain | `docs/stack-contract.md` |
 | Verification scripts | `examples/smoke/package.json`, `examples/astro/package.json` |
 | D1 and performance tests | `docs/recipes.md` |

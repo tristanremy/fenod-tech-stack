@@ -14,7 +14,7 @@ description: Fenod's opinionated stack for building web apps, sites, and APIs. U
 ## Decision matrix
 
 | Need | Stack | Deploy |
-|------|-------|--------|
+| ------ | ------- | -------- |
 | Full-stack app | TanStack Start (+ Hono/ORPC when API boundary needs it) + Drizzle + D1 + Better Auth | CF Workers |
 | Developer-maintained content + SEO | Astro | CF Workers static assets |
 | Direct client content editing | Astro + EmDash candidate; supported CMS database/auth adapters | CF Workers SSR + D1 + R2 |
@@ -58,7 +58,7 @@ pnpm dlx @tanstack/cli@latest create my-app \
 ## Grow on triggers only
 
 | Trigger | Add |
-|---------|-----|
+| --------- | ----- |
 | API boundary / non-UI clients | Hono + ORPC |
 | Thick feature API | slices: `router.ts` thin, `service.ts` + Drizzle direct |
 | Second deployable / shared package | monorepo |
@@ -90,7 +90,7 @@ No hexagonal. No repository interfaces around Drizzle without pain.
 Resolve `docs/<slug>.md` in this repo.
 
 | Need | Read |
-|------|------|
+| ------ | ------ |
 | Law | `docs/stack-contract.md` |
 | Agent entry | `AGENTS.md` |
 | Gotchas | `docs/gotchas.md` |

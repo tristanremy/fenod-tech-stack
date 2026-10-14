@@ -44,7 +44,9 @@ function ignoredPaths(paths) {
 
 test("secret and local-state files are ignored in every exportable example", () => {
   const ignored = ignoredPaths(MUST_BE_IGNORED);
-  const missing = MUST_BE_IGNORED.filter((candidate) => !ignored.has(candidate));
+  const missing = MUST_BE_IGNORED.filter(
+    (candidate) => !ignored.has(candidate),
+  );
   assert.deepEqual(missing, [], "these paths would be committed by mistake");
 });
 

@@ -34,7 +34,8 @@ export function inputError(token, isTTY) {
   if (!token.startsWith("dp.st.") || /\s/.test(token)) {
     return "STOP: service-token format invalid (expected dp.st. prefix, no spaces/newlines).";
   }
-  if (!isTTY) return "STOP: stdin is not interactive. Run directly in a terminal without a pipe or redirection.";
+  if (!isTTY)
+    return "STOP: stdin is not interactive. Run directly in a terminal without a pipe or redirection.";
   return null;
 }
 

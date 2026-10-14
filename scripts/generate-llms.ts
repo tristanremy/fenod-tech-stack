@@ -1,77 +1,177 @@
-import { access, readFile, writeFile } from 'node:fs/promises';
-import process from 'node:process';
+import { access, readFile, writeFile } from "node:fs/promises";
+import process from "node:process";
 
-const checkOnly = process.argv.includes('--check');
+const checkOnly = process.argv.includes("--check");
 
 const coreDefaults =
-  'Node 24, pnpm, TanStack Start on Cloudflare Workers, static Astro for developer-maintained marketing/content; Astro+EmDash candidate for client editing with a bounded CMS database/auth exception and pilot gate, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler baseline; optional cf beta toolbox and conditional Alchemy 2 pinned pilot, Infisical+Worker secrets, Oxlint+Oxfmt+@shadcn/lint, TypeScript 7 tsc, Vitest, Playwright.';
+  "Node 24, pnpm, TanStack Start on Cloudflare Workers, static Astro for developer-maintained marketing/content; Astro+EmDash candidate for client editing with a bounded CMS database/auth exception and pilot gate, Start server functions first then Hono+ORPC when needed, Drizzle 0.4x+D1, Better Auth, Tailwind v4+shadcn/ui, Wrangler baseline; optional cf beta toolbox and conditional Alchemy 2 pinned pilot, Infisical+Worker secrets, Oxlint+Oxfmt+@shadcn/lint, TypeScript 7 tsc, Vitest, Playwright.";
 
 const docs = [
-  ['Agent entry', 'AGENTS.md'],
-  ['Stack Contract', 'docs/stack-contract.md'],
-  ['Agent Operating Contract', 'docs/agent-operating-contract.md'],
-  ['Gotchas', 'docs/gotchas.md'],
-  ['Recipes', 'docs/recipes.md'],
-  ['Astro content sites', 'docs/astro.md'],
-  ['New project', 'docs/new-project.md'],
-  ['Security Model', 'docs/security-model.md'],
-  ['Agent Factory', 'docs/agent-factory.md'],
+  ["Agent entry", "AGENTS.md"],
+  ["Stack Contract", "docs/stack-contract.md"],
+  ["Agent Operating Contract", "docs/agent-operating-contract.md"],
+  ["Gotchas", "docs/gotchas.md"],
+  ["Recipes", "docs/recipes.md"],
+  ["Astro content sites", "docs/astro.md"],
+  ["New project", "docs/new-project.md"],
+  ["Security Model", "docs/security-model.md"],
+  ["Agent Factory", "docs/agent-factory.md"],
 ] as const;
 
 const routes = [
-  { task: 'Astro / content site / SEO / JSON-LD / responsive images', read: ['docs/astro.md', 'examples/astro/README.md', 'examples/astro/package.json'] },
-  { task: 'client content editing / CMS / EmDash / draft preview / publishing', read: ['docs/astro-emdash.md', 'docs/astro.md', 'docs/security-model.md'] },
-  { task: 'Cloudflare CLI / cf migration / Alchemy 2 / infrastructure lifecycle', read: ['docs/cloudflare-tooling.md', 'docs/agent-operating-contract.md', 'skills/fenod-cloudflare-deploy/SKILL.md'] },
-  { task: 'new project / getting started / first deploy / repo and Cloudflare setup', read: ['docs/new-project.md', 'examples/smoke/README.md', 'docs/environment-secrets.md'] },
-  { task: 'new app / architecture / stack choice', read: ['docs/stack-contract.md', 'skills/fenod-stack/SKILL.md', 'examples/smoke/STACK.md'] },
-  { task: 'deploy / Cloudflare / secrets / D1 migration', read: ['docs/agent-operating-contract.md', 'docs/security-model.md', 'skills/fenod-cloudflare-deploy/SKILL.md'] },
-  { task: 'AI feature / coding agent / eval / sandbox', read: ['docs/agent-factory.md', 'docs/agent-evals.md', 'docs/security-model.md'] },
-  { task: 'auth / permissions / sensitive data', read: ['docs/security-model.md', 'docs/agent-operating-contract.md', 'examples/smoke/src/lib/auth.ts'] },
-  { task: 'test / lint / typecheck / refactor', read: ['skills/fenod-quality/SKILL.md', 'examples/smoke/package.json'] },
-  { task: 'UI / shadcn component or block', read: ['docs/recipes.md', 'skills/fenod-stack/SKILL.md', 'examples/smoke/components.json', 'examples/smoke/oxlint.config.ts'] },
-  { task: 'slow data loading / D1 N+1 / Router cache', read: ['docs/recipes.md', 'docs/gotchas.md', 'docs/security-model.md'] },
-  { task: 'TanStack Start / D1 reference', read: ['examples/smoke/STACK.md', 'examples/smoke/package.json'] },
+  {
+    task: "Astro / content site / SEO / JSON-LD / responsive images",
+    read: [
+      "docs/astro.md",
+      "examples/astro/README.md",
+      "examples/astro/package.json",
+    ],
+  },
+  {
+    task: "client content editing / CMS / EmDash / draft preview / publishing",
+    read: [
+      "docs/astro-emdash.md",
+      "docs/astro.md",
+      "docs/security-model.md",
+    ],
+  },
+  {
+    task: "Cloudflare CLI / cf migration / Alchemy 2 / infrastructure lifecycle",
+    read: [
+      "docs/cloudflare-tooling.md",
+      "docs/agent-operating-contract.md",
+      "skills/fenod-cloudflare-deploy/SKILL.md",
+    ],
+  },
+  {
+    task: "new project / getting started / first deploy / repo and Cloudflare setup",
+    read: [
+      "docs/new-project.md",
+      "examples/smoke/README.md",
+      "docs/environment-secrets.md",
+    ],
+  },
+  {
+    task: "new app / architecture / stack choice",
+    read: [
+      "docs/stack-contract.md",
+      "skills/fenod-stack/SKILL.md",
+      "examples/smoke/STACK.md",
+    ],
+  },
+  {
+    task: "deploy / Cloudflare / secrets / D1 migration",
+    read: [
+      "docs/agent-operating-contract.md",
+      "docs/security-model.md",
+      "skills/fenod-cloudflare-deploy/SKILL.md",
+    ],
+  },
+  {
+    task: "AI feature / coding agent / eval / sandbox",
+    read: [
+      "docs/agent-factory.md",
+      "docs/agent-evals.md",
+      "docs/security-model.md",
+    ],
+  },
+  {
+    task: "auth / permissions / sensitive data",
+    read: [
+      "docs/security-model.md",
+      "docs/agent-operating-contract.md",
+      "examples/smoke/src/lib/auth.ts",
+    ],
+  },
+  {
+    task: "test / lint / typecheck / refactor",
+    read: ["skills/fenod-quality/SKILL.md", "examples/smoke/package.json"],
+  },
+  {
+    task: "UI / shadcn component or block",
+    read: [
+      "docs/recipes.md",
+      "skills/fenod-stack/SKILL.md",
+      "examples/smoke/components.json",
+      "examples/smoke/oxlint.config.ts",
+    ],
+  },
+  {
+    task: "slow data loading / D1 N+1 / Router cache",
+    read: ["docs/recipes.md", "docs/gotchas.md", "docs/security-model.md"],
+  },
+  {
+    task: "TanStack Start / D1 reference",
+    read: ["examples/smoke/STACK.md", "examples/smoke/package.json"],
+  },
 ] as const;
 
-const llms = `# Fenod Stack\n\n> Agent-first Cloudflare TypeScript stack. Stack Contract is law. Proof: examples/smoke.\n\n## Read first\n\n${docs.map(([title, path]) => `- ${title}: ${path}`).join('\n')}\n\n## Route by task\n\n${routes.map(({ task, read }) => `- **${task}** → ${read.join(', ')}`).join('\n')}\n\n## Core defaults\n\n${coreDefaults}\n\n## Verification\n\nHandbook root: \`pnpm check && pnpm test\`. Reference apps: \`pnpm --dir examples/smoke ship\` and \`pnpm --dir examples/astro ship\`. Product repos: \`pnpm lint && pnpm typecheck && pnpm test\` (add build/browser checks for higher risk).\n`;
+const llms = `# Fenod Stack\n\n> Agent-first Cloudflare TypeScript stack. Stack Contract is law. Proof: examples/smoke.\n\n## Read first\n\n${docs.map(([title, path]) => `- ${title}: ${path}`).join("\n")}\n\n## Route by task\n\n${routes.map(({ task, read }) => `- **${task}** → ${read.join(", ")}`).join("\n")}\n\n## Core defaults\n\n${coreDefaults}\n\n## Verification\n\nHandbook root: \`pnpm check && pnpm test\`. Reference apps: \`pnpm --dir examples/smoke ship\` and \`pnpm --dir examples/astro ship\`. Product repos: \`pnpm lint && pnpm typecheck && pnpm test\` (add build/browser checks for higher risk).\n`;
 
 const context = {
   version: 1,
-  readFirst: ['AGENTS.md', 'docs/stack-contract.md', 'docs/agent-operating-contract.md'],
+  readFirst: [
+    "AGENTS.md",
+    "docs/stack-contract.md",
+    "docs/agent-operating-contract.md",
+  ],
   routes,
   defaults: coreDefaults,
-  verification: ['pnpm check', 'pnpm test', 'pnpm --dir examples/smoke ship', 'pnpm --dir examples/astro ship'],
-  forbidden: ['npm', 'yarn', 'new Pages projects', 'Redis', 'production deploys from agent sessions', 'real secrets in Git'],
+  verification: [
+    "pnpm check",
+    "pnpm test",
+    "pnpm --dir examples/smoke ship",
+    "pnpm --dir examples/astro ship",
+  ],
+  forbidden: [
+    "npm",
+    "yarn",
+    "new Pages projects",
+    "Redis",
+    "production deploys from agent sessions",
+    "real secrets in Git",
+  ],
 };
 
 // A route is useful only if its target exists in this checkout.
-for (const path of new Set([...context.readFirst, ...routes.flatMap(({ read }) => read)])) {
+for (const path of new Set([
+  ...context.readFirst,
+  ...routes.flatMap(({ read }) => read),
+])) {
   await access(path);
 }
 
 let full = `${llms}\n\n---\n\n# Full selected context\n`;
 for (const [title, path] of docs) {
-  const content = await readFile(path, 'utf8');
+  const content = await readFile(path, "utf8");
   full += `\n\n---\n\n# ${title}\n\n${content}`;
 }
 const outputs = [
-  ['llms.txt', llms],
-  ['agent-context.json', `${JSON.stringify(context, null, 2)}\n`],
-  ['llms-full.txt', full],
+  ["llms.txt", llms],
+  ["agent-context.json", `${JSON.stringify(context, null, 2)}\n`],
+  ["llms-full.txt", full],
 ] as const;
 
 for (const [path, content] of outputs) {
   if (checkOnly) {
-    const current = await readFile(path, 'utf8').catch((error: NodeJS.ErrnoException) => {
-      if (error.code === 'ENOENT') return undefined;
-      throw error;
-    });
+    const current = await readFile(path, "utf8").catch(
+      (error: NodeJS.ErrnoException) => {
+        if (error.code === "ENOENT") return undefined;
+        throw error;
+      },
+    );
     if (current !== content) {
-      console.error(`${path} is stale or missing; run pnpm llms:build and review the diff.`);
+      console.error(
+        `${path} is stale or missing; run pnpm llms:build and review the diff.`,
+      );
       process.exitCode = 1;
     }
   } else {
     await writeFile(path, content);
   }
 }
-console.log(checkOnly ? 'agent context comparison complete (read-only)' : 'generated agent context');
+console.log(
+  checkOnly
+    ? "agent context comparison complete (read-only)"
+    : "generated agent context",
+);

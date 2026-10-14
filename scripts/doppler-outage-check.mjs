@@ -139,7 +139,8 @@ try {
       );
       if (mode === "timeout") assert.ok(events.includes("timeout-aborted"));
       // Transient statuses must be retried, not fail on the first response.
-      if (mode === "rate-limited") assert.ok(events.length > 1, "429 was not retried");
+      if (mode === "rate-limited")
+        assert.ok(events.length > 1, "429 was not retried");
     }
     process.stdout.write(`PASS ${mode}\n`);
   };
