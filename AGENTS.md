@@ -32,7 +32,7 @@ Do not load old Starlight pages, French translations, or `code-patterns`.
 - Mutation → `invalidateQueries`. No Convex. No live DO without a written multi-user trigger.
 - `wrangler types`. Dates `>= 2026-08-04` already include `nodejs_compat`. Observability on every Worker.
 - Fast-moving libraries (TanStack Start, ORPC, Better Auth, Alchemy v2, Effect) drift from training data: read the installed types/source in `node_modules` before using an API you are not sure of.
-- No `as` casts (except `as const`), no `any`, no non-null `!` without a stated reason in the review packet. Parse unknown input once at its boundary.
+- No `as` casts (except `as const`), no `any`, no non-null `!`: Oxlint enforces it (installed `src/components/ui/**` is exempt). A proven exception gets the `SAFETY` / `Verified by` / disable-line block from `docs/effect-lane.md` §2 and is listed in the review packet. Parse unknown input once at its boundary.
 
 ## Do not
 

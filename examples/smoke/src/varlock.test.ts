@@ -16,6 +16,9 @@ const token = "test-only-internal-token-canary-never-in-the-app";
 function run(cwd: string, args: string[], overrides: Record<string, string | undefined> = {}) {
   return spawnSync(process.execPath, [cli, ...args], {
     cwd,
+    // SAFETY: Wrangler's generated ProcessEnv marks app keys as required; this child runs without them on purpose.
+    // Verified by: the missing/invalid config tests below, which fail if app keys leak into the child.
+    // oxlint-disable-next-line typescript/consistent-type-assertions
     env: {
       PATH: process.env.PATH,
       HOME: cwd,
@@ -132,6 +135,9 @@ it.each(["deploy", "db:remote"])("blocks the remote %s script", (script) => {
   try {
     const result = spawnSync("pnpm", ["run", script], {
       cwd: root,
+      // SAFETY: as in run(): the child deliberately has no app keys or credentials.
+      // Verified by: this test, which requires the remote script to fail without them.
+      // oxlint-disable-next-line typescript/consistent-type-assertions
       env: {
         PATH: process.env.PATH,
         HOME: home,

@@ -158,16 +158,7 @@ Every export gets JSDoc stating the sharpest fact the signature does not show: f
 
 ## Lint
 
-Add to the project Oxlint config (`oxlint.config.ts` in the starter):
-
-```ts
-plugins: ["react", "typescript"],
-rules: {
-  "typescript/consistent-type-assertions": ["error", { assertionStyle: "never" }],
-  "typescript/no-explicit-any": "error",
-  "typescript/no-non-null-assertion": "error",
-},
-```
+The starter's `oxlint.config.ts` already rejects casts, `any` and `!` in every lane, with installed shadcn source under `src/components/ui/**` exempt. Keep those rules when opting in.
 
 When the repo runs type-aware Oxlint, also turn on `typescript/no-unsafe-type-assertion` and `typescript/no-unnecessary-type-assertion`. The `make<X>` import rule has no lint rule yet; review checks it.
 

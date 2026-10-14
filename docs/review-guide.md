@@ -42,7 +42,7 @@ Stop as soon as something is wrong and send it back.
 
 ## Send back without discussion
 
-- a cast, `any`, or `!` without a `SAFETY` block (Effect lane) or a stated reason (default lane)
+- a cast, `any`, or `!` without a `SAFETY` block (Oxlint already rejects the bare form in every lane)
 - a catch-all that turns expected failures into one generic error
 - parsing the same value twice, or untyped data passed past its boundary
 - a new dependency, stack choice, or architecture shape not asked for
