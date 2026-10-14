@@ -22,25 +22,26 @@ The Stack Contract keeps Effect out of the default stack. This pilot tests it on
 
 ## Protocol
 
+0. **Readability check (30 minutes, before anything else).** An agent builds one small Effect service (about 200 lines: one boundary, two typed errors, one Layer). The maintainer reviews it from signatures, schemas and error translation only. If they cannot say what it does, what can fail and what it depends on within 30 minutes, stop here and record that as the finding: the lane only pays off for a reviewer who reads Effect signatures fluently.
 1. Opt the project in with `Lane: effect` in its `STACK.md`. Pin exact `effect` and `alchemy` versions; record them in the findings.
 2. Agents build the service with `docs/effect-lane.md`, `docs/errors.md`, and the review packet from `docs/review-guide.md`.
 3. For every PR in both lanes, record:
-   - maintainer minutes spent reviewing
-   - whether reading bodies was needed beyond the always-read list (yes / no)
-   - CI-red rounds before green
+   - whether reading bodies was needed beyond the always-read list (yes / no), and why
    - defects found after merge, within the timebox
    - agent errors caused by Effect API drift (wrong API from training data)
+   - maintainer review minutes, as context only
 4. **Timebox: 2 weeks.** If agents keep producing non-compiling Effect after the `node_modules` rule is in place, that is the finding: stop and write it up.
 
 ## Decision rule
 
-- **Adopt** the lane for own-product backends if median review time drops by 30% or more and post-merge defects do not rise.
+- **Adopt** the lane for own-product backends if the Effect PRs clearly needed fewer body reads and post-merge defects did not rise.
+- This is a recorded judgment, not a measurement: one service against one other over two weeks, assessed by the reviewer, cannot show a precise percentage. The baseline also improves, because errors, review packet and lint apply to both lanes.
 - **Stop** otherwise. Keep `docs/errors.md` and `docs/review-guide.md` either way: they are lane-agnostic.
 - Client work stays default lane whatever the result.
 
 ## Deliverable
 
-`plans/findings/011-effect-lane-pilot.md` with the numbers above, pinned versions, the three worst agent mistakes, and the verdict. Then update this plan's Status and the README table.
+`plans/findings/011-effect-lane-pilot.md` with the readability check result, the per-PR records above, pinned versions, the three worst agent mistakes, and the verdict. Then update this plan's Status and the README table.
 
 ## Gates
 

@@ -10,8 +10,10 @@ Fenod code is written by agents and reviewed by the maintainer. Review time is t
 
 Short, factual, no marketing. Sections with nothing to report say `none`.
 
+**Short form** for PRs that change no runtime code (docs, formatting, lockfile-only patch updates with a clean audit): Intent, Verification run, Not verified, Production action. Dependency upgrades that change a `package.json` version, config, or source use the full packet.
+
 1. **Intent.** One or two sentences: what changes for the user or the system.
-2. **Public surface.** Every new or changed exported signature, schema, route, ORPC procedure, or Effect service interface, copied as code.
+2. **Public surface.** Every new or changed exported signature, schema, route, ORPC procedure, or Effect service interface, as `file:line` with one line on what changed. The diff is the source of truth; do not paste code that can drift from it.
 3. **Boundaries.** Where unknown data is now parsed (`file:line`) and with which schema.
 4. **Errors.** New or changed codes / tags: status, `retryable`, where translated. Checked against [errors.md](errors.md).
 5. **Assertions and suppressions.** Every `as` (other than `as const`), `SAFETY` block, `oxlint-disable`, `@ts-expect-error`, with its reason. Target: none.

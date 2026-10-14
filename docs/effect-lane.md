@@ -83,9 +83,9 @@ A library internal may keep one assertion when TypeScript cannot express a prove
 
 Missing any of the three lines blocks the review.
 
-## 3. Optional values are `Option`
+## 3. Optional values
 
-Inside the application, optional means `Option.Option<A>`, never `null`, `undefined`, or `?:`. Decode nullable input with `Schema.OptionFromNullOr` at the boundary. Encode back only when an external contract needs `null`.
+Inside Effect services and domain types, an optional value is `Option.Option<A>`; decode nullable input with `Schema.OptionFromNullOr` where the service reads it. Keep `null` / `undefined` where Drizzle rows, JSON and React already use them. Do not convert back and forth just to satisfy this rule.
 
 ## 4. Errors are tagged, translated by tag
 
