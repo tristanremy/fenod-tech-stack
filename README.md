@@ -10,6 +10,8 @@ Opinionated defaults for building full-stack TypeScript products on Cloudflare W
 
 **New client project?** Follow [Start a new project](docs/new-project.md): every step from export to first deploy, marked agent or human.
 
+**Existing product?** Use [UPGRADING.md](UPGRADING.md): preserve project overrides, apply separate verified batches, and prove deployment guards/rollback before enabling direct-to-main delivery.
+
 ## The short version
 
 | Need | Default |

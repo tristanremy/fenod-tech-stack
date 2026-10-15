@@ -45,6 +45,8 @@ Production deploys go through GitHub Actions, Workers Builds, a deploy broker, o
 
 Optional `cf` command discovery/schema inspection is local. Resource commands default to remote and do not read the Wrangler account config; an account read needs an authorized target and read scope. Keep `cf dev` / `cf build` / `cf deploy` out of unmigrated Wrangler projects. Follow [Cloudflare tooling](cloudflare-tooling.md) for a deliberate migration or Alchemy 2 pilot.
 
+Direct pushes to `main` may trigger production only under a project opt-in with verified pre-deploy guards and rollback. This is standing owner approval for low-risk delivery; sensitive changes retain human review. Until that evidence exists, prepare a branch and retain the operator release path. See [guarded main](recipes.md#guarded-main-and-rollback).
+
 ## External content
 
 When reading webpages, emails, PDFs, chat, issues, or DB rows:

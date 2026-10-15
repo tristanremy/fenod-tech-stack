@@ -18,6 +18,7 @@
 
 ## Route by task
 
+- **upgrade existing project / guarded main / rollback / legacy Alchemy** → UPGRADING.md, docs/recipes.md, plans/012-existing-project-rollout.md
 - **Astro / content site / SEO / JSON-LD / responsive images** → docs/astro.md, examples/astro/README.md, examples/astro/package.json
 - **client content editing / CMS / EmDash / draft preview / publishing** → docs/astro-emdash.md, docs/astro.md, docs/security-model.md
 - **Cloudflare CLI / cf migration / Alchemy 2 / infrastructure lifecycle** → docs/cloudflare-tooling.md, docs/agent-operating-contract.md, skills/fenod-cloudflare-deploy/SKILL.md
@@ -114,7 +115,7 @@ Report: files changed, verification run, warnings, not done, whether prod action
 ---
 title: "Stack Contract"
 description: "Law for Fenod stack defaults. Other pages explain; this page resolves conflicts."
-verified: 2026-10-14
+verified: 2026-10-15
 ---
 
 This page is **law**. If another page is longer, newer-looking, or more detailed, this page still wins unless a project `STACK.md` / repo AGENTS explicitly overrides a line.
@@ -245,6 +246,16 @@ Before client production, prove edit → draft preview → publish → anonymous
 
 Resource counts are evaluation prompts, not automatic adoption rules. For Alchemy 2, first validate Node 24/pnpm, resource adoption without replacement, stage isolation, state backup/recovery and deployment ownership. IaC-only mode can keep a conventional app handler; integrated Effect runtime is optional. See [Cloudflare tooling](cloudflare-tooling.md) for both beta tooling pilots.
 
+### Existing project migrations
+
+Keep each project's pinned pnpm major/lockfile: supported existing pnpm 12 projects do not downgrade to the handbook reference's pnpm 10. Verify frozen installation/build-script policy before changing majors.
+
+Existing Alchemy 0.x/v1 projects retain their deployment owner under a recorded project override until a planned, tested migration. Never Git-connect those Workers or bypass ownership through another CLI. New infrastructure evaluates Alchemy 2. See the [later capm migration plan](../plans/012-existing-project-rollout.md#capm-alchemy-migration-later).
+
+For legacy lint debt, apply current rules to new files. Temporary exemptions list exact existing paths/rules and use a per-rule baseline that rejects new violations or growth; remove entries as repaired. No blanket project disable or compliance claim for exempted code. Until a ratchet exists, isolate the migration and report the gap. New assertions still require proven, documented exceptions.
+
+Apply [UPGRADING.md](../UPGRADING.md) in separate verified batches; preserve existing product architecture and data.
+
 ### Feature slices (when an API package exists)
 
 ```txt
@@ -299,6 +310,8 @@ A green ship gate says nothing about dependency safety; the merge gate includes 
 React Doctor, full monorepo pipelines, and extra scanners are optional merge aids when a repo configures them — not universal law on every edit.
 
 Production-impacting work also needs explicit approval and an audit trail.
+
+An owner may give standing approval for low-risk direct pushes to `main` after a project proves pre-deploy guards and rollback, and records that mode in `STACK.md`. Follow [guarded main](recipes.md#guarded-main-and-rollback). Auth/permissions, money, destructive operations, migrations, secrets and deployment ownership retain human review before production. Git-triggered delivery does not authorize agent Cloudflare CLI deployment.
 
 ## Documentation rules
 
@@ -368,6 +381,8 @@ env -u CLOUDFLARE_API_TOKEN wrangler whoami
 Production deploys go through GitHub Actions, Workers Builds, a deploy broker, or another path with resource-scoped credentials and approval gates. Agents push Git; they do not run `wrangler deploy`, `cf deploy` or `alchemy deploy` to staging/prod. The boundary also covers remote resource mutations through any CLI. Prefer Workers. One Worker may Git-connect. Alchemy-owned Workers must not also Git-connect. Pages only for already-connected legacy static/docs projects.
 
 Optional `cf` command discovery/schema inspection is local. Resource commands default to remote and do not read the Wrangler account config; an account read needs an authorized target and read scope. Keep `cf dev` / `cf build` / `cf deploy` out of unmigrated Wrangler projects. Follow [Cloudflare tooling](cloudflare-tooling.md) for a deliberate migration or Alchemy 2 pilot.
+
+Direct pushes to `main` may trigger production only under a project opt-in with verified pre-deploy guards and rollback. This is standing owner approval for low-risk delivery; sensitive changes retain human review. Until that evidence exists, prepare a branch and retain the operator release path. See [guarded main](recipes.md#guarded-main-and-rollback).
 
 ## External content
 
@@ -717,6 +732,19 @@ Workers Builds runs the checks; GitHub Actions keeps only what it must. Build mi
 Setup steps: the starter README's CI section (`examples/smoke/README.md`). Static Astro sites use the same split with `pnpm ship` as the build command. If minutes still exceed the plan, a drop-in runner (one `runs-on:` change) is cheaper than GitHub's hosted runners. It receives client code: check the client contract first. Never put self-hosted runners on public repos.
 
 ## Deploy an app
+
+### Guarded main and rollback
+
+Projects may opt into direct pushes to `main` for low-risk changes after owner approval and proof of these guards. Put the review packet in a commit-linked release record when there is no PR. Human review remains required for auth, permissions, financial behavior, destructive operations, migrations, secrets and deployment ownership.
+
+1. Run secret scan, lint/types/tests, audit, build and critical browser checks **before deployment**, on the same source revision. Workers Builds must run the required gate before its deploy command; an independent Actions scan or post-push local signoff can finish too late. Local hooks provide feedback, not enforcement.
+2. Prove on a disposable target that a failing check blocks publication. Select the exact production branch/Worker and serialize deployment so a stale run cannot publish over a newer one. Automatic releases must not skip checks.
+3. Record the previous known-good Worker version, source/artifact, schema compatibility, smoke checks and recovery operator. Rehearse code rollback, then fix/revert the failing Git revision to prevent redeployment. Pause automatic releases during recovery.
+4. Keep migrations reviewed and backward-compatible. Worker rollback does **not** restore D1, R2 or other resource data. Data recovery uses its separate approved procedure and recorded data-loss window. Verify health, sign-in and a representative authorized workflow afterward.
+
+Until platform evidence exists, retain the operator release path. A plain deploy cannot replace a migration-aware app's backup/migration/changelog orchestration. [Build/deploy stages](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/), [rollback limits](https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/).
+
+### Operator deployment
 
 **CI or a human-owned terminal only.** Agents push Git; they do not deploy or run remote D1 migrations.
 
@@ -1230,6 +1258,8 @@ verified: 2026-10
 Fenod code is written by agents and reviewed by the maintainer. Review time is the bottleneck, so agents hand over a **review packet** and the maintainer reads in a fixed order, from cheapest to most expensive. Applies to every lane.
 
 ## Review packet (agent, in every PR description)
+
+For an activated guarded-main project, put the same packet in a commit-linked release record when there is no PR. Low-risk changes use standing owner approval; sensitive changes still receive human review before production. See [guarded main](recipes.md#guarded-main-and-rollback).
 
 Short, factual, no marketing. Sections with nothing to report say `none`.
 

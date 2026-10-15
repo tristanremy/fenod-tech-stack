@@ -7,6 +7,14 @@
   ],
   "routes": [
     {
+      "task": "upgrade existing project / guarded main / rollback / legacy Alchemy",
+      "read": [
+        "UPGRADING.md",
+        "docs/recipes.md",
+        "plans/012-existing-project-rollout.md"
+      ]
+    },
+    {
       "task": "Astro / content site / SEO / JSON-LD / responsive images",
       "read": [
         "docs/astro.md",

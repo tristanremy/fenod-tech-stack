@@ -4,6 +4,8 @@ Plans are dated evidence and proposals, not authority. Current law is [the Stack
 
 ## Current
 
+- [012 — Existing-project rollout](012-existing-project-rollout.md): guarded-main delivery, per-project safety batches, production-site ownership, and capm's deferred Alchemy migration. **Approved direction; platform activation remains gated on evidence.**
+
 - [010 — Maintained starter and Doppler/Varlock pilot](010-maintained-starter.md): approved direction, in-place smoke evolution, local-first implementation batches, permission checkpoints, release gates and downstream maintenance. **S0–S3 delivered; S4 closed with documented limits; S5 partial, resources removed; S6 not promoted.** Next: close the acceptance gaps (deployed-artifact provenance, inventory before mutation, recovery) before any promotion.
 - [011 — Effect lane pilot](011-effect-lane-pilot.md): two-week, opt-in pilot of Effect for own-product backends, gated by a 30-minute readability check, judged by how often function bodies had to be read. **Proposed.** Client work stays in the default lane whatever the result.
 - [009 — Agent-first audit, September 2026](009-agent-first-audit.md): findings, source-backed dependency/platform review, Shadcn Lint integration, Jev pilot and sequenced acceptance gates. **Audit delivered; starter promotion blocked on documented gaps.**

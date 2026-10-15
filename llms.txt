@@ -18,6 +18,7 @@
 
 ## Route by task
 
+- **upgrade existing project / guarded main / rollback / legacy Alchemy** → UPGRADING.md, docs/recipes.md, plans/012-existing-project-rollout.md
 - **Astro / content site / SEO / JSON-LD / responsive images** → docs/astro.md, examples/astro/README.md, examples/astro/package.json
 - **client content editing / CMS / EmDash / draft preview / publishing** → docs/astro-emdash.md, docs/astro.md, docs/security-model.md
 - **Cloudflare CLI / cf migration / Alchemy 2 / infrastructure lifecycle** → docs/cloudflare-tooling.md, docs/agent-operating-contract.md, skills/fenod-cloudflare-deploy/SKILL.md

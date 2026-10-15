@@ -8,6 +8,8 @@ Fenod code is written by agents and reviewed by the maintainer. Review time is t
 
 ## Review packet (agent, in every PR description)
 
+For an activated guarded-main project, put the same packet in a commit-linked release record when there is no PR. Low-risk changes use standing owner approval; sensitive changes still receive human review before production. See [guarded main](recipes.md#guarded-main-and-rollback).
+
 Short, factual, no marketing. Sections with nothing to report say `none`.
 
 **Short form** for PRs that change no runtime code (docs, formatting, lockfile-only patch updates with a clean audit): Intent, Verification run, Not verified, Production action. Dependency upgrades that change a `package.json` version, config, or source use the full packet.

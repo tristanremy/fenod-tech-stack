@@ -1,7 +1,7 @@
 ---
 title: "Stack Contract"
 description: "Law for Fenod stack defaults. Other pages explain; this page resolves conflicts."
-verified: 2026-10-14
+verified: 2026-10-15
 ---
 
 This page is **law**. If another page is longer, newer-looking, or more detailed, this page still wins unless a project `STACK.md` / repo AGENTS explicitly overrides a line.
@@ -132,6 +132,16 @@ Before client production, prove edit → draft preview → publish → anonymous
 
 Resource counts are evaluation prompts, not automatic adoption rules. For Alchemy 2, first validate Node 24/pnpm, resource adoption without replacement, stage isolation, state backup/recovery and deployment ownership. IaC-only mode can keep a conventional app handler; integrated Effect runtime is optional. See [Cloudflare tooling](cloudflare-tooling.md) for both beta tooling pilots.
 
+### Existing project migrations
+
+Keep each project's pinned pnpm major/lockfile: supported existing pnpm 12 projects do not downgrade to the handbook reference's pnpm 10. Verify frozen installation/build-script policy before changing majors.
+
+Existing Alchemy 0.x/v1 projects retain their deployment owner under a recorded project override until a planned, tested migration. Never Git-connect those Workers or bypass ownership through another CLI. New infrastructure evaluates Alchemy 2. See the [later capm migration plan](../plans/012-existing-project-rollout.md#capm-alchemy-migration-later).
+
+For legacy lint debt, apply current rules to new files. Temporary exemptions list exact existing paths/rules and use a per-rule baseline that rejects new violations or growth; remove entries as repaired. No blanket project disable or compliance claim for exempted code. Until a ratchet exists, isolate the migration and report the gap. New assertions still require proven, documented exceptions.
+
+Apply [UPGRADING.md](../UPGRADING.md) in separate verified batches; preserve existing product architecture and data.
+
 ### Feature slices (when an API package exists)
 
 ```txt
@@ -186,6 +196,8 @@ A green ship gate says nothing about dependency safety; the merge gate includes 
 React Doctor, full monorepo pipelines, and extra scanners are optional merge aids when a repo configures them — not universal law on every edit.
 
 Production-impacting work also needs explicit approval and an audit trail.
+
+An owner may give standing approval for low-risk direct pushes to `main` after a project proves pre-deploy guards and rollback, and records that mode in `STACK.md`. Follow [guarded main](recipes.md#guarded-main-and-rollback). Auth/permissions, money, destructive operations, migrations, secrets and deployment ownership retain human review before production. Git-triggered delivery does not authorize agent Cloudflare CLI deployment.
 
 ## Documentation rules
 

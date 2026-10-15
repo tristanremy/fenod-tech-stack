@@ -154,6 +154,19 @@ Setup steps: the starter README's CI section (`examples/smoke/README.md`). Stati
 
 ## Deploy an app
 
+### Guarded main and rollback
+
+Projects may opt into direct pushes to `main` for low-risk changes after owner approval and proof of these guards. Put the review packet in a commit-linked release record when there is no PR. Human review remains required for auth, permissions, financial behavior, destructive operations, migrations, secrets and deployment ownership.
+
+1. Run secret scan, lint/types/tests, audit, build and critical browser checks **before deployment**, on the same source revision. Workers Builds must run the required gate before its deploy command; an independent Actions scan or post-push local signoff can finish too late. Local hooks provide feedback, not enforcement.
+2. Prove on a disposable target that a failing check blocks publication. Select the exact production branch/Worker and serialize deployment so a stale run cannot publish over a newer one. Automatic releases must not skip checks.
+3. Record the previous known-good Worker version, source/artifact, schema compatibility, smoke checks and recovery operator. Rehearse code rollback, then fix/revert the failing Git revision to prevent redeployment. Pause automatic releases during recovery.
+4. Keep migrations reviewed and backward-compatible. Worker rollback does **not** restore D1, R2 or other resource data. Data recovery uses its separate approved procedure and recorded data-loss window. Verify health, sign-in and a representative authorized workflow afterward.
+
+Until platform evidence exists, retain the operator release path. A plain deploy cannot replace a migration-aware app's backup/migration/changelog orchestration. [Build/deploy stages](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/), [rollback limits](https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/).
+
+### Operator deployment
+
 **CI or a human-owned terminal only.** Agents push Git; they do not deploy or run remote D1 migrations.
 
 ```bash
