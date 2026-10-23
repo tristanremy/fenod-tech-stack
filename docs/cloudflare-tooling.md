@@ -1,7 +1,7 @@
 ---
 title: "Cloudflare tooling"
 description: "Wrangler baseline, optional cf CLI, and conditional Alchemy 2 adoption."
-verified: 2026-10-11
+verified: 2026-10-23
 ---
 
 Follow the [Stack Contract](stack-contract.md) and [authority rules](agent-operating-contract.md). These are source-backed adoption recipes; this handbook has no tested `cf` migration or Alchemy 2 reference. Agents prepare local changes and push Git. Remote provisioning, deployments, migrations, DNS and deletion go through the approved CI/broker/operator flow, whichever CLI is used.
@@ -46,6 +46,8 @@ Do not run `cf dev`, `cf build` or `cf deploy` in an unmigrated Wrangler project
 ```bash
 pnpm dlx cf@1.0.0-beta.14 migrate --dry-run
 ```
+
+> **Warning: `cloudflare.config.ts` needs `@cloudflare/vite-plugin` v2 beta.** `@cloudflare/vite-plugin` 1.65.0 (2026-10-23) removed `experimental.newConfig` from v1. Vite plugin v1 now reads Wrangler configuration files only. A project that ran `cf migrate` and uses `cloudflare.config.ts` must move to the v2 beta of `@cloudflare/vite-plugin`; staying on v1 breaks its build on the next update. Projects that keep `wrangler.jsonc`, like the starter (`^1.63.1`), are unaffected. [Release notes](https://github.com/cloudflare/workers-sdk/releases/tag/%40cloudflare%2Fvite-plugin%401.65.0).
 
 If the migration is part of the task, run `migrate` locally and review the resulting `cloudflare.config.ts`, package/lockfile changes, modes, routes, resource IDs and binding names. Resolve generated TODOs, including manual DO migration/Workflow/Container work. Keep pnpm and pin the adopted CLI. Retain the Wrangler config while remaining Wrangler operations need it. [Migration procedure](https://developers.cloudflare.com/cf/wrangler/migrate/).
 
