@@ -883,7 +883,7 @@ Branch → change → `pnpm release` → push → PR. Workers Builds checks the 
 
 ---
 title: "Security Model"
-verified: 2026-10-11
+verified: 2026-10-23
 ---
 
 Security posture for secrets, Cloudflare, AI agents, user data, and production changes.
@@ -1037,7 +1037,7 @@ Production-impacting actions need at least one hard gate:
 - explicit `workflow_dispatch`
 - deploy broker approval
 - typed policy file validating target resources
-- backup/snapshot before destructive mutation
+- backup/snapshot before destructive mutation. A deleted D1 database can be restored (undelete) only within 7 days of deletion; older requests fail. Cloudflare does not document Time Travel as covering a deleted database, so do not rely on it for one. Beyond the 7-day window only your own backups protect you, e.g. `wrangler d1 export <db> --remote --output=backup.sql` ([undelete window](https://developers.cloudflare.com/changelog/post/2026-10-23-undelete-seven-day-window/))
 
 ## Security Checklist
 
