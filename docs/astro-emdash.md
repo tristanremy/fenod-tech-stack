@@ -1,19 +1,19 @@
 ---
 title: "Astro + EmDash client content"
 description: "Client editing on Workers, with supported CMS auth, publishing and recovery."
-verified: 2026-10-11
+verified: 2026-11-02
 ---
 
 Use **Astro + EmDash as the preferred candidate when clients need to edit and publish website content directly**. Keep static Astro for developer-maintained content. Follow the [Stack Contract](stack-contract.md); this recipe is source-backed, with a Fenod CMS pilot still pending. [`examples/astro`](../examples/astro/README.md) proves the static path only.
 
-EmDash's 1.x line is stable upstream. Pin a reviewed release and its adapters in the project lockfile; `create-emdash@1.2.0` is the scaffolder reviewed on 2026-10-11. [Stable announcement](https://blog.cloudflare.com/emdash-cms-plugin-registry/), [upstream project](https://github.com/emdash-cms/emdash).
+EmDash's 1.x line is stable upstream. Pin a reviewed release and its adapters in the project lockfile; `create-emdash@1.4.0` is the scaffolder reviewed on 2026-11-02. Target Astro 7.4.4 and `@astrojs/cloudflare` 14.4.3. [Stable announcement](https://blog.cloudflare.com/emdash-cms-plugin-registry/), [upstream project](https://github.com/emdash-cms/emdash).
 
 ## Start one CMS site
 
 Use Node 24 + pnpm in a new project directory:
 
 ```bash
-pnpm create emdash@1.2.0
+pnpm create emdash@1.4.0
 ```
 
 Choose **Cloudflare**, the appropriate starter/theme, and **pnpm**. Review generated package versions, scripts, ignored local files and bindings before starting development. For an existing Astro site, follow the [integration guide](https://docs.emdashcms.com/existing-project/) instead of replacing its theme. [Scaffolder](https://docs.emdashcms.com/getting-started/).
@@ -32,6 +32,16 @@ Developers own Astro templates, content fields and allowed blocks/sections. Clie
 
 For R2 images, use EmDash's supported image component/endpoint and verify the generated `IMAGES` binding. Build-time `astro:assets` fixtures do not prove CMS media delivery. Public pages must not depend on a visitor being signed into the protected media API. If using a public R2 media origin, restrict it to intended media objects: automatic JSON archives share the `backups/` prefix and must remain private. Check anonymous images/downloads and denied backup URLs. [Cloudflare image delivery](https://docs.emdashcms.com/deployment/cloudflare/#image-transformation), [storage boundary](https://docs.emdashcms.com/deployment/storage/#public-access).
 
+### Trim the admin nav for clients
+
+EmDash 1.4 adds the `hiddenNavItems` configuration option to simplify the admin UI for client users. Pass an array of nav item keys to hide:
+
+```typescript
+hiddenNavItems: ["settings", "plugins"]
+```
+
+Available keys: `"dashboard"`, `"content"`, `"media"`, `"settings"`, `"users"`, `"plugins"`. Hidden items are still accessible via direct URL if the user has permissions. Use this to keep the client interface focused on content and media. [Configuration](https://docs.emdashcms.com/reference/configuration/).
+
 For protected CMS admin, prefer EmDash's **supported Cloudflare Access adapter**:
 
 - Protect the complete `/_emdash/*` path, including the REST API. The public website stays public. Cover alternate Worker/preview hostnames too so the policy cannot be bypassed.
@@ -46,6 +56,20 @@ Access selects identities; CMS authorization still controls editing and publishi
 CMS-backed routes must render at request time and query **published** content. Saving a draft must not change the anonymous page. Preview access stays authenticated and preview responses stay out of shared caches. [Content queries](https://docs.emdashcms.com/guides/querying-content/), [preview mode](https://docs.emdashcms.com/guides/preview/).
 
 Publishing can update an SSR page without a code deploy; a prerendered route still needs rebuilding. Define and test public cache invalidation or a bounded TTL before promising immediate updates. Begin without extra public response caching, then add the supported caching path when needed. [Astro integration](https://docs.emdashcms.com/coming-from/astro/), [Cloudflare caching](https://docs.emdashcms.com/deployment/cloudflare/).
+
+### Set explicit Cache-Control on CMS pages
+
+**EmDash 1.4 removed the implicit `no-cache` header** that Astro previously set on CMS-rendered pages. Without an explicit `Cache-Control`, a freshly published page may be stale in the browser cache.
+
+Set a bounded TTL with revalidation on every CMS-backed route. The recommended header is:
+
+```
+Cache-Control: public, max-age=0, must-revalidate
+```
+
+This allows caching but forces revalidation on every navigation, so users see freshly published content after a refresh. Place it in Astro middleware or per-route `Astro.response.headers.set()`. For higher traffic, choose a small positive `max-age` and couple it with explicit cache purging after publish. Test that an anonymous browser sees the new content after publish without clearing its cache manually.
+
+Do not set `no-cache` or `no-store` on public pages: it disables shared caches and may hurt performance. The above header balances cache reuse with freshness.
 
 ## Prove handoff and recovery
 
