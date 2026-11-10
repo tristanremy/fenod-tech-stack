@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rybbit-proxy",
+  "main": "rybbit-worker.ts",
+  "compatibility_date": "2024-09-23",
+  "vars": {
+    "RYBBIT_HOST": "https://a.fno.ovh"
+  }
+}
