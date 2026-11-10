@@ -22,7 +22,7 @@ const docs = [
 
 const routes = [
   {
-    task: "upgrade existing project / guarded main / rollback / legacy Alchemy",
+    task: "upgrade existing project / push to main / rollback / legacy Alchemy",
     read: [
       "UPGRADING.md",
       "docs/recipes.md",

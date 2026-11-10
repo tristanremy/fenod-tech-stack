@@ -6,19 +6,21 @@ Follow [UPGRADING.md](../UPGRADING.md) in independent product repositories. No a
 
 ## Ordered delivery
 
-1. Release handbook guidance: existing pnpm 12 support, bounded lint migration, legacy Alchemy ownership and guarded-main acceptance.
+1. Release handbook guidance: existing pnpm 12 support, bounded lint migration, legacy Alchemy ownership and push-to-deploy acceptance.
 2. L'Épi Barbu safety: real overrides, no agent CLI release authority, redacted secret scan and operator recovery runbook. Keep runtime/dependencies separate. Enabling automatic production requires disposable-target gate/rollback evidence.
 3. Gwarell: preserve dirty trees; resolve production source before disabling the duplicate deploy path, then apply safety/runtime/toolchain/CI/lint batches separately.
 4. capm: preserve current Alchemy ownership and worktree history. Apply safety and Node 24 independently of infrastructure migration.
 
-## Guarded main acceptance
+## Push-to-deploy acceptance
+
+Pushing to `main` is always allowed (decision 2026-11-10). These checks apply only before a push to `main` deploys production.
 
 - A deliberately failing pre-deploy check leaves the deployed version unchanged on an isolated target.
 - Checks use the exact source revision/target and finish before publication. A stale concurrent run cannot publish after a newer release.
 - Secret scan, audit, critical browser flows and build are gates; a later GitHub status is not equivalent.
 - Record the previous known-good version, artifact/source revision, smoke checks and recovery operator. Rehearse rollback and prevent the failing Git revision immediately deploying again.
 - Expand/contract schema changes keep the previous app compatible. Database restore is a separate approved action with a recovery point and expected data-loss window, never an automatic response to an HTTP failure.
-- Until proven, retain the operator release path. Sensitive changes need human review; standing approval for low-risk guarded-main delivery is recorded in project `STACK.md` after activation.
+- Until proven, keep production deploys on the operator release path. Sensitive changes need human review.
 
 ## Gwarell production ownership
 

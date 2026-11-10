@@ -197,7 +197,7 @@ React Doctor, full monorepo pipelines, and extra scanners are optional merge aid
 
 Production-impacting work also needs explicit approval and an audit trail.
 
-An owner may give standing approval for low-risk direct pushes to `main` after a project proves pre-deploy guards and rollback, and records that mode in `STACK.md`. Follow [guarded main](recipes.md#guarded-main-and-rollback). Auth/permissions, money, destructive operations, migrations, secrets and deployment ownership retain human review before production. Git-triggered delivery does not authorize agent Cloudflare CLI deployment.
+Agents push directly to `main`. When that push deploys production, follow [push to main](recipes.md#push-to-main-and-rollback): auth/permissions, money, destructive operations, migrations, secrets and deployment ownership retain human review before production. Git-triggered delivery does not authorize agent Cloudflare CLI deployment.
 
 ## Documentation rules
 

@@ -10,7 +10,7 @@ Deliver one small change at a time, with its own verification and reversal instr
 
 ## 1. Deployment authority and recovery
 
-Replace agent instructions that authorize production CLI deployment with Git delivery to a gated pipeline. Projects can opt into **guarded direct pushes to main** for low-risk changes after the [deployment gate](docs/recipes.md#guarded-main-and-rollback) is verified. A PR is not mandatory for those changes. Auth, permissions, money, destructive operations, migrations, secrets and deployment ownership retain human review before production.
+Replace agent instructions that authorize production CLI deployment with Git delivery. Agents push directly to `main`; a PR is not required. If that push deploys production, verify the [deployment gate](docs/recipes.md#push-to-main-and-rollback) first. Auth, permissions, money, destructive operations, migrations, secrets and deployment ownership retain human review before production.
 
 Make automated agent deploy entries explicitly refuse with a nonzero status; retain documented operator recovery commands. Add a redacted secret scan locally and in CI. A scan-only GitHub job does not block an independent Workers Builds deployment: required checks must finish inside the deployment path before publication.
 
@@ -38,7 +38,7 @@ Pin Node and pnpm remotely. Run release checks before publication, not only in a
 
 New files use the current no-casts/`any`/non-null rules. Existing codebases use the [legacy baseline policy](docs/stack-contract.md#existing-project-migrations): exact existing files/rules, a ceiling that prevents new violations or growth, and entries removed as repaired. This is migration debt, not a compliance claim.
 
-Apply [error design](docs/errors.md) as affected boundaries change. Put the [review packet](docs/review-guide.md) in a PR or the guarded-main release record. Do not mass-rewrite stable business logic just to match a new example.
+Apply [error design](docs/errors.md) as affected boundaries change. Put the [review packet](docs/review-guide.md) in a PR, the commit message or a release record. Do not mass-rewrite stable business logic just to match a new example.
 
 ## Current rollout
 
