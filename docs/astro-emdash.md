@@ -1,22 +1,24 @@
 ---
 title: "Astro + EmDash client content"
 description: "Client editing on Workers, with supported CMS auth, publishing and recovery."
-verified: 2026-11-02
+verified: 2026-11-12
 ---
 
 Use **Astro + EmDash as the preferred candidate when clients need to edit and publish website content directly**. Keep static Astro for developer-maintained content. Follow the [Stack Contract](stack-contract.md); this recipe is source-backed, with a Fenod CMS pilot still pending. [`examples/astro`](../examples/astro/README.md) proves the static path only.
 
-EmDash's 1.x line is stable upstream. Pin a reviewed release and its adapters in the project lockfile; `create-emdash@1.4.0` is the scaffolder reviewed on 2026-11-02. Target Astro 7.4.4 and `@astrojs/cloudflare` 14.4.3. [Stable announcement](https://blog.cloudflare.com/emdash-cms-plugin-registry/), [upstream project](https://github.com/emdash-cms/emdash).
+EmDash's 1.x line is stable upstream. Pin a reviewed release and its adapters in the project lockfile; `create-emdash@1.5.0` is the scaffolder reviewed on 2026-11-12. Target Astro 7.4.11. **Pin `emdash` and `@emdash-cms/cloudflare` to the exact same version** (e.g., both `1.5.0`); a mismatched adapter makes npm install fail. [Stable announcement](https://blog.cloudflare.com/emdash-cms-plugin-registry/), [upstream project](https://github.com/emdash-cms/emdash).
 
 ## Start one CMS site
 
 Use Node 24 + pnpm in a new project directory:
 
 ```bash
-pnpm create emdash@1.4.0
+pnpm create emdash@1.5.0
 ```
 
 Choose **Cloudflare**, the appropriate starter/theme, and **pnpm**. Review generated package versions, scripts, ignored local files and bindings before starting development. For an existing Astro site, follow the [integration guide](https://docs.emdashcms.com/existing-project/) instead of replacing its theme. [Scaffolder](https://docs.emdashcms.com/getting-started/).
+
+**EmDash 1.5 fixes D1 backups and snapshots for large sites.** EmDash 1.4 backups and snapshots failed on D1 sites approaching the 50 MB limit (introduced 4 Nov 2024). EmDash 1.5 uses streaming exports to avoid the limit. Upgrade from 1.4 if your site hits backup failures.
 
 The target is one **Astro SSR Worker**, **D1** content and **R2** media. Use `@astrojs/cloudflare`, React for the admin, `emdash/astro`, and the D1/R2 adapters from `@emdash-cms/cloudflare`. Preserve the upstream Worker entry point and scheduled handler/cron for scheduled publishing and maintenance. Set the current compatibility date and Workers Observability. Omit the plugin sandbox runner/`LOADER` binding until sandboxed plugins are needed. [Cloudflare configuration](https://docs.emdashcms.com/deployment/cloudflare/).
 
@@ -26,6 +28,14 @@ The template currently uses Wrangler and may provision named D1/R2 resources on 
 
 Review core migration mode before a production release: the template's `auto` mode applies pending migrations on the first request. Use the supported controlled migration workflow so approved migrations and a recovery point precede new traffic; record the release policy in project `STACK.md`. [Core migrations](https://docs.emdashcms.com/deployment/core-migrations/).
 
+### Upgrading to EmDash 1.5
+
+**ctx.kv migration:** EmDash 1.5 moves internal KV state (plugin persistence) from D1 to Workers KV. When upgrading from 1.4 or earlier, run a **coordinated migration** as a one-time operator action. Do not use `auto` mode for this upgrade; schedule the migration during a maintenance window and verify state transfer before returning to traffic. Existing plugin data stays accessible during the migration. [Migration guide](https://docs.emdashcms.com/deployment/core-migrations/).
+
+**Type checks:** EmDash 1.5 adds stricter TypeScript checks on `emdash()` configuration options and `.astro` component props. Unknown options and props now fail at type-check time. Review `astro check` output after upgrading and remove unrecognized keys or fix typos. This prevents silent config/prop errors.
+
+**Co-editing (not recommended for client sites):** EmDash 1.5 introduces experimental collaborative editing (`coEditing`, off by default, requires the `EMDASH_ROOMS` Durable Object binding). It is not recommended for client sites yet: the feature is early-stage, adds billing and state complexity, and the Fenod CMS pilot does not cover it. Keep `coEditing` disabled until a project-specific multi-user editing trigger exists and a tested rollback/recovery path is documented.
+
 ## Give clients a supported editing workflow
 
 Developers own Astro templates, content fields and allowed blocks/sections. Clients edit text, images, metadata and agreed page sections through `/_emdash/admin/`. Define the editable model with the client; the CMS does not grant arbitrary control over application code or layouts. Preserve the existing [metadata, JSON-LD and image practices](astro.md) at the CMS input/rendering boundary. [Themes](https://docs.emdashcms.com/themes/creating-themes/), [sections](https://docs.emdashcms.com/guides/sections/).
@@ -34,7 +44,7 @@ For R2 images, use EmDash's supported image component/endpoint and verify the ge
 
 ### Trim the admin nav for clients
 
-EmDash 1.4 adds the `hiddenNavItems` configuration option to simplify the admin UI for client users. Pass an array of nav item keys to hide:
+EmDash 1.4+ adds the `hiddenNavItems` configuration option to simplify the admin UI for client users. Pass an array of nav item keys to hide:
 
 ```typescript
 hiddenNavItems: ["settings", "plugins"]

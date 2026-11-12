@@ -456,9 +456,13 @@ Optional `cf` beta resource commands can coexist with Wrangler, but use separate
 
 Static Astro remains the default for developer-maintained content. For direct client edits, prefer the [Astro + EmDash candidate](astro-emdash.md) with SSR, D1 and R2; it still needs a Fenod pilot. CMS internals keep their supported database/auth adapters. Access auth protects `/_emdash/*`, including the API, and is an exclusive production login mode; CMS roles still apply. SSR publishing avoids rebuilds only when the page reads published content at request time and caches follow the update policy. Prerendered routes still need a rebuild.
 
-EmDash 1.4 requires plugin `ctx.*` calls to be awaited: `await ctx.getUser()`, `await ctx.storage.get()`. Not awaiting them will fail at runtime. This applies to all plugin context methods that access async resources.
+EmDash 1.4+ requires plugin `ctx.*` calls to be awaited: `await ctx.getUser()`, `await ctx.storage.get()`. Not awaiting them will fail at runtime. This applies to all plugin context methods that access async resources.
 
-EmDash 1.4 removed the implicit `no-cache` header on CMS pages. Set an explicit `Cache-Control` with a bounded TTL so published content is not stale in browser caches. See the [CMS recipe](astro-emdash.md).
+EmDash 1.4+ removed the implicit `no-cache` header on CMS pages. Set an explicit `Cache-Control` with a bounded TTL so published content is not stale in browser caches. See the [CMS recipe](astro-emdash.md).
+
+EmDash 1.5 adds stricter TypeScript checks on `emdash()` options and `.astro` props. Unknown config keys or component props now fail `astro check`. Review type errors after upgrading and remove typos or unrecognized options.
+
+EmDash 1.5 moves plugin KV state from D1 to Workers KV. When upgrading from 1.4 or earlier, run the coordinated ctx.kv migration during a maintenance window. Do not use auto mode for this upgrade. See the [CMS recipe](astro-emdash.md).
 
 ## Cloudflare Token Scope
 
